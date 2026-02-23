@@ -19,3 +19,6 @@
 ## Update (2026-03-09T09:45:54)
 - feat: add support for pagination in API
 
+## Update (2026-02-23T09:45:54)
+- test: add unit tests for utility functions
+
