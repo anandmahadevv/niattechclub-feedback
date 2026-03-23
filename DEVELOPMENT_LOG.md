@@ -13,3 +13,6 @@
 ## Update (2026-04-06T09:45:54)
 - fix: resolve edge case in user authentication
 
+## Update (2026-03-23T09:45:54)
+- test: improve coverage for core logic
+
