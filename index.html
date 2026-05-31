@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIAT Tech Club - Event Ideas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#2563eb', // blue-600
+                        secondary: '#4f46e5', // indigo-600
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            /* Simple white to light gray gradient */
+            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+            min-height: 100vh;
+            color: #1f2937;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        .input-field {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: white;
+        }
+
+        /* Custom Radio */
+        .custom-radio {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            display: inline-grid;
+            place-content: center;
+            margin-right: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .custom-radio::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 10px 10px #2563eb;
+        }
+
+        .custom-radio:checked {
+            border-color: #2563eb;
+        }
+
+        .custom-radio:checked::before {
+            transform: scale(1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(to right, #2563eb, #4f46e5);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+</head>
+<body class="antialiased py-12 px-4 flex items-center justify-center">
+
+    <div class="w-full max-w-3xl form-card p-8 md:p-12 relative overflow-hidden">
+        
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <img src="logo.png" alt="NIAT Tech Club" class="mx-auto h-28 md:h-40 object-contain mb-6 mix-blend-multiply">
+            <h1 class="text-3xl font-bold text-red-700 tracking-tight mb-2">NIAT Tech Club Mangaluru</h1>
+            <p class="text-gray-500 max-w-lg mx-auto">Please share your vision and ideas for upcoming events so we can improve and together make it successful</p>
+        </div>
+
+        <!-- Form -->
+        <form id="ideaForm" class="space-y-6" onsubmit="submitForm(event)">
+            
+            <!-- Name -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2" for="name">Name <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <select id="name" name="name" required class="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 appearance-none cursor-pointer">
+                        <option value="" disabled selected>Select your name...</option>
+                        <option value="DINESH A">DINESH A</option>
+                        <option value="Divya">Divya</option>
+                        <option value="Anand M">Anand M</option>
+                        <option value="Darshan Dharmar">Darshan Dharmar</option>
+                        <option value="Dhanush Shenoy H">Dhanush Shenoy H</option>
+                        <option value="Raza Abbas Rizwan Haider Rizvi">Raza Abbas Rizwan Haider Rizvi</option>
+                        <option value="Lin Joel Pais">Lin Joel Pais</option>
+                        <option value="Akshay Krishna">Akshay Krishna</option>
+                        <option value="Prathik BG">Prathik BG</option>
+                        <option value="Madhu K M">Madhu K M</option>
+                        <option value="Ajmeera Tharun">Ajmeera Tharun</option>
+                        <option value="G R HARSHA">G R HARSHA</option>
+                        <option value="Nidhi Deepak Shetty">Nidhi Deepak Shetty</option>
+                        <option value="Ajay s m">Ajay s m</option>
+                        <option value="Sangam J K">Sangam J K</option>
+                        <option value="K K V N Saiteja">K K V N Saiteja</option>
+                        <option value="Muhammed sufail M M">Muhammed sufail M M</option>
+                        <option value="Nishan V">Nishan V</option>
+                        <option value="Samarth Shetty">Samarth Shetty</option>
+                        <option value="Yashas Y">Yashas Y</option>
+                        <option value="Surya Narayana c k">Surya Narayana c k</option>
+                        <option value="Deekshith k R">Deekshith k R</option>
+                        <option value="Bindu S H">Bindu S H</option>
+                        <option value="Punyashree Y">Punyashree Y</option>
+                        <option value="Ananya Laxman Naik">Ananya Laxman Naik</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2" for="category">Category <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <select id="category" name="category" required class="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 appearance-none cursor-pointer">
+                        <option value="" disabled selected>Select a category...</option>
+                        <option value="workshop">Workshop Request</option>
+                        <option value="event">Event Suggestion</option>
+                        <option value="suggestion">General Suggestion</option>
+                        <option value="project">Project Proposal</option>
+                        <option value="other">Other Innovative Idea</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Idea Text Area -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2" for="idea">Your Idea <span class="text-red-500">*</span></label>
+                <textarea id="idea" name="idea" required rows="5" class="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 resize-none" placeholder="Describe your idea in detail..."></textarea>
+            </div>
+
+            <!-- Project Showcase -->
+            <div class="bg-blue-50/50 p-5 rounded-xl border border-blue-100">
+                <label class="block text-sm font-semibold text-blue-800 mb-1" for="projects">
+                    <i class="fas fa-star text-yellow-500 mr-1"></i> We will showcase your projects! <span class="text-blue-600/70 font-normal ml-1">(Optional)</span>
+                </label>
+                <p class="text-xs text-blue-600 mb-3">Please tell us about any projects you've built (share links or descriptions).</p>
+                <textarea id="projects" name="projects" rows="3" class="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 resize-none bg-white" placeholder="e.g., I built a weather app (github.com/link)..."></textarea>
+            </div>
+
+            <!-- Technical Support -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Do you need any technical support for your project or idea? <span class="text-red-500">*</span></label>
+                <div class="flex gap-8">
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="radio" name="tech_support" value="yes" required class="custom-radio">
+                        <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Yes, I need support.</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="radio" name="tech_support" value="no" required class="custom-radio">
+                        <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">No, I'm good.</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button type="submit" id="submitBtn" class="w-full submit-btn text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2">
+                    <span>Submit Idea</span>
+                    <i class="fas fa-paper-plane text-sm"></i>
+                </button>
+            </div>
+            
+            <!-- Status Message -->
+            <div id="statusMessage" class="hidden text-center mt-4 p-4 rounded-xl text-sm font-medium transition-all"></div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('niat_form_submitted') === 'true') {
+                const form = document.getElementById('ideaForm');
+                const status = document.getElementById('statusMessage');
+                
+                Array.from(form.children).forEach(child => {
+                    if (child.id !== 'statusMessage') {
+                        child.style.display = 'none';
+                    }
+                });
+                
+                status.innerHTML = '<i class="fas fa-check-circle text-2xl mb-2 block"></i>You have already submitted an idea! Thank you.';
+                status.className = 'block text-center p-8 rounded-xl text-lg font-medium bg-blue-50 text-blue-700 border border-blue-200';
+            }
+        });
+
+        async function submitForm(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('statusMessage');
+            const btnText = btn.querySelector('span');
+            const btnIcon = btn.querySelector('i');
+            const form = document.getElementById('ideaForm');
+            
+            // Loading State
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            btnText.textContent = 'Submitting...';
+            btnIcon.className = 'fas fa-circle-notch fa-spin text-sm';
+
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('https://formspree.io/f/xdajvbdp', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    // Mark as submitted locally
+                    localStorage.setItem('niat_form_submitted', 'true');
+                    
+                    // Success State
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    btn.style.background = '#10b981'; // emerald-500
+                    
+                    btnText.textContent = 'Submitted Successfully!';
+                    btnIcon.className = 'fas fa-check text-sm';
+                    
+                    status.innerHTML = '<i class="fas fa-check-circle text-2xl mb-2 block"></i>Thank you! Your idea has been received.';
+                    status.className = 'block text-center mt-4 p-8 rounded-xl text-lg font-medium transition-all bg-emerald-50 text-emerald-700 border border-emerald-200';
+                    
+                    // Hide other form fields nicely after a short delay
+                    setTimeout(() => {
+                        Array.from(form.children).forEach(child => {
+                            if (child.id !== 'statusMessage') {
+                                child.style.display = 'none';
+                            }
+                        });
+                        status.classList.remove('mt-4');
+                    }, 1500);
+                    
+                } else {
+                    throw new Error('Form submission failed');
+                }
+            } catch (error) {
+                // Error State
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                btnText.textContent = 'Submit Idea';
+                btnIcon.className = 'fas fa-paper-plane text-sm';
+                
+                status.textContent = 'Oops! There was a problem submitting your form.';
+                status.className = 'block text-center mt-4 p-4 rounded-xl text-sm font-medium transition-all bg-red-50 text-red-700 border border-red-200';
+            }
+        }
+    </script>
+</body>
+</html>
