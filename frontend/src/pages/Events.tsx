@@ -55,7 +55,7 @@ export default function Events() {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-gray-900">Anand Mahadev</p>
-                      <p className="text-xs text-gray-500">SDE Intern @BlueStock Media, Head @YenTech</p>
+                      <p className="text-xs text-gray-500">SDE Intern @BlueStock, Media Head @YenTech and Google Student Ambassador</p>
                     </div>
                   </div>
                 </div>
