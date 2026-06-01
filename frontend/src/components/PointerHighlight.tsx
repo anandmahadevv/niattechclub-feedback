@@ -1,7 +1,6 @@
-"use client";
-import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
+import { cn } from "../lib/utils";
 
 export function PointerHighlight({
   children,
