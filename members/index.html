@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet the Members - NIAT Tech Club</title>
+    <link rel="icon" type="image/png" href="../logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+            color: #111827;
+        }
+
+        .member-card {
+            background: #ffffff;
+            border: 1px solid rgba(229, 231, 235, 0.5);
+            border-radius: 16px;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: rgba(229, 231, 235, 1);
+        }
+        
+        .avatar-gradient {
+            background: linear-gradient(135deg, #fca5a5 0%, #b91c1c 100%);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans pb-20 flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="../logo.png" alt="NIAT Tech Club" class="h-10 object-contain mix-blend-multiply">
+                <span class="font-bold tracking-tight text-gray-900 hidden sm:block">NIAT Tech Club</span>
+            </div>
+            <div class="flex items-center gap-6 text-sm font-medium text-gray-500">
+                <a href="/" class="hover:text-red-700 transition-colors"><i class="fas fa-lightbulb mr-1.5"></i> Submit Ideas</a>
+                <a href="/showcase" class="hover:text-red-700 transition-colors"><i class="fas fa-trophy mr-1.5"></i> Showcase</a>
+                <a href="/members" class="text-red-700 font-semibold"><i class="fas fa-users mr-1.5"></i> Members</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section (Uniform size) -->
+    <header class="max-w-6xl mx-auto px-6 pt-16 pb-12 text-center w-full">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">Meet the 2025-26 Team</h1>
+        <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">The brilliant minds driving innovation and technology at NIAT Tech Club.</p>
+    </header>
+
+    <!-- Members Grid -->
+    <main class="max-w-6xl mx-auto px-6 w-full flex-grow">
+        <!-- Leadership -->
+        <div id="leadership-grid" class="flex flex-col md:flex-row justify-center gap-6 mb-12">
+            <!-- Leadership injected by JS -->
+        </div>
+
+        <!-- Members -->
+        <div id="members-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <!-- Members injected by JS -->
+        </div>
+    </main>
+
+    <script>
+        const members = [
+            "DINESH A", "Divya", "Anand M", "Darshan Dharmar", "Dhanush Shenoy H", 
+            "Raza Abbas Rizwan Haider Rizvi", "Lin Joel Pais", "Akshay Krishna", "Prathik BG", 
+            "Madhu K M", "Ajmeera Tharun", "G R HARSHA", "Nidhi Deepak Shetty", "Ajay s m", 
+            "Sangam J K", "K K V N Saiteja", "Muhammed sufail M M", "Nishan V", "Samarth Shetty", 
+            "Yashas Y", "Surya Narayana c k", "Deekshith k R", "Bindu S H", "Punyashree Y", 
+            "Ananya Laxman Naik"
+        ];
+
+        const membersGrid = document.getElementById('members-grid');
+        const leadershipGrid = document.getElementById('leadership-grid');
+
+        members.forEach(name => {
+            // Create initials (e.g. "Anand M" -> "AM")
+            const parts = name.trim().split(' ');
+            let initials = parts[0].charAt(0).toUpperCase();
+            if (parts.length > 1) {
+                initials += parts[parts.length - 1].charAt(0).toUpperCase();
+            }
+            
+            let roleHtml = `<p class="text-xs text-red-600 font-semibold mt-2 uppercase tracking-wide">Member</p>`;
+            let isLeadership = false;
+
+            if (name === "DINESH A") {
+                roleHtml = `<p class="text-xs text-amber-500 font-bold mt-2 uppercase tracking-wide"><i class="fas fa-crown mr-1"></i> President</p>`;
+                isLeadership = true;
+            } else if (name === "Divya") {
+                roleHtml = `<p class="text-xs text-blue-600 font-bold mt-2 uppercase tracking-wide"><i class="fas fa-star mr-1"></i> Vice President</p>`;
+                isLeadership = true;
+            }
+
+            const card = document.createElement('div');
+            
+            if (isLeadership) {
+                card.className = 'member-card p-8 flex flex-col items-center text-center w-full md:w-80 shadow-lg border-2 border-red-50';
+                card.innerHTML = `
+                    <div class="w-24 h-24 rounded-full avatar-gradient text-white flex items-center justify-center text-3xl font-bold mb-4 shadow-md ring-4 ring-red-50">
+                        ${initials}
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 leading-tight">${name}</h3>
+                    ${roleHtml}
+                `;
+                leadershipGrid.appendChild(card);
+            } else {
+                card.className = 'member-card p-6 flex flex-col items-center text-center';
+                card.innerHTML = `
+                    <div class="w-16 h-16 rounded-full avatar-gradient text-white flex items-center justify-center text-xl font-bold mb-4 shadow-md">
+                        ${initials}
+                    </div>
+                    <h3 class="font-bold text-gray-900 leading-tight">${name}</h3>
+                    ${roleHtml}
+                `;
+                membersGrid.appendChild(card);
+            }
+        });
+    </script>
+</body>
+</html>

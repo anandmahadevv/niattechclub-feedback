@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NIAT Tech Club - Event Ideas</title>
+    <link rel="icon" type="image/png" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -93,16 +94,31 @@
         }
     </style>
 </head>
-<body class="antialiased py-12 px-4 flex items-center justify-center">
+<body class="antialiased flex flex-col min-h-screen">
 
-    <div class="w-full max-w-3xl form-card p-8 md:p-12 relative overflow-hidden">
-        
-        <!-- Header -->
-        <div class="text-center mb-10">
-            <img src="logo.png" alt="NIAT Tech Club" class="mx-auto h-28 md:h-40 object-contain mb-6 mix-blend-multiply">
-            <h1 class="text-3xl font-bold text-red-700 tracking-tight mb-2">NIAT Tech Club Mangaluru</h1>
-            <p class="text-gray-500 max-w-lg mx-auto">Please share your vision and ideas for upcoming events so we can improve and together make it successful</p>
+    <!-- Navbar -->
+    <nav class="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="NIAT Tech Club" class="h-10 object-contain mix-blend-multiply">
+                <span class="font-bold tracking-tight text-gray-900 hidden sm:block">NIAT Tech Club</span>
+            </div>
+            <div class="flex items-center gap-6 text-sm font-medium text-gray-500">
+                <a href="/" class="text-red-700 font-semibold"><i class="fas fa-lightbulb mr-1.5"></i> Submit Ideas</a>
+                <a href="/showcase" class="hover:text-red-700 transition-colors"><i class="fas fa-trophy mr-1.5"></i> Showcase</a>
+                <a href="/members" class="hover:text-red-700 transition-colors"><i class="fas fa-users mr-1.5"></i> Members</a>
+            </div>
         </div>
+    </nav>
+
+    <!-- Header Section (Uniform size) -->
+    <header class="max-w-6xl mx-auto px-6 pt-16 pb-12 text-center w-full">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">Event Ideas</h1>
+        <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">Please share your vision and ideas for upcoming events so we can improve and together make it successful.</p>
+    </header>
+
+    <div class="flex-grow flex items-start justify-center pb-12 px-4 w-full">
+        <div class="w-full max-w-3xl form-card p-8 md:p-12 relative overflow-hidden">
 
         <!-- Form -->
         <form id="ideaForm" class="space-y-6" onsubmit="submitForm(event)">
@@ -205,23 +221,36 @@
             <div id="statusMessage" class="hidden text-center mt-4 p-4 rounded-xl text-sm font-medium transition-all"></div>
         </form>
     </div>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('niat_form_submitted') === 'true') {
-                const form = document.getElementById('ideaForm');
-                const status = document.getElementById('statusMessage');
-                
-                Array.from(form.children).forEach(child => {
-                    if (child.id !== 'statusMessage') {
-                        child.style.display = 'none';
-                    }
-                });
-                
-                status.innerHTML = '<i class="fas fa-check-circle text-2xl mb-2 block"></i>You have already submitted an idea! Thank you.';
-                status.className = 'block text-center p-8 rounded-xl text-lg font-medium bg-blue-50 text-blue-700 border border-blue-200';
-            }
-        });
+        function fillAgain() {
+            const form = document.getElementById('ideaForm');
+            const status = document.getElementById('statusMessage');
+            const btn = document.getElementById('submitBtn');
+            const btnText = btn.querySelector('span');
+            const btnIcon = btn.querySelector('i');
+
+            // Reset the form values
+            form.reset();
+
+            // Unhide the form fields
+            Array.from(form.children).forEach(child => {
+                if (child.id !== 'statusMessage') {
+                    child.style.display = '';
+                }
+            });
+
+            // Reset the submit button
+            btn.disabled = false;
+            btn.style.background = '';
+            btnText.textContent = 'Submit Idea';
+            btnIcon.className = 'fas fa-paper-plane text-sm';
+
+            // Hide the status message box
+            status.classList.add('hidden');
+            status.classList.remove('block');
+        }
 
         async function submitForm(e) {
             e.preventDefault();
@@ -250,9 +279,6 @@
                 });
                 
                 if (response.ok) {
-                    // Mark as submitted locally
-                    localStorage.setItem('niat_form_submitted', 'true');
-                    
                     // Success State
                     btn.classList.remove('opacity-75', 'cursor-not-allowed');
                     btn.style.background = '#10b981'; // emerald-500
@@ -260,7 +286,7 @@
                     btnText.textContent = 'Submitted Successfully!';
                     btnIcon.className = 'fas fa-check text-sm';
                     
-                    status.innerHTML = '<i class="fas fa-check-circle text-2xl mb-2 block"></i>Thank you! Your idea has been received.';
+                    status.innerHTML = '<i class="fas fa-check-circle text-2xl mb-2 block"></i>Thank you! Your idea has been received.<br><button type="button" onclick="fillAgain()" class="mt-4 text-sm underline text-emerald-600 hover:text-emerald-800 font-semibold">Submit Another Idea</button>';
                     status.className = 'block text-center mt-4 p-8 rounded-xl text-lg font-medium transition-all bg-emerald-50 text-emerald-700 border border-emerald-200';
                     
                     // Hide other form fields nicely after a short delay
