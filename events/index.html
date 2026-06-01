@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Events - NIAT Tech Club</title>
+    <link rel="icon" type="image/png" href="../logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#b91c1c', // red-700
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            color: #111827;
+        }
+
+        .event-card {
+            background: #ffffff;
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: rgba(229, 231, 235, 1);
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="antialiased font-sans flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full">
+        <div class="mx-auto px-6 md:px-20 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="../logo.png" alt="NIAT Tech Club" class="h-10 object-contain mix-blend-multiply">
+                <span class="font-bold tracking-tight text-gray-900 hidden md:block">NIAT Tech Club</span>
+            </div>
+            <div class="flex items-center gap-4 md:gap-6 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar">
+                <a href="../" class="hover:text-red-700 transition-colors">Home</a>
+                <a href="./" class="text-red-700 font-semibold">Events</a>
+                <a href="../showcase/" class="hover:text-red-700 transition-colors">Showcase</a>
+                <a href="../members/" class="hover:text-red-700 transition-colors">Members</a>
+                <a href="../ideas/" class="hover:text-red-700 transition-colors"><i class="fas fa-lightbulb mr-1.5"></i> Ideas</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section (Uniform size) -->
+    <header class="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center w-full">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">Upcoming Events</h1>
+        <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">Join us for our latest workshops, hackathons, and community meetups.</p>
+    </header>
+
+    <!-- Events Content -->
+    <main class="max-w-5xl mx-auto px-6 w-full flex-grow pb-20">
+        
+        <div class="space-y-6">
+            
+            <!-- Event 1 -->
+            <div class="event-card p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start md:items-center relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-red-700"></div>
+                
+                <div class="flex-shrink-0 text-center bg-red-50 rounded-xl p-4 w-24 border border-red-100">
+                    <span class="block text-red-700 font-bold text-sm uppercase tracking-wide">Oct</span>
+                    <span class="block text-3xl font-extrabold text-gray-900 mt-1">15</span>
+                </div>
+                
+                <div class="flex-grow">
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <span class="px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-semibold">Workshop</span>
+                        <span class="px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-medium"><i class="far fa-clock mr-1"></i> 10:00 AM - 1:00 PM</span>
+                        <span class="px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-medium"><i class="fas fa-map-marker-alt mr-1"></i> Lab 3</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-red-700 transition-colors">Intro to Web Development</h2>
+                    <p class="text-gray-500 text-sm leading-relaxed">Learn the fundamentals of HTML, CSS, and vanilla JavaScript in this hands-on workshop led by our senior members.</p>
+                </div>
+                
+                <div class="flex-shrink-0 mt-4 md:mt-0 w-full md:w-auto">
+                    <button class="w-full md:w-auto bg-gray-900 hover:bg-black text-white font-semibold py-2.5 px-6 rounded-lg transition-colors">
+                        RSVP Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Event 2 -->
+            <div class="event-card p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start md:items-center relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
+                
+                <div class="flex-shrink-0 text-center bg-indigo-50 rounded-xl p-4 w-24 border border-indigo-100">
+                    <span class="block text-indigo-700 font-bold text-sm uppercase tracking-wide">Nov</span>
+                    <span class="block text-3xl font-extrabold text-gray-900 mt-1">02</span>
+                </div>
+                
+                <div class="flex-grow">
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold">Hackathon</span>
+                        <span class="px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-medium"><i class="far fa-clock mr-1"></i> 9:00 AM (24 Hours)</span>
+                        <span class="px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-medium"><i class="fas fa-map-marker-alt mr-1"></i> Main Auditorium</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">InnovateHack 2026</h2>
+                    <p class="text-gray-500 text-sm leading-relaxed">Our flagship 24-hour hackathon. Form teams, build incredible solutions, and win exciting prizes sponsored by our tech partners.</p>
+                </div>
+                
+                <div class="flex-shrink-0 mt-4 md:mt-0 w-full md:w-auto">
+                    <button class="w-full md:w-auto bg-gray-900 hover:bg-black text-white font-semibold py-2.5 px-6 rounded-lg transition-colors">
+                        Register Team
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Past Events Section -->
+        <div class="mt-20">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-4">Past Events</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Past Event 1 -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-6 relative overflow-hidden flex flex-col opacity-80 hover:opacity-100 transition-opacity">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 text-xs font-semibold">Workshop</span>
+                        <span class="px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold flex items-center gap-1">
+                            <i class="fas fa-check-circle"></i> Completed
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Introduction to UI/UX Design</h3>
+                    <p class="text-gray-500 text-sm mb-4 flex-grow">A deep dive into Figma, user research, and wireframing for beginners.</p>
+                    <div class="text-gray-400 text-xs font-medium flex items-center gap-2">
+                        <i class="far fa-calendar-alt"></i> September 12, 2025
+                    </div>
+                </div>
+
+                <!-- Past Event 2 -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-6 relative overflow-hidden flex flex-col opacity-80 hover:opacity-100 transition-opacity">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 text-xs font-semibold">Seminar</span>
+                        <span class="px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold flex items-center gap-1">
+                            <i class="fas fa-check-circle"></i> Completed
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">AI in the Real World</h3>
+                    <p class="text-gray-500 text-sm mb-4 flex-grow">Guest lecture by industry experts on the practical applications of Machine Learning and GenAI.</p>
+                    <div class="text-gray-400 text-xs font-medium flex items-center gap-2">
+                        <i class="far fa-calendar-alt"></i> August 28, 2025
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="mt-12 text-center">
+            <div class="inline-flex items-center justify-center p-6 bg-gray-50 rounded-2xl border border-gray-200 border-dashed w-full">
+                <div>
+                    <i class="far fa-lightbulb text-3xl text-yellow-500 mb-3"></i>
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">Have an idea for an event?</h3>
+                    <p class="text-gray-500 text-sm mb-4">We are always looking for new workshop topics or guest speakers.</p>
+                    <a href="../ideas/" class="inline-flex items-center justify-center bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
+                        Submit an Idea <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="bg-gray-50 border-t border-gray-200 py-12 mt-auto w-full">
+        <div class="mx-auto px-6 md:px-20 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <img src="../photo.png" alt="NIAT Tech Club" class="h-8 object-contain mix-blend-multiply opacity-50 grayscale hover:grayscale-0 transition-all">
+                <span class="text-gray-400 font-semibold text-sm">© 2026 NIAT Tech Club</span>
+            </div>
+            <div class="flex items-center gap-6 text-gray-400 text-xl">
+                <a href="#" class="hover:text-indigo-500 transition-colors" title="Discord"><i class="fab fa-discord"></i></a>
+                <a href="#" class="hover:text-pink-500 transition-colors" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="hover:text-blue-700 transition-colors" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="hover:text-gray-900 transition-colors" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
