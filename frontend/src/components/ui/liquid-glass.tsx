@@ -72,17 +72,26 @@ const GlassEffect: React.FC<GlassEffectProps> = ({
 };
 
 // Dock Component
-export const GlassDock: React.FC<{ children: React.ReactNode; href?: string; className?: string }> = ({
+export const GlassDock: React.FC<{ children?: React.ReactNode; href?: string; className?: string; icons?: DockIcon[] }> = ({
   children,
   href,
-  className = ""
+  className = "",
+  icons
 }) => (
   <GlassEffect
     href={href}
     className={`rounded-3xl p-3 hover:p-4 hover:rounded-4xl ${className}`}
   >
     <div className="flex items-center justify-center gap-4 rounded-3xl p-2 py-0 overflow-hidden">
-      {children}
+      {icons ? icons.map((icon, idx) => (
+        <img 
+          key={idx} 
+          src={icon.src} 
+          alt={icon.alt} 
+          onClick={icon.onClick}
+          className="w-12 h-12 rounded-2xl object-cover hover:scale-110 transition-transform cursor-pointer"
+        />
+      )) : children}
     </div>
   </GlassEffect>
 );
