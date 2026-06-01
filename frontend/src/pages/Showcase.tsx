@@ -2,6 +2,7 @@ import { useState } from "react";
 import Tilt from "react-parallax-tilt";
 import { toast } from "sonner";
 import { useAdminData } from "../hooks/useAdminData";
+import ReactMarkdown from "react-markdown";
 
 export default function Showcase() {
   const [isOpen, setIsOpen] = useState(false);
@@ -110,7 +111,23 @@ export default function Showcase() {
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">{project.project_title}</h3>
                     <p className="text-sm font-semibold text-gray-500">By {project.name}</p>
                   </div>
-                  <p className="text-gray-600 text-base leading-relaxed mb-8 flex-grow">{project.description}</p>
+                  <div className="text-gray-600 text-base leading-relaxed mb-8 flex-grow overflow-hidden">
+                    <ReactMarkdown 
+                      components={{
+                        p: ({node, ...props}) => <p className="mb-4 last:mb-0" {...props} />,
+                        a: ({node, ...props}) => <a className="text-red-600 hover:text-red-800 underline" target="_blank" rel="noreferrer" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc list-inside mb-4" {...props} />,
+                        ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-4" {...props} />,
+                        li: ({node, ...props}) => <li className="mb-1" {...props} />,
+                        h1: ({node, ...props}) => <h1 className="text-xl font-bold mb-2 mt-4 text-gray-900" {...props} />,
+                        h2: ({node, ...props}) => <h2 className="text-lg font-bold mb-2 mt-4 text-gray-900" {...props} />,
+                        h3: ({node, ...props}) => <h3 className="text-md font-bold mb-2 mt-3 text-gray-900" {...props} />,
+                        strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+                      }}
+                    >
+                      {project.description}
+                    </ReactMarkdown>
+                  </div>
                   <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
                     <div className="flex flex-wrap gap-2">
                       {project.tags.split(',').map((tag, idx) => (
@@ -193,8 +210,11 @@ export default function Showcase() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="description">
+                    Project Description <span className="text-gray-400 font-normal">(Markdown supported)</span> <span className="text-red-500">*</span>
+                  </label>
                   <textarea
+                    id="description"
                     name="description"
                     required
                     rows={3}
