@@ -41,10 +41,10 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Link
-                to="/showcase"
+                to="/events"
                 className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white font-semibold py-4 px-8 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-red-700/20"
               >
-                View Projects <i className="fas fa-arrow-right text-sm"></i>
+                View Events <i className="fas fa-arrow-right text-sm"></i>
               </Link>
               <Link
                 to="/ideas"
