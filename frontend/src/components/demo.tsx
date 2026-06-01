@@ -1,5 +1,7 @@
-import ButtonWithIconDemo from "@/components/ui/button-witn-icon";
+import { Component } from "@/components/ui/liquid-glass";
 
-export default function DemoOne() {
-  return <ButtonWithIconDemo />;
-}
+const DemoOne = () => {
+  return <Component />;
+};
+
+export { DemoOne };

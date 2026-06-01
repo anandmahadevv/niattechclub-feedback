@@ -1,4 +1,6 @@
 import { useState } from "react";
+import Tilt from "react-parallax-tilt";
+import { toast } from "sonner";
 
 export default function Showcase() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,14 +11,10 @@ export default function Showcase() {
     tags: "",
     link: "",
   });
-  const [status, setStatus] = useState<{
-    type: "idle" | "loading" | "success" | "error";
-    message: string;
-  }>({ type: "idle", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const openModal = () => {
     setIsOpen(true);
-    setStatus({ type: "idle", message: "" });
   };
 
   const closeModal = () => {
@@ -37,7 +35,8 @@ export default function Showcase() {
 
   const submitProjectForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus({ type: "loading", message: "Submitting..." });
+    setIsSubmitting(true);
+    const toastId = toast.loading("Submitting your project...");
 
     const submissionData = new FormData();
     submissionData.append("form_type", "Project Showcase Submission");
@@ -57,18 +56,22 @@ export default function Showcase() {
       });
 
       if (response.ok) {
-        setStatus({
-          type: "success",
-          message: "Thank you! Your project has been submitted for review.",
+        toast.success("Thank you! Your project has been submitted for review.", { id: toastId });
+        // Reset form
+        setFormData({
+          name: "",
+          project_title: "",
+          description: "",
+          tags: "",
+          link: "",
         });
       } else {
         throw new Error("Form submission failed");
       }
     } catch (error) {
-      setStatus({
-        type: "error",
-        message: "Oops! There was a problem submitting your project.",
-      });
+      toast.error("Oops! There was a problem submitting your project.", { id: toastId });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -85,19 +88,21 @@ export default function Showcase() {
       {/* Projects Grid */}
       <main className="max-w-7xl mx-auto px-6 w-full flex-grow flex justify-center items-start">
         <div className="w-full max-w-md">
-          {/* Empty State / Add Project Card */}
-          <article
-            onClick={openModal}
-            className="project-card flex flex-col items-center justify-center h-[300px] border-dashed border-2 bg-transparent hover:bg-gray-50/50 cursor-pointer shadow-none hover:shadow-none hover:border-gray-300 group"
-          >
-            <div className="w-16 h-16 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-2xl mb-4 transition-transform group-hover:scale-110">
-              <i className="fas fa-plus"></i>
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Add Your Project</h3>
-            <p className="text-gray-500 text-sm text-center px-8">
-              Have you built something amazing? Submit your project to the club leads to be featured here!
-            </p>
-          </article>
+          {/* Empty State / Add Project Card with 3D Tilt */}
+          <Tilt tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.03} transitionSpeed={2000}>
+            <article
+              onClick={openModal}
+              className="project-card flex flex-col items-center justify-center h-[300px] border-dashed border-2 bg-white hover:bg-gray-50/80 cursor-pointer shadow-sm hover:shadow-xl hover:border-gray-300 group rounded-2xl transition-all"
+            >
+              <div className="w-16 h-16 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-2xl mb-4 transition-transform group-hover:scale-110">
+                <i className="fas fa-plus"></i>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Add Your Project</h3>
+              <p className="text-gray-500 text-sm text-center px-8">
+                Have you built something amazing? Submit your project to the club leads to be featured here!
+              </p>
+            </article>
+          </Tilt>
         </div>
       </main>
 
@@ -118,18 +123,6 @@ export default function Showcase() {
               <p className="text-gray-500 text-sm mt-1">Submit your work to be featured on the showcase page.</p>
             </div>
 
-            {status.type === "success" ? (
-              <div className="block text-center p-6 rounded-xl text-md font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <i className="fas fa-check-circle text-2xl mb-2 block"></i>
-                {status.message}
-                <button
-                  onClick={closeModal}
-                  className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-colors"
-                >
-                  Close Modal
-                </button>
-              </div>
-            ) : (
               <form onSubmit={submitProjectForm} className="space-y-4 text-left">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Your Name</label>
@@ -197,24 +190,17 @@ export default function Showcase() {
 
                 <button
                   type="submit"
-                  disabled={status.type === "loading"}
+                  disabled={isSubmitting}
                   className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-3 px-6 rounded-xl transition-colors mt-6 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
                 >
-                  <span>{status.type === "loading" ? "Submitting..." : "Submit Project"}</span>
+                  <span>{isSubmitting ? "Submitting..." : "Submit Project"}</span>
                   <i
                     className={
-                      status.type === "loading" ? "fas fa-circle-notch fa-spin text-sm" : "fas fa-paper-plane text-sm"
+                      isSubmitting ? "fas fa-circle-notch fa-spin text-sm" : "fas fa-paper-plane text-sm"
                     }
                   ></i>
                 </button>
-
-                {status.type === "error" && (
-                  <div className="block text-center mt-4 p-4 rounded-xl text-sm font-medium bg-red-50 text-red-700 border border-red-200">
-                    {status.message}
-                  </div>
-                )}
               </form>
-            )}
           </div>
         </div>
       )}

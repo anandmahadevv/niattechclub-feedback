@@ -1,4 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { AnimatePresence } from "motion/react";
+import { Toaster } from "sonner";
+import { PageWrapper } from "./components/PageWrapper";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -8,29 +11,40 @@ import Members from "./pages/Members";
 import Ideas from "./pages/Ideas";
 import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 
+function AppContent() {
+  const location = useLocation();
+  
+  return (
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900 font-sans antialiased">
+      <Toaster position="bottom-right" richColors />
+      {/* Navigation Bar */}
+      <Navbar />
+
+      <UpgradeBannerDemo />
+
+      {/* Dynamic Route Content with Transitions */}
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+          <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
+          <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
+          <Route path="/members" element={<PageWrapper><Members /></PageWrapper>} />
+          <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
+          {/* Catch-all route to redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AnimatePresence>
+
+      {/* Footer */}
+      <Footer />
+    </div>
+  );
+}
+
 function App() {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900 font-sans antialiased">
-        {/* Navigation Bar */}
-        <Navbar />
-
-        <UpgradeBannerDemo />
-
-        {/* Dynamic Route Content */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/showcase" element={<Showcase />} />
-          <Route path="/members" element={<Members />} />
-          <Route path="/ideas" element={<Ideas />} />
-          {/* Catch-all redirect to Home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-
-        {/* Footer */}
-        <Footer />
-      </div>
+      <AppContent />
     </Router>
   );
 }
