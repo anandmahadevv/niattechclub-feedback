@@ -6,26 +6,12 @@ import Events from "./pages/Events";
 import Showcase from "./pages/Showcase";
 import Members from "./pages/Members";
 import Ideas from "./pages/Ideas";
-import { Banner } from "@/components/ui/banner";
 import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 
 function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900 font-sans antialiased">
-        <Banner 
-          id="main-banner"
-          variant="rainbow"
-          rainbowColors={[
-            "rgba(255,255,255,1)",
-            "rgba(226,232,240,0.8)",
-            "rgba(241,245,249,0.9)",
-            "rgba(255,255,255,0.7)"
-          ]}
-          className="text-gray-900 border-b border-gray-200"
-        >
-          🚀 Welcome to the new Tech Club! Exciting features coming soon!
-        </Banner>
         {/* Navigation Bar */}
         <Navbar />
 
