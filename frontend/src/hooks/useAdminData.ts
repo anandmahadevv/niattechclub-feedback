@@ -55,7 +55,7 @@ export function useAdminData() {
           link: "https://Inkd.in/g7qWnZ7k", 
           date: "June 1, 2026", 
           status: "published",
-          imageUrl: "/images/hack-mate.gif" // User to drop image here
+          imageUrl: "/images/hackmate.png"
         },
         { 
           id: 2, 
