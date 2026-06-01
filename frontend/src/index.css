@@ -1,4 +1,23 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  --radius: 0.5rem;
+}
+
+.dark {
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@keyframes moveBackground {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% -1000%;
+  }
+}
+
 
 @theme {
   --font-sans: 'Inter', sans-serif;

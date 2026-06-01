@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner";
+import { useAdminData } from "../hooks/useAdminData";
 
 export default function Ideas() {
   const [formData, setFormData] = useState({
@@ -7,11 +9,7 @@ export default function Ideas() {
     idea: "",
     tech_support: "",
   });
-  const [status, setStatus] = useState<{
-    type: "idle" | "loading" | "success" | "error";
-    message: string;
-  }>({ type: "idle", message: "" });
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
@@ -30,12 +28,14 @@ export default function Ideas() {
       idea: "",
       tech_support: "",
     });
-    setStatus({ type: "idle", message: "" });
   };
+
+  const { addIdea } = useAdminData();
 
   const submitIdeaForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus({ type: "loading", message: "Submitting..." });
+    setIsSubmitting(true);
+    const toastId = toast.loading("Submitting your idea...");
 
     const submissionData = new FormData();
     submissionData.append("name", formData.name);
@@ -44,6 +44,14 @@ export default function Ideas() {
     submissionData.append("tech_support", formData.tech_support);
 
     try {
+      // Save locally for the Admin Dashboard
+      addIdea({
+        name: formData.name,
+        category: formData.category,
+        idea: formData.idea,
+        tech: formData.tech_support
+      });
+
       const response = await fetch("https://formspree.io/f/xdajvbdp", {
         method: "POST",
         body: submissionData,
@@ -53,18 +61,21 @@ export default function Ideas() {
       });
 
       if (response.ok) {
-        setStatus({
-          type: "success",
-          message: "Thank you! Your idea has been received.",
+        toast.success("Idea submitted successfully! We will review it shortly.", {
+          id: toastId,
         });
+        resetForm();
       } else {
-        throw new Error("Form submission failed");
+        toast.error("Failed to submit idea. Please try again.", {
+          id: toastId,
+        });
       }
     } catch (error) {
-      setStatus({
-        type: "error",
-        message: "Oops! There was a problem submitting your form.",
+      toast.error("An error occurred. Please check your connection.", {
+        id: toastId,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -81,20 +92,6 @@ export default function Ideas() {
       {/* Form Container */}
       <div className="flex-grow flex items-start justify-center px-4 w-full">
         <div className="w-full max-w-3xl form-card p-8 md:p-12 relative overflow-hidden">
-          {status.type === "success" ? (
-            <div className="block text-center p-8 rounded-xl text-lg font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <i className="fas fa-check-circle text-2xl mb-2 block"></i>
-              {status.message}
-              <br />
-              <button
-                type="button"
-                onClick={resetForm}
-                className="mt-4 text-sm underline text-emerald-600 hover:text-emerald-800 font-semibold"
-              >
-                Submit Another Idea
-              </button>
-            </div>
-          ) : (
             <form onSubmit={submitIdeaForm} className="space-y-6">
               {/* Name */}
               <div>
@@ -232,25 +229,18 @@ export default function Ideas() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  disabled={status.type === "loading"}
+                  disabled={isSubmitting}
                   className="w-full submit-btn text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
                 >
-                  <span>{status.type === "loading" ? "Submitting..." : "Submit Idea"}</span>
+                  <span>{isSubmitting ? "Submitting..." : "Submit Idea"}</span>
                   <i
                     className={
-                      status.type === "loading" ? "fas fa-circle-notch fa-spin text-sm" : "fas fa-paper-plane text-sm"
+                      isSubmitting ? "fas fa-circle-notch fa-spin text-sm" : "fas fa-paper-plane text-sm"
                     }
                   ></i>
                 </button>
               </div>
-
-              {status.type === "error" && (
-                <div className="block text-center mt-4 p-4 rounded-xl text-sm font-medium bg-red-50 text-red-700 border border-red-200">
-                  {status.message}
-                </div>
-              )}
             </form>
-          )}
         </div>
       </div>
     </div>
