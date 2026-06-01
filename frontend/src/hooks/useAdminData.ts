@@ -18,6 +18,7 @@ export interface Project {
   link: string;
   date: string;
   status: 'pending' | 'published';
+  imageUrl?: string;
 }
 
 export function useAdminData() {
@@ -45,7 +46,17 @@ export function useAdminData() {
     } else {
       // Default dummy data if empty
       const defaultProjects: Project[] = [
-        { id: 1, name: "Divya K", project_title: "Campus Navigator App", description: "An interactive map to help freshmen find their classrooms across the university campus.", tags: "React Native, Firebase", link: "https://github.com", date: "June 1, 2026", status: "published" }
+        { 
+          id: 1, 
+          name: "Divya K", 
+          project_title: "Campus Navigator App", 
+          description: "An interactive map to help freshmen find their classrooms across the university campus.", 
+          tags: "React Native, Firebase", 
+          link: "https://github.com", 
+          date: "June 1, 2026", 
+          status: "published",
+          imageUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800"
+        }
       ];
       setProjects(defaultProjects);
       localStorage.setItem("techclub_projects", JSON.stringify(defaultProjects));

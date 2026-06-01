@@ -12,6 +12,7 @@ export default function Showcase() {
     description: "",
     tags: "",
     link: "",
+    imageUrl: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,6 +28,7 @@ export default function Showcase() {
       description: "",
       tags: "",
       link: "",
+      imageUrl: "",
     });
   };
 
@@ -55,7 +57,8 @@ export default function Showcase() {
         project_title: formData.project_title,
         description: formData.description,
         tags: formData.tags,
-        link: formData.link
+        link: formData.link,
+        imageUrl: formData.imageUrl
       });
 
       const response = await fetch("https://formspree.io/f/xdajvbdp", {
@@ -94,23 +97,30 @@ export default function Showcase() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
           {projects.filter(p => (p.status || 'published') === 'published').map((project) => (
             <Tilt key={project.id} tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000} className="h-full">
-              <article className="project-card flex flex-col h-full bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl p-6 transition-all">
-                <div className="mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{project.project_title}</h3>
-                  <p className="text-sm font-semibold text-gray-500">By {project.name}</p>
-                </div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow">{project.description}</p>
-                <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.split(',').map((tag, idx) => (
-                      <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-semibold">{tag.trim()}</span>
-                    ))}
+              <article className="project-card flex flex-col h-full bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all">
+                {project.imageUrl && (
+                  <div className="w-full h-48 overflow-hidden bg-gray-100">
+                    <img src={project.imageUrl} alt={project.project_title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
                   </div>
-                  {project.link && (
-                    <a href={project.link} target="_blank" rel="noreferrer" className="text-red-600 hover:text-red-800 transition-colors">
-                      <i className="fas fa-external-link-alt"></i>
-                    </a>
-                  )}
+                )}
+                <div className="p-6 flex flex-col flex-grow">
+                  <div className="mb-4">
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">{project.project_title}</h3>
+                    <p className="text-sm font-semibold text-gray-500">By {project.name}</p>
+                  </div>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow">{project.description}</p>
+                  <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.split(',').map((tag, idx) => (
+                        <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-semibold">{tag.trim()}</span>
+                      ))}
+                    </div>
+                    {project.link && (
+                      <a href={project.link} target="_blank" rel="noreferrer" className="text-red-600 hover:text-red-800 transition-colors">
+                        <i className="fas fa-external-link-alt"></i>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </article>
             </Tilt>
@@ -214,6 +224,18 @@ export default function Showcase() {
                       placeholder="https://github.com/..."
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Preview Image URL (Optional)</label>
+                  <input
+                    type="url"
+                    name="imageUrl"
+                    value={formData.imageUrl}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all text-sm"
+                    placeholder="https://example.com/image.png"
+                  />
                 </div>
 
                 <button
