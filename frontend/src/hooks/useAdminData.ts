@@ -41,22 +41,35 @@ export function useAdminData() {
     }
 
     const storedProjects = localStorage.getItem("techclub_projects");
+    
+    const hackMateProject: Project = { 
+      id: 999, // use a high ID for the default force-inject
+      name: "Anand Mahadev, Dhanush Shenoy H, Dinesh A", 
+      project_title: "HACK-MATE", 
+      description: "An AI-powered hackathon co-pilot built to help teams build projects faster, collaborate better, and simplify hackathon workflows. Reached 1000+ users across 10+ countries with 1,280 Git clones in just one month. Built fully open-source with an active community.", 
+      tags: "React, TypeScript, AI, Open-Source", 
+      link: "https://hackmate.anandmahadev.in/", 
+      date: "June 1, 2026", 
+      status: "published",
+      imageUrl: "/hackmate.jpeg"
+    };
+
     if (storedProjects) {
-      setProjects(JSON.parse(storedProjects));
+      let parsed = JSON.parse(storedProjects);
+      // Force inject HACK-MATE if missing, OR update if it has old link
+      const existingIndex = parsed.findIndex((p: Project) => p.project_title === "HACK-MATE");
+      if (existingIndex === -1) {
+        parsed = [hackMateProject, ...parsed];
+        localStorage.setItem("techclub_projects", JSON.stringify(parsed));
+      } else if (parsed[existingIndex].link !== hackMateProject.link) {
+        parsed[existingIndex] = hackMateProject;
+        localStorage.setItem("techclub_projects", JSON.stringify(parsed));
+      }
+      setProjects(parsed);
     } else {
       // Default dummy data if empty
       const defaultProjects: Project[] = [
-        { 
-          id: 1, 
-          name: "Anand Mahadev, Dhanush Shenoy H, Dinesh A", 
-          project_title: "HACK-MATE", 
-          description: "An AI-powered hackathon co-pilot built to help teams build projects faster, collaborate better, and simplify hackathon workflows. Reached 1000+ users across 10+ countries with 1,280 Git clones in just one month. Built fully open-source with an active community.", 
-          tags: "React, TypeScript, AI, Open-Source", 
-          link: "https://Inkd.in/g7qWnZ7k", 
-          date: "June 1, 2026", 
-          status: "published",
-          imageUrl: "/images/hackmate.png"
-        },
+        hackMateProject,
         { 
           id: 2, 
           name: "Divya K", 

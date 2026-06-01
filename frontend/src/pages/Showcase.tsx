@@ -93,31 +93,31 @@ export default function Showcase() {
       </header>
 
       {/* Projects Grid */}
-      <main className="max-w-7xl mx-auto px-6 w-full flex-grow flex flex-col items-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+      <main className="max-w-6xl mx-auto px-6 w-full flex-grow flex flex-col items-center">
+        <div className="flex flex-col gap-8 w-full">
           {projects.filter(p => (p.status || 'published') === 'published').map((project) => (
-            <Tilt key={project.id} tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000} className="h-full">
-              <article className="project-card flex flex-col h-full bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all">
+            <Tilt key={project.id} tiltMaxAngleX={2} tiltMaxAngleY={2} scale={1.01} transitionSpeed={2000} className="w-full">
+              <article className="project-card flex flex-col md:flex-row w-full bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all">
                 {project.imageUrl && (
-                  <div className="w-full h-48 overflow-hidden bg-gray-100">
+                  <div className="w-full md:w-2/5 h-64 md:h-auto shrink-0 bg-gray-100 border-b md:border-b-0 md:border-r border-gray-100">
                     <img src={project.imageUrl} alt={project.project_title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
                   </div>
                 )}
-                <div className="p-6 flex flex-col flex-grow">
+                <div className="p-8 flex flex-col flex-grow w-full">
                   <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{project.project_title}</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{project.project_title}</h3>
                     <p className="text-sm font-semibold text-gray-500">By {project.name}</p>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow">{project.description}</p>
-                  <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
+                  <p className="text-gray-600 text-base leading-relaxed mb-8 flex-grow">{project.description}</p>
+                  <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
                     <div className="flex flex-wrap gap-2">
                       {project.tags.split(',').map((tag, idx) => (
-                        <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-semibold">{tag.trim()}</span>
+                        <span key={idx} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-bold uppercase tracking-wider">{tag.trim()}</span>
                       ))}
                     </div>
                     {project.link && (
-                      <a href={project.link} target="_blank" rel="noreferrer" className="text-red-600 hover:text-red-800 transition-colors">
-                        <i className="fas fa-external-link-alt"></i>
+                      <a href={project.link} target="_blank" rel="noreferrer" className="text-red-600 hover:text-red-800 transition-colors flex items-center gap-2 font-semibold text-sm bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg">
+                        View Project <i className="fas fa-external-link-alt"></i>
                       </a>
                     )}
                   </div>
@@ -125,19 +125,21 @@ export default function Showcase() {
               </article>
             </Tilt>
           ))}
+        </div>
           
-          {/* Add Project Card with 3D Tilt */}
+        {/* Add Project Card/Button Below */}
+        <div className="mt-16 w-full max-w-2xl">
           <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000}>
             <article
               onClick={openModal}
-              className="project-card flex flex-col items-center justify-center h-full min-h-[250px] border-dashed border-2 bg-gray-50/50 hover:bg-gray-50 cursor-pointer shadow-sm hover:shadow-md hover:border-gray-300 group rounded-2xl transition-all"
+              className="project-card flex flex-col items-center justify-center p-10 border-dashed border-2 bg-gray-50/50 hover:bg-gray-50 cursor-pointer shadow-sm hover:shadow-md hover:border-gray-300 group rounded-2xl transition-all"
             >
-              <div className="w-14 h-14 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-xl mb-3 transition-transform group-hover:scale-110">
+              <div className="w-16 h-16 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-2xl mb-4 transition-transform group-hover:scale-110">
                 <i className="fas fa-plus"></i>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Add Your Project</h3>
-              <p className="text-gray-500 text-sm text-center px-6">
-                Submit your work to be featured!
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Have a project to share?</h3>
+              <p className="text-gray-500 text-base text-center">
+                Submit your work to be featured in the tech club showcase!
               </p>
             </article>
           </Tilt>
