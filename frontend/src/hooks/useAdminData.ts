@@ -48,6 +48,17 @@ export function useAdminData() {
       const defaultProjects: Project[] = [
         { 
           id: 1, 
+          name: "Anand Mahadev, Dhanush Shenoy H, Dinesh A", 
+          project_title: "HACK-MATE", 
+          description: "An AI-powered hackathon co-pilot built to help teams build projects faster, collaborate better, and simplify hackathon workflows. Reached 1000+ users across 10+ countries with 1,280 Git clones in just one month. Built fully open-source with an active community.", 
+          tags: "React, TypeScript, AI, Open-Source", 
+          link: "https://Inkd.in/g7qWnZ7k", 
+          date: "June 1, 2026", 
+          status: "published",
+          imageUrl: "/images/hack-mate.gif" // User to drop image here
+        },
+        { 
+          id: 2, 
           name: "Divya K", 
           project_title: "Campus Navigator App", 
           description: "An interactive map to help freshmen find their classrooms across the university campus.", 
