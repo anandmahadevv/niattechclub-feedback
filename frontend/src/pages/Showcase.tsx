@@ -86,7 +86,9 @@ export default function Showcase() {
     <div className="flex-grow w-full flex flex-col pb-20">
       {/* Header Section */}
       <header className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center w-full">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">Student Showcase</h1>
+        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-red-800 to-gray-900 mb-6" style={{ fontFamily: "'Outfit', sans-serif" }}>
+          Student Showcase
+        </h1>
         <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
           Celebrating the brilliant projects, research, and achievements of our NIAT Tech Club members.
         </p>
