@@ -48,12 +48,12 @@ export function UpgradeBanner({
       opacity: 1,
       rotate: 360,
       transition: {
-        x: { duration: 0.3, ease: "easeOut" },
-        y: { duration: 0.3, ease: "easeOut" },
+        x: { duration: 0.3, ease: "easeOut" as const },
+        y: { duration: 0.3, ease: "easeOut" as const },
         opacity: { duration: 0.3 },
         rotate: {
           duration: 1,
-          type: "spring",
+          type: "spring" as const,
           stiffness: 100,
           damping: 10,
         },
