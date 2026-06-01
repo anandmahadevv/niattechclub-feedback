@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAdminData } from "../hooks/useAdminData";
 
 export default function Ideas() {
   const [formData, setFormData] = useState({
@@ -29,6 +30,8 @@ export default function Ideas() {
     });
   };
 
+  const { addIdea } = useAdminData();
+
   const submitIdeaForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -41,6 +44,14 @@ export default function Ideas() {
     submissionData.append("tech_support", formData.tech_support);
 
     try {
+      // Save locally for the Admin Dashboard
+      addIdea({
+        name: formData.name,
+        category: formData.category,
+        idea: formData.idea,
+        tech: formData.tech_support
+      });
+
       const response = await fetch("https://formspree.io/f/xdajvbdp", {
         method: "POST",
         body: submissionData,
@@ -50,13 +61,19 @@ export default function Ideas() {
       });
 
       if (response.ok) {
-        toast.success("Thank you! Your idea has been received.", { id: toastId });
+        toast.success("Idea submitted successfully! We will review it shortly.", {
+          id: toastId,
+        });
         resetForm();
       } else {
-        throw new Error("Form submission failed");
+        toast.error("Failed to submit idea. Please try again.", {
+          id: toastId,
+        });
       }
     } catch (error) {
-      toast.error("Oops! There was a problem submitting your form.", { id: toastId });
+      toast.error("An error occurred. Please check your connection.", {
+        id: toastId,
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import Tilt from "react-parallax-tilt";
 import { toast } from "sonner";
+import { useAdminData } from "../hooks/useAdminData";
 
 export default function Showcase() {
   const [isOpen, setIsOpen] = useState(false);
+  const { projects, addProject } = useAdminData();
   const [formData, setFormData] = useState({
     name: "",
     project_title: "",
@@ -47,6 +49,15 @@ export default function Showcase() {
     submissionData.append("link", formData.link);
 
     try {
+      // Save locally for the Admin Dashboard
+      addProject({
+        name: formData.name,
+        project_title: formData.project_title,
+        description: formData.description,
+        tags: formData.tags,
+        link: formData.link
+      });
+
       const response = await fetch("https://formspree.io/f/xdajvbdp", {
         method: "POST",
         body: submissionData,
@@ -56,17 +67,10 @@ export default function Showcase() {
       });
 
       if (response.ok) {
-        toast.success("Thank you! Your project has been submitted for review.", { id: toastId });
-        // Reset form
-        setFormData({
-          name: "",
-          project_title: "",
-          description: "",
-          tags: "",
-          link: "",
-        });
+        toast.success("Thank you! Your project has been submitted and will be published soon.", { id: toastId });
+        closeModal();
       } else {
-        throw new Error("Form submission failed");
+        toast.error("Failed to submit project.", { id: toastId });
       }
     } catch (error) {
       toast.error("Oops! There was a problem submitting your project.", { id: toastId });
@@ -86,20 +90,44 @@ export default function Showcase() {
       </header>
 
       {/* Projects Grid */}
-      <main className="max-w-7xl mx-auto px-6 w-full flex-grow flex justify-center items-start">
-        <div className="w-full max-w-md">
-          {/* Empty State / Add Project Card with 3D Tilt */}
-          <Tilt tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.03} transitionSpeed={2000}>
+      <main className="max-w-7xl mx-auto px-6 w-full flex-grow flex flex-col items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+          {projects.filter(p => (p.status || 'published') === 'published').map((project) => (
+            <Tilt key={project.id} tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000} className="h-full">
+              <article className="project-card flex flex-col h-full bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl p-6 transition-all">
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">{project.project_title}</h3>
+                  <p className="text-sm font-semibold text-gray-500">By {project.name}</p>
+                </div>
+                <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow">{project.description}</p>
+                <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
+                  <div className="flex flex-wrap gap-2">
+                    {project.tags.split(',').map((tag, idx) => (
+                      <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-semibold">{tag.trim()}</span>
+                    ))}
+                  </div>
+                  {project.link && (
+                    <a href={project.link} target="_blank" rel="noreferrer" className="text-red-600 hover:text-red-800 transition-colors">
+                      <i className="fas fa-external-link-alt"></i>
+                    </a>
+                  )}
+                </div>
+              </article>
+            </Tilt>
+          ))}
+          
+          {/* Add Project Card with 3D Tilt */}
+          <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000}>
             <article
               onClick={openModal}
-              className="project-card flex flex-col items-center justify-center h-[300px] border-dashed border-2 bg-white hover:bg-gray-50/80 cursor-pointer shadow-sm hover:shadow-xl hover:border-gray-300 group rounded-2xl transition-all"
+              className="project-card flex flex-col items-center justify-center h-full min-h-[250px] border-dashed border-2 bg-gray-50/50 hover:bg-gray-50 cursor-pointer shadow-sm hover:shadow-md hover:border-gray-300 group rounded-2xl transition-all"
             >
-              <div className="w-16 h-16 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-2xl mb-4 transition-transform group-hover:scale-110">
+              <div className="w-14 h-14 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-xl mb-3 transition-transform group-hover:scale-110">
                 <i className="fas fa-plus"></i>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Add Your Project</h3>
-              <p className="text-gray-500 text-sm text-center px-8">
-                Have you built something amazing? Submit your project to the club leads to be featured here!
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Add Your Project</h3>
+              <p className="text-gray-500 text-sm text-center px-6">
+                Submit your work to be featured!
               </p>
             </article>
           </Tilt>

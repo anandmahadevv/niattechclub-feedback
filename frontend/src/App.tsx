@@ -9,18 +9,24 @@ import Events from "./pages/Events";
 import Showcase from "./pages/Showcase";
 import Members from "./pages/Members";
 import Ideas from "./pages/Ideas";
+import Admin from "./pages/Admin";
 import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 
 function AppContent() {
   const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
   
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900 font-sans antialiased">
+    <div className={`flex flex-col min-h-screen font-sans antialiased ${isAdminRoute ? 'bg-gray-100' : 'bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900'}`}>
       <Toaster position="bottom-right" richColors />
-      {/* Navigation Bar */}
-      <Navbar />
-
-      <UpgradeBannerDemo />
+      
+      {/* Conditionally render public layout components */}
+      {!isAdminRoute && (
+        <>
+          <Navbar />
+          <UpgradeBannerDemo />
+        </>
+      )}
 
       {/* Dynamic Route Content with Transitions */}
       <AnimatePresence mode="wait">
@@ -30,13 +36,14 @@ function AppContent() {
           <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
           <Route path="/members" element={<PageWrapper><Members /></PageWrapper>} />
           <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
+          <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
           {/* Catch-all route to redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AnimatePresence>
 
       {/* Footer */}
-      <Footer />
+      {!isAdminRoute && <Footer />}
     </div>
   );
 }
