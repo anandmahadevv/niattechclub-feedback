@@ -4,58 +4,107 @@ export default function Events() {
   return (
     <div className="flex-grow w-full flex flex-col">
       {/* Header Section */}
-      <header className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center w-full">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">Something is cooking...</h1>
-        <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-          We are preparing our next batch of workshops, hackathons, and community meetups. Stay tuned!
+      <header className="max-w-4xl mx-auto px-6 pt-6 pb-8 text-center w-full">
+        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-gray-900 mb-6 drop-shadow-sm flex items-center justify-center gap-4">
+          Events <span className="text-red-500"><i className="far fa-calendar-check"></i></span>
+        </h1>
+        <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed font-medium">
+          Discover our upcoming events and explore what we've done in the past.
         </p>
       </header>
 
       {/* Events Content */}
       <main className="max-w-5xl mx-auto px-6 w-full flex-grow pb-20">
-        <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-2xl border border-gray-200 border-dashed mb-12">
-          <span className="text-6xl mb-4">👨‍🍳</span>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Something is cooking!</h2>
-          <p className="text-gray-500">New events will be announced here soon.</p>
+        
+        {/* Past Events Section */}
+        <div>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-4">Past Events</h2>
+
+          {/* Featured Past Event: AI Tools & Innovation Workshop */}
+          <div className="bg-white border border-gray-200 rounded-3xl p-8 mb-10 shadow-sm relative overflow-hidden transition-shadow hover:shadow-md">
+            <div className="flex flex-col lg:flex-row gap-8">
+              <div className="lg:w-1/2 flex flex-col justify-center">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="px-3 py-1 rounded-md bg-red-50 text-red-700 text-xs font-bold uppercase tracking-wider">Workshop</span>
+                  <span className="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold flex items-center gap-1">
+                    <i className="fas fa-check-circle"></i> Completed
+                  </span>
+                  <span className="text-gray-500 text-sm font-medium flex items-center gap-1 ml-auto">
+                    <i className="far fa-calendar-alt"></i> April 30
+                  </span>
+                </div>
+                <h3 className="text-3xl font-extrabold text-gray-900 mb-2">Intro to Dev Tools: AI Tools & Innovation Workshop</h3>
+                <div className="inline-flex items-center gap-2 text-sm text-gray-700 font-semibold bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 mb-6 w-fit">
+                  <i className="fas fa-map-marker-alt text-red-500"></i> LH 18, C Block
+                </div>
+                
+                {/* Speakers */}
+                <div className="flex flex-wrap gap-6 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0 text-lg">
+                      <i className="fas fa-user-tie"></i>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">Dhanush Shenoy H</p>
+                      <p className="text-xs text-gray-500">AI/ML Head @YenTech</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 text-lg">
+                      <i className="fas fa-user-tie"></i>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">Anand Mahadev</p>
+                      <p className="text-xs text-gray-500">SDE Intern @BlueStock Media, Head @YenTech</p>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-gray-600 leading-relaxed mb-6 text-sm md:text-base">
+                  An engaging hands-on workshop designed to introduce students to cutting-edge AI tools, including Google Stitch, Claude Code, and Google AI Studio. Participants explored AI-assisted development, prompt engineering, workflow automation, and rapid prototyping, gaining practical insights into modern AI-powered workflows.
+                </p>
+                
+                <h4 className="text-lg font-bold text-gray-900 mb-3">Outcomes</h4>
+                <ul className="space-y-2 mb-6">
+                  {[
+                    "Introduced students to industry-leading AI development tools.",
+                    "Enhanced understanding of prompt engineering and AI-assisted development.",
+                    "Enabled participants to build and prototype AI-powered solutions.",
+                    "Fostered innovation, creativity, and collaborative problem-solving.",
+                    "Provided practical exposure to workflow automation and emerging AI technologies.",
+                    "Encouraged students to explore real-world applications of AI in product development and technology."
+                  ].map((outcome, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-gray-600 text-sm">
+                      <i className="fas fa-arrow-right text-red-500 mt-1 flex-shrink-0"></i>
+                      <span>{outcome}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-gray-700 text-sm md:text-base font-medium italic border-l-4 border-red-500 pl-4">
+                  The session empowered participants to transform ideas into functional prototypes while building confidence in leveraging AI for innovation and future-ready development.
+                </p>
+              </div>
+
+              {/* Image Grid */}
+              <div className="lg:w-1/2 grid grid-cols-2 gap-3 h-full">
+                <img src="/images/media__1780320484677.jpg" alt="AI Workshop Presentation" className="w-full h-48 lg:h-64 object-cover rounded-2xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" />
+                <img src="/images/media__1780320485068.jpg" alt="AI Workshop Demo" className="w-full h-48 lg:h-64 object-cover rounded-2xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" />
+                <img src="/images/media__1780320484934.jpg" alt="AI Workshop Crowd" className="w-full h-48 lg:h-64 object-cover rounded-2xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" />
+                <img src="/images/media__1780320484800.jpg" alt="AI Workshop Overview" className="w-full h-48 lg:h-64 object-cover rounded-2xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" />
+              </div>
+            </div>
+          </div>
+
+
         </div>
 
-        {/* Past Events Section */}
+        {/* Upcoming Events Section */}
         <div className="mt-20">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-4">Past Events</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Past Event 1 */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 relative overflow-hidden flex flex-col opacity-80 hover:opacity-100 transition-opacity">
-              <div className="flex justify-between items-start mb-4">
-                <span className="px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 text-xs font-semibold">Workshop</span>
-                <span className="px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold flex items-center gap-1">
-                  <i className="fas fa-check-circle"></i> Completed
-                </span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Introduction to UI/UX Design</h3>
-              <p className="text-gray-500 text-sm mb-4 flex-grow">
-                A deep dive into Figma, user research, and wireframing for beginners.
-              </p>
-              <div className="text-gray-400 text-xs font-medium flex items-center gap-2">
-                <i className="far fa-calendar-alt"></i> September 12, 2025
-              </div>
-            </div>
-
-            {/* Past Event 2 */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 relative overflow-hidden flex flex-col opacity-80 hover:opacity-100 transition-opacity">
-              <div className="flex justify-between items-start mb-4">
-                <span className="px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 text-xs font-semibold">Seminar</span>
-                <span className="px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold flex items-center gap-1">
-                  <i className="fas fa-check-circle"></i> Completed
-                </span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">AI in the Real World</h3>
-              <p className="text-gray-500 text-sm mb-4 flex-grow">
-                Guest lecture by industry experts on the practical applications of Machine Learning and GenAI.
-              </p>
-              <div className="text-gray-400 text-xs font-medium flex items-center gap-2">
-                <i className="far fa-calendar-alt"></i> August 28, 2025
-              </div>
-            </div>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-4">Upcoming Events</h2>
+          <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-2xl border border-gray-200 border-dashed mb-12">
+            <span className="text-6xl mb-4">👨‍🍳</span>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Something is cooking!</h2>
+            <p className="text-gray-500">We are preparing our next batch of workshops, hackathons, and community meetups. Stay tuned!</p>
           </div>
         </div>
 
