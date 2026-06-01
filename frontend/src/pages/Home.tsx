@@ -47,10 +47,10 @@ export default function Home() {
                 View Events <i className="fas fa-arrow-right text-sm"></i>
               </Link>
               <Link
-                to="/ideas"
+                to="/showcase"
                 className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 font-semibold py-4 px-8 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
               >
-                Submit an Idea <i className="fas fa-lightbulb text-sm text-yellow-500"></i>
+                Projects <i className="fas fa-laptop-code text-sm text-blue-500"></i>
               </Link>
             </div>
           </div>
