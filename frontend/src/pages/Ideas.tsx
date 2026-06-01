@@ -30,7 +30,7 @@ export default function Ideas() {
     });
   };
 
-  const { ideas, addIdea, upvoteIdea } = useAdminData();
+  const { addIdea } = useAdminData();
 
   const submitIdeaForm = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,56 +243,6 @@ export default function Ideas() {
             </form>
         </div>
       </div>
-
-      {/* Idea Board Section */}
-      <section className="max-w-7xl mx-auto px-6 w-full mt-24 mb-12">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Community Idea Board</h2>
-          <p className="text-gray-500 max-w-2xl mx-auto">
-            Vote on the ideas you want to see come to life next! The most upvoted ideas will be prioritized.
-          </p>
-        </div>
-
-        {ideas.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-            <p className="text-gray-500">No ideas submitted yet. Be the first!</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ideas.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0)).map((idea) => (
-              <div key={idea.id} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full relative">
-                <div className="flex justify-between items-start mb-4">
-                  <span className="px-3 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-full uppercase tracking-wider">
-                    {idea.category}
-                  </span>
-                  <div className="flex flex-col items-center">
-                    <button 
-                      onClick={() => upvoteIdea(idea.id)}
-                      className="w-10 h-10 rounded-full flex flex-col items-center justify-center bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors border border-gray-100 hover:border-red-100"
-                      title="Upvote this idea"
-                    >
-                      <i className="fas fa-arrow-up text-sm"></i>
-                    </button>
-                    <span className="text-sm font-bold text-gray-700 mt-1">{idea.upvotes || 0}</span>
-                  </div>
-                </div>
-                
-                <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{idea.idea}</h3>
-                
-                <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between text-sm text-gray-500">
-                  <span className="font-medium text-gray-700 flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
-                      {idea.name.charAt(0)}
-                    </div>
-                    {idea.name}
-                  </span>
-                  <span>{idea.date}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
     </div>
   );
 }

@@ -7,7 +7,6 @@ export interface Idea {
   idea: string;
   tech: string;
   date: string;
-  upvotes?: number;
 }
 
 export interface Project {
@@ -34,8 +33,8 @@ export function useAdminData() {
     } else {
       // Default dummy data if empty
       const defaultIdeas: Idea[] = [
-        { id: 1, name: "Rahul S", category: "Workshop", idea: "Docker for Beginners", tech: "Yes", date: "June 1, 2026", upvotes: 12 },
-        { id: 2, name: "Priya M", category: "Guest Lecture", idea: "Cybersecurity Basics", tech: "No", date: "June 2, 2026", upvotes: 8 }
+        { id: 1, name: "Rahul S", category: "Workshop", idea: "Docker for Beginners", tech: "Yes", date: "June 1, 2026" },
+        { id: 2, name: "Priya M", category: "Guest Lecture", idea: "Cybersecurity Basics", tech: "No", date: "June 2, 2026" }
       ];
       setIdeas(defaultIdeas);
       localStorage.setItem("techclub_ideas", JSON.stringify(defaultIdeas));
@@ -88,12 +87,11 @@ export function useAdminData() {
     }
   }, []);
 
-  const addIdea = (idea: Omit<Idea, "id" | "date" | "upvotes">) => {
+  const addIdea = (idea: Omit<Idea, "id" | "date">) => {
     const newIdea = {
       ...idea,
       id: Date.now(),
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-      upvotes: 0
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
     };
     const updated = [...ideas, newIdea];
     setIdeas(updated);
@@ -102,14 +100,6 @@ export function useAdminData() {
 
   const deleteIdea = (id: number) => {
     const updated = ideas.filter(i => i.id !== id);
-    setIdeas(updated);
-    localStorage.setItem("techclub_ideas", JSON.stringify(updated));
-  };
-
-  const upvoteIdea = (id: number) => {
-    const updated = ideas.map(idea => 
-      idea.id === id ? { ...idea, upvotes: (idea.upvotes || 0) + 1 } : idea
-    );
     setIdeas(updated);
     localStorage.setItem("techclub_ideas", JSON.stringify(updated));
   };
@@ -142,7 +132,6 @@ export function useAdminData() {
     ideas,
     addIdea,
     deleteIdea,
-    upvoteIdea,
     projects,
     addProject,
     deleteProject,
