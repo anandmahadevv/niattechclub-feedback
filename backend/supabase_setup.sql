@@ -73,6 +73,7 @@ CREATE TABLE public.rsvps (
     name TEXT NOT NULL,
     email TEXT NOT NULL,
     phone TEXT,
+    status TEXT DEFAULT 'confirmed',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
