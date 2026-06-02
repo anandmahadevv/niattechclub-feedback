@@ -11,7 +11,11 @@ export default function Showcase() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const { projects, addProject } = useAdminData();
+  const { projects, addProject, upvoteProject } = useAdminData();
+  const [likedProjects, setLikedProjects] = useState<number[]>(() => {
+    const saved = localStorage.getItem('techclub_liked_projects');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [formData, setFormData] = useState({
     name: "",
     project_title: "",
@@ -177,11 +181,32 @@ export default function Showcase() {
                         <span key={idx} className="px-2.5 py-0.5 bg-gray-100 text-gray-600 rounded-md text-[10px] font-bold uppercase tracking-wider">{tag.trim()}</span>
                       ))}
                     </div>
-                    {project.link && (
-                      <a href={project.link} target="_blank" rel="noreferrer" className="text-red-600 hover:text-red-800 transition-colors flex items-center gap-1 font-semibold text-xs bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg shrink-0">
-                        View <i className="fas fa-external-link-alt text-[10px]"></i>
-                      </a>
-                    )}
+                    
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          if (likedProjects.includes(project.id)) {
+                            toast.success("You have already upvoted this project!");
+                            return;
+                          }
+                          upvoteProject(project.id, project.upvotes || 0); 
+                          const newLiked = [...likedProjects, project.id];
+                          setLikedProjects(newLiked);
+                          localStorage.setItem('techclub_liked_projects', JSON.stringify(newLiked));
+                        }}
+                        className={`${likedProjects.includes(project.id) ? 'text-red-500 bg-red-50 border-red-200' : 'text-gray-500 hover:text-red-500 hover:bg-red-50 border-gray-100 hover:border-red-100 bg-white'} transition-all flex items-center gap-1.5 font-bold text-xs px-2.5 py-1.5 rounded-lg border shadow-sm hover:shadow active:scale-95`}
+                      >
+                        <i className={`fas fa-caret-up text-sm leading-none ${likedProjects.includes(project.id) ? 'text-red-600' : ''}`}></i>
+                        <span className="leading-none">{project.upvotes || 0}</span>
+                      </button>
+
+                      {project.link && (
+                        <a href={project.link} target="_blank" rel="noreferrer" className="text-red-600 hover:text-red-800 transition-colors flex items-center gap-1 font-semibold text-xs bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg shrink-0">
+                          View <i className="fas fa-external-link-alt text-[10px]"></i>
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </article>

@@ -20,6 +20,7 @@ export interface Project {
   date: string;
   status: 'pending' | 'published';
   image_url?: string;
+  upvotes: number;
 }
 
 export function useAdminData() {
@@ -153,6 +154,26 @@ export function useAdminData() {
     }
   };
 
+  const upvoteProject = async (id: number, currentUpvotes: number) => {
+    // Optimistic UI update
+    setProjects((prev) => 
+      prev.map((p) => p.id === id ? { ...p, upvotes: currentUpvotes + 1 } : p)
+    );
+    
+    const { error } = await supabase
+      .from('projects')
+      .update({ upvotes: currentUpvotes + 1 })
+      .eq('id', id);
+      
+    if (error) {
+      console.error("Failed to upvote project:", error);
+      // Revert if error
+      setProjects((prev) => 
+        prev.map((p) => p.id === id ? { ...p, upvotes: currentUpvotes } : p)
+      );
+    }
+  };
+
   return {
     ideas,
     addIdea,
@@ -161,6 +182,7 @@ export function useAdminData() {
     addProject,
     deleteProject,
     publishProject,
+    upvoteProject,
     loading
   };
 }

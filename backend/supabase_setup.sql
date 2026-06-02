@@ -17,6 +17,7 @@ CREATE TABLE public.projects (
     date TEXT,
     status TEXT DEFAULT 'pending',
     image_url TEXT,
+    upvotes INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -84,3 +85,4 @@ CREATE POLICY "Public Read RSVPs" ON public.rsvps FOR SELECT USING (true);
 CREATE POLICY "Public Insert RSVPs" ON public.rsvps FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update RSVPs" ON public.rsvps FOR UPDATE USING (true);
 CREATE POLICY "Public Delete RSVPs" ON public.rsvps FOR DELETE USING (true);
+
