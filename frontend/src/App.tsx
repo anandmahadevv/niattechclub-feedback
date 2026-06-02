@@ -14,11 +14,9 @@ import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 import { AuthProvider } from "./components/AuthContext";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
-import ScannerPage from "./pages/Scanner";
-
 function AppContent() {
   const location = useLocation();
-  const isAuthOrAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/scanner';
+  const isAuthOrAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/login';
   
   return (
     <div className={`flex flex-col min-h-screen font-sans antialiased ${isAuthOrAdminRoute ? 'bg-gray-100 dark:bg-slate-950' : 'bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900'}`}>
@@ -43,7 +41,6 @@ function AppContent() {
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
           <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
           <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
-          <Route path="/scanner" element={<PageWrapper><ScannerPage /></PageWrapper>} />
           {/* Catch-all route to redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
