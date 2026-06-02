@@ -88,7 +88,7 @@ export function UpgradeBanner({
           >
             <SettingsFilled className="text-[#005FF2] dark:text-[#006EFE]" />
           </motion.div>
-          <div className="relative flex h-[35px] items-center gap-1 rounded-[6px] border border-[#CBE7FF] bg-[#F0F7FF] pl-2.5 pr-1 text-sm dark:border-[#003674] dark:bg-[#06193A]">
+          <div className="relative flex min-h-[35px] flex-wrap items-center gap-1.5 rounded-[6px] border border-[#CBE7FF] bg-[#F0F7FF] py-1.5 pl-2.5 pr-1 text-sm dark:border-[#003674] dark:bg-[#06193A]">
             <button
               className="focus-visible:shadow-focus-ring rounded-xs my-[-1px] cursor-pointer border-none bg-transparent px-0 py-1 font-sans text-[13px] font-medium text-[#002359] underline decoration-[#CAE7FF] underline-offset-[5px] outline-none hover:text-[#005FF2] hover:decoration-[#94CCFF] focus-visible:!shadow-[#008FFF] dark:text-[#EAF5FF] dark:decoration-[#003674] dark:hover:text-[#44A7FF] dark:hover:decoration-[#00408A]"
               onMouseEnter={() => setIsHovered(true)}
@@ -97,13 +97,13 @@ export function UpgradeBanner({
             >
               {buttonText}
             </button>
-            <span className="text-[0.8125rem] text-[#005FF2] dark:text-[#44A7FF]">
+            <span className="text-[0.8125rem] text-[#005FF2] dark:text-[#44A7FF] flex-1 leading-snug pr-6">
               {description}
             </span>
             {onClose && (
               <button 
                 onClick={onClose}
-                className="m-0 flex h-6 !w-6 shrink-0 cursor-pointer items-center justify-center rounded-[4px] border-0 bg-transparent p-0 text-[#005FF2] hover:bg-[#CAE7FF] dark:hover:bg-[#012F61]"
+                className="absolute right-1 top-1/2 -translate-y-1/2 m-0 flex h-6 !w-6 shrink-0 cursor-pointer items-center justify-center rounded-[4px] border-0 bg-transparent p-0 text-[#005FF2] hover:bg-[#CAE7FF] dark:hover:bg-[#012F61]"
               >
                 <X size={16} className="text-[#005FF2] dark:text-[#47A8FF]" />
               </button>

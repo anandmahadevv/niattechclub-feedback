@@ -62,14 +62,16 @@ export function useAdminData() {
 
     fetchData();
 
-    // Set up real-time subscriptions
-    const ideasSubscription = supabase.channel('custom-all-ideas')
+    // Set up real-time subscriptions with unique channel names to allow multiple components to use this hook
+    const channelId = Math.random().toString(36).substring(7);
+    
+    const ideasSubscription = supabase.channel(`custom-all-ideas-${channelId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'ideas' }, () => {
         fetchData(); // Simplest way to handle real-time sync is to re-fetch
       })
       .subscribe();
 
-    const projectsSubscription = supabase.channel('custom-all-projects')
+    const projectsSubscription = supabase.channel(`custom-all-projects-${channelId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
         fetchData();
       })

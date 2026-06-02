@@ -13,6 +13,7 @@ import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 import { AuthProvider } from "./components/AuthContext";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+
 function AppContent() {
   const location = useLocation();
   const isAuthOrAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/login';

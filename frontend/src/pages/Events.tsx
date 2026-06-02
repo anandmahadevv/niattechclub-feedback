@@ -27,9 +27,10 @@ export default function Events() {
   useEffect(() => {
     fetchRsvps();
 
-    // Set up Supabase Realtime subscription for live updates
+    // Set up Supabase Realtime subscription for live updates with unique channel
+    const channelId = Math.random().toString(36).substring(7);
     const channel = supabase
-      .channel('public:rsvps')
+      .channel(`public:rsvps-${channelId}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'rsvps', filter: 'event_slug=eq.promptwars' },
