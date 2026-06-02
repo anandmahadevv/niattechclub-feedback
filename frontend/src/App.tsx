@@ -7,7 +7,6 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Events from "./pages/Events";
 import Showcase from "./pages/Showcase";
-import Members from "./pages/Members";
 import Ideas from "./pages/Ideas";
 import Admin from "./pages/Admin";
 import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
@@ -36,7 +35,6 @@ function AppContent() {
           <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
           <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
           <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
-          <Route path="/members" element={<PageWrapper><Members /></PageWrapper>} />
           <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
           <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />

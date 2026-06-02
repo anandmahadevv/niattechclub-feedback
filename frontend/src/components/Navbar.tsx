@@ -36,14 +36,7 @@ export default function Navbar() {
           >
             Showcase
           </NavLink>
-          <NavLink
-            to="/members"
-            className={({ isActive }) =>
-              isActive ? "text-red-700 font-semibold" : "hover:text-red-700 transition-colors"
-            }
-          >
-            Members
-          </NavLink>
+
           <NavLink
             to="/ideas"
             className={({ isActive }) =>
