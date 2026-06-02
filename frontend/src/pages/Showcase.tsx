@@ -1,11 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Tilt from "react-parallax-tilt";
 import { toast } from "sonner";
 import { useAdminData } from "../hooks/useAdminData";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../components/AuthContext";
 
 export default function Showcase() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { projects, addProject } = useAdminData();
   const [formData, setFormData] = useState({
@@ -19,13 +23,22 @@ export default function Showcase() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const openModal = () => {
+    if (!user) {
+      toast.error("Please log in to submit a project!");
+      navigate("/login?redirect=/showcase");
+      return;
+    }
     setIsOpen(true);
+    setFormData((prev) => ({
+      ...prev,
+      name: user.user_metadata?.name || "",
+    }));
   };
 
   const closeModal = () => {
     setIsOpen(false);
     setFormData({
-      name: "",
+      name: user?.user_metadata?.name || "",
       project_title: "",
       description: "",
       tags: "",

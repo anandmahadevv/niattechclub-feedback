@@ -12,6 +12,9 @@ import Ideas from "./pages/Ideas";
 import Admin from "./pages/Admin";
 import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 import PageLoader from "./components/PageLoader";
+import { AuthProvider } from "./components/AuthContext";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 
 function AppContent() {
   const location = useLocation();
@@ -38,6 +41,8 @@ function AppContent() {
           <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
           <Route path="/members" element={<PageWrapper><Members /></PageWrapper>} />
           <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
+          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+          <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
           <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
           {/* Catch-all route to redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -52,9 +57,11 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
   );
 }
 
