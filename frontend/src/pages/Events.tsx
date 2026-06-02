@@ -195,7 +195,6 @@ export default function Events() {
                       }
                       
                       submitBtn.disabled = true;
-                      submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
                       
                       try {
                         const { supabase } = await import('../lib/supabase');
@@ -226,7 +225,6 @@ export default function Events() {
                         const { toast } = await import('sonner');
                         toast.error(error.message || "Failed to submit RSVP.");
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = 'Confirm RSVP <i class="fas fa-check-circle"></i>';
                       }
                     }}>
                   <div>

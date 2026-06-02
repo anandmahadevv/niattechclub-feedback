@@ -11,7 +11,6 @@ import Members from "./pages/Members";
 import Ideas from "./pages/Ideas";
 import Admin from "./pages/Admin";
 import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
-import PageLoader from "./components/PageLoader";
 import { AuthProvider } from "./components/AuthContext";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
@@ -22,7 +21,6 @@ function AppContent() {
   
   return (
     <div className={`flex flex-col min-h-screen font-sans antialiased ${isAuthOrAdminRoute ? 'bg-gray-100 dark:bg-slate-950' : 'bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900'}`}>
-      <PageLoader />
       <Toaster position="bottom-right" richColors />
       
       {/* Conditionally render public layout components */}
