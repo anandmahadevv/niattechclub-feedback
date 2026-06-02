@@ -110,7 +110,7 @@ export default function Ideas() {
           <form onSubmit={submitIdeaForm} className="space-y-6">
             {/* Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2" htmlFor="name">
+              <label className="block text-sm font-semibold text-slate-900 dark:text-slate-900 mb-2" htmlFor="name">
                 Name <span className="text-red-500">*</span>
               </label>
               {user ? (
@@ -131,7 +131,7 @@ export default function Ideas() {
                     required
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 appearance-none cursor-pointer"
+                    className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-gray-900 bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 adppearance-none cursor-pointer"
                   >
                     <option value="" disabled>
                       Select your name...
@@ -171,7 +171,7 @@ export default function Ideas() {
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2" htmlFor="category">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-slate-900 mb-2" htmlFor="category">
                 Category <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -181,7 +181,7 @@ export default function Ideas() {
                   required
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 appearance-none cursor-pointer"
+                  className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-gray-900 bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 appearance-none cursor-pointer"
                 >
                   <option value="" disabled className="text-gray-400">
                     Select a category...
@@ -200,7 +200,7 @@ export default function Ideas() {
 
             {/* Idea Text Area */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2" htmlFor="idea">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-slate-900 mb-2" htmlFor="idea">
                 Your Idea <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -210,7 +210,7 @@ export default function Ideas() {
                 rows={5}
                 value={formData.idea}
                 onChange={handleInputChange}
-                className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 resize-none outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-slate-900 bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 resize-none outline-none focus:ring-2 focus:ring-red-500"
                 placeholder="Describe your idea in detail..."
               ></textarea>
             </div>
