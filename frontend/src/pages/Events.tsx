@@ -218,7 +218,18 @@ export default function Events() {
                         
                         if (error) throw error;
                         
-                        toast.success("RSVP successful!");
+                        // Send confirmation email via backend
+                        try {
+                          await fetch('http://localhost:5000/api/send-rsvp-email', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name, email })
+                          });
+                        } catch (emailError) {
+                          console.error("Failed to send confirmation email:", emailError);
+                        }
+                        
+                        toast.success("RSVP successful! Confirmation email sent.");
                         setRsvpCount(prev => prev + 1);
                         setIsRsvped(true);
                       } catch (error: any) {
