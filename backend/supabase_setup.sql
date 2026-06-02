@@ -65,3 +65,22 @@ CREATE POLICY "Public Delete Ideas" ON public.ideas FOR DELETE USING (true);
 
 -- CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING (bucket_id = 'project_images');
 -- CREATE POLICY "Public Insert" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'project_images');
+
+-- 7. Create RSVPs Table
+CREATE TABLE public.rsvps (
+    id SERIAL PRIMARY KEY,
+    event_slug TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 8. Enable Row Level Security (RLS) for RSVPs
+ALTER TABLE public.rsvps ENABLE ROW LEVEL SECURITY;
+
+-- RSVPs Policies
+CREATE POLICY "Public Read RSVPs" ON public.rsvps FOR SELECT USING (true);
+CREATE POLICY "Public Insert RSVPs" ON public.rsvps FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Update RSVPs" ON public.rsvps FOR UPDATE USING (true);
+CREATE POLICY "Public Delete RSVPs" ON public.rsvps FOR DELETE USING (true);
