@@ -233,7 +233,7 @@ export default function Showcase() {
                     value={formData.project_title}
                     onChange={handleInputChange}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
-                    placeholder="e.g. Campus Navigator App"
+                    placeholder="e.g. HACK-MATE"
                   />
                 </div>
 
