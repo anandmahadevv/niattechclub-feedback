@@ -7,6 +7,7 @@ export default function Events() {
   const [rsvpCount, setRsvpCount] = useState<number>(0);
   const [isRsvped, setIsRsvped] = useState(false);
   const [attendees, setAttendees] = useState<{ id: number; name: string; created_at: string }[]>([]);
+  const [showAttendees, setShowAttendees] = useState(false);
 
   useEffect(() => {
     async function fetchRsvps() {
@@ -298,34 +299,41 @@ export default function Events() {
                     </form>
                   </>
                 )}
+
+                {/* Integrated Attendees Dropdown */}
+                {attendees.length > 0 && (
+                  <div className="mt-8 border-t border-gray-200 pt-6">
+                    <button 
+                      onClick={() => setShowAttendees(!showAttendees)}
+                      className="w-full flex items-center justify-between text-left focus:outline-none group"
+                    >
+                      <div className="flex items-center gap-2 text-gray-900 font-bold">
+                        <i className="fas fa-users text-purple-600"></i>
+                        <span>Who's Going? <span className="text-gray-500 font-medium text-sm ml-1">({attendees.length} Registered)</span></span>
+                      </div>
+                      <i className={`fas fa-chevron-down text-gray-400 transition-transform duration-300 ${showAttendees ? 'rotate-180' : ''}`}></i>
+                    </button>
+                    
+                    {showAttendees && (
+                      <div className="mt-4 flex flex-wrap gap-2 animate-in slide-in-from-top-2 fade-in duration-300">
+                        {attendees.map((attendee) => (
+                          <div key={attendee.id} className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-sm">
+                            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-[9px] font-bold shadow-inner">
+                              {attendee.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="text-xs font-semibold text-gray-700">{attendee.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Attendees Section */}
-        {attendees.length > 0 && (
-          <div className="mt-12 bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
-            <div className="flex items-center gap-3 mb-6 border-b pb-4">
-              <i className="fas fa-users text-2xl text-purple-600"></i>
-              <h3 className="text-2xl font-extrabold text-gray-900">Who's Going?</h3>
-              <span className="ml-auto bg-gray-100 text-gray-700 text-sm font-bold px-3 py-1 rounded-full">
-                {attendees.length} Registered
-              </span>
-            </div>
-            
-            <div className="flex flex-wrap gap-3">
-              {attendees.map((attendee) => (
-                <div key={attendee.id} className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-full px-4 py-2 hover:bg-gray-100 hover:border-gray-200 transition-colors shadow-sm animate-in fade-in zoom-in duration-300">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold shadow-inner">
-                    {attendee.name.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="text-sm font-semibold text-gray-700">{attendee.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+
 
         <div className="mt-16 text-center">
           <div className="inline-flex items-center justify-center p-6 bg-gray-50 rounded-2xl border border-gray-200 border-dashed w-full">
