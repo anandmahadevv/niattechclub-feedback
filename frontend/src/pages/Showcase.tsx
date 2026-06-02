@@ -31,14 +31,14 @@ export default function Showcase() {
     setIsOpen(true);
     setFormData((prev) => ({
       ...prev,
-      name: user.user_metadata?.name || "",
+      name: user.name || "",
     }));
   };
 
   const closeModal = () => {
     setIsOpen(false);
     setFormData({
-      name: user?.user_metadata?.name || "",
+      name: user?.name || "",
       project_title: "",
       description: "",
       tags: "",

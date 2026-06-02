@@ -51,7 +51,7 @@ export default function Ideas() {
     setIsSubmitting(true);
     const toastId = toast.loading("Submitting your idea...");
 
-    const userName = user.user_metadata?.name || user.email || formData.name || "Anonymous";
+    const userName = user.name || user.email || formData.name || "Anonymous";
 
     const submissionData = new FormData();
     submissionData.append("name", userName);
@@ -120,7 +120,7 @@ export default function Ideas() {
                   name="name"
                   required
                   disabled
-                  value={user.user_metadata?.name || user.email || ""}
+                  value={user.name || user.email || ""}
                   className="w-full input-field rounded-xl px-4 py-3 text-sm bg-gray-50 dark:bg-zinc-900/40 text-gray-400 dark:text-zinc-555 border border-gray-200 dark:border-zinc-800 cursor-not-allowed outline-none font-medium"
                 />
               ) : (

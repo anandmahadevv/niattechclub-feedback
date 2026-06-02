@@ -68,7 +68,7 @@ export default function Navbar() {
                 }
               >
                 <i className="fas fa-user-circle text-lg"></i>
-                <span className="max-w-[100px] truncate hidden sm:inline">{user.user_metadata?.name || "Profile"}</span>
+                <span className="max-w-[100px] truncate hidden sm:inline">{user.name || "Profile"}</span>
               </NavLink>
               <button
                 onClick={() => signOut()}

@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabase";
 import { toast } from "sonner";
 
 export default function Profile() {
-  const { user, loading } = useAuth();
+  const { user, loading, updateLocalUser } = useAuth();
   const navigate = useNavigate();
 
   const [saving, setSaving] = useState(false);
@@ -21,12 +21,12 @@ export default function Profile() {
       if (!user) {
         navigate("/login?redirect=/profile");
       } else {
-        // Initialize form with user_metadata
+        // Initialize form with custom user fields
         setFormData({
-          name: user.user_metadata?.name || "",
-          rollNumber: user.user_metadata?.roll_number || "",
-          department: user.user_metadata?.department || "",
-          bio: user.user_metadata?.bio || "",
+          name: user.name || "",
+          rollNumber: user.roll_number || "",
+          department: user.department || "",
+          bio: user.bio || "",
         });
       }
     }
@@ -45,16 +45,20 @@ export default function Profile() {
     const toastId = toast.loading("Updating profile details...");
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: {
-          name: formData.name,
-          roll_number: formData.rollNumber,
-          department: formData.department,
-          bio: formData.bio,
-        },
+      const { data, error } = await supabase.rpc("update_user_profile", {
+        user_id: user.id,
+        name_input: formData.name,
+        roll_number_input: formData.rollNumber,
+        department_input: formData.department,
+        bio_input: formData.bio,
       });
 
       if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error("Failed to update profile.");
+      }
+
+      updateLocalUser(data[0]);
 
       toast.success("Profile updated successfully!", { id: toastId });
     } catch (err: any) {
