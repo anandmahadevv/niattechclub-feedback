@@ -6,15 +6,13 @@ export default function Events() {
   const TOTAL_SLOTS = 50;
   const [rsvpCount, setRsvpCount] = useState<number>(0);
   const [isRsvped, setIsRsvped] = useState(false);
-  const [isWaitlisted, setIsWaitlisted] = useState(false);
 
   useEffect(() => {
     async function fetchRsvpCount() {
       const { count, error } = await supabase
         .from('rsvps')
         .select('*', { count: 'exact', head: true })
-        .eq('event_slug', 'promptwars')
-        .eq('status', 'confirmed');
+        .eq('event_slug', 'promptwars');
         
       if (error) {
         console.error("Error fetching RSVP count:", error);
@@ -22,7 +20,24 @@ export default function Events() {
         setRsvpCount(count);
       }
     }
+    
     fetchRsvpCount();
+
+    // Set up Supabase Realtime subscription for live updates
+    const channel = supabase
+      .channel('public:rsvps')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'rsvps', filter: 'event_slug=eq.promptwars' },
+        () => {
+          fetchRsvpCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const remainingSlots = Math.max(0, TOTAL_SLOTS - rsvpCount);
@@ -164,15 +179,13 @@ export default function Events() {
                 <p className="text-sm text-gray-500 mb-6">Fill out the form below to register for this event.</p>
                 
                 {isRsvped ? (
-                  <div className={`border rounded-2xl p-6 text-center animate-in fade-in zoom-in duration-300 ${isWaitlisted ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200'}`}>
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner ${isWaitlisted ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600'}`}>
-                      <i className={`fas ${isWaitlisted ? 'fa-clock' : 'fa-check-circle'}`}></i>
+                  <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center animate-in fade-in zoom-in duration-300">
+                    <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                      <i className="fas fa-check-circle"></i>
                     </div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">{isWaitlisted ? 'You are on the Waitlist!' : 'Congrats for booking!'}</h4>
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">Congrats for booking!</h4>
                     <p className="text-sm text-gray-600">
-                      {isWaitlisted 
-                        ? 'The event is currently full, but we have added you to the waitlist. We will email you if a spot opens up.' 
-                        : 'Your spot for PromptWars has been successfully reserved. Keep an eye on your email for further updates!'}
+                      Your spot for PromptWars has been successfully reserved. Keep an eye on your email for further updates!
                     </p>
                   </div>
                 ) : (
@@ -186,6 +199,7 @@ export default function Events() {
                     
                     <form className="space-y-4" onSubmit={async (e) => {
                       e.preventDefault();
+                      if (isFull) return;
                       const form = e.target as HTMLFormElement;
                       const name = (form.elements.namedItem('name') as HTMLInputElement).value;
                       const email = (form.elements.namedItem('email') as HTMLInputElement).value;
@@ -215,10 +229,8 @@ export default function Events() {
                           throw new Error("You have already RSVP'd for this event with this email.");
                         }
 
-                        const currentStatus = isFull ? 'waitlisted' : 'confirmed';
-
                         const { error } = await supabase.from('rsvps').insert([
-                          { event_slug: 'promptwars', name, email, status: currentStatus }
+                          { event_slug: 'promptwars', name, email }
                         ]);
                         
                         if (error) throw error;
@@ -228,15 +240,14 @@ export default function Events() {
                           await fetch('/api/send-rsvp-email', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name, email, status: currentStatus })
+                            body: JSON.stringify({ name, email })
                           });
                         } catch (emailError) {
                           console.error("Failed to send confirmation email:", emailError);
                         }
                         
-                        toast.success(isFull ? "You've been added to the waitlist!" : "RSVP successful! Confirmation email sent.");
-                        if (!isFull) setRsvpCount(prev => prev + 1);
-                        if (isFull) setIsWaitlisted(true);
+                        toast.success("RSVP successful! Confirmation email sent.");
+                        setRsvpCount(prev => prev + 1);
                         setIsRsvped(true);
                       } catch (error: any) {
                         const { toast } = await import('sonner');
@@ -276,9 +287,10 @@ export default function Events() {
                   </div>
                       <button
                         type="submit"
-                        className={`w-full py-3 px-4 text-white font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-sm mt-2 ${isFull ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-900 hover:bg-gray-800'}`}
+                        disabled={isFull}
+                        className="w-full py-3 px-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {isFull ? 'Join Waitlist' : 'Confirm RSVP'} <i className={`fas ${isFull ? 'fa-clock' : 'fa-check-circle'}`}></i>
+                        {isFull ? 'Registration Closed' : 'Confirm RSVP'} <i className={`fas ${isFull ? 'fa-ban' : 'fa-check-circle'}`}></i>
                       </button>
                     </form>
                   </>

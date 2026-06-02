@@ -7,32 +7,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { name, email, status = 'confirmed' } = req.body;
+  const { name, email } = req.body;
 
   if (!email || !name) {
     return res.status(400).json({ error: 'Name and email are required' });
   }
 
   try {
-    const isWaitlisted = status === 'waitlisted';
-    
-    const subject = isWaitlisted 
-      ? 'PromptWars 2026 - You are on the waitlist ⏳' 
-      : 'PromptWars 2026 - Registration Confirmed! 🎉';
-      
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=promptwars:${encodeURIComponent(email)}`;
     
-    const html = isWaitlisted ? `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-          <h2 style="color: #ca8a04;">Hi ${name},</h2>
-          <p>Thank you for your interest in <strong>PromptWars 2026</strong>!</p>
-          <p>The event is currently at full capacity, so we have added you to the waitlist.</p>
-          <p>If a spot opens up, we will notify you immediately by email!</p>
-          <br />
-          <p>Best regards,</p>
-          <p><strong>The Tech Club Team</strong></p>
-        </div>
-    ` : `
+    const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
           <h2 style="color: #4F46E5;">Congratulations, ${name}!</h2>
           <p>You have successfully registered and secured your entry for <strong>PromptWars 2026</strong>.</p>
@@ -51,7 +35,7 @@ export default async function handler(req, res) {
     const data = await resend.emails.send({
       from: 'event@techclub.niat.me',
       to: email,
-      subject: subject,
+      subject: 'PromptWars 2026 - Registration Confirmed! 🎉',
       html: html
     });
 
