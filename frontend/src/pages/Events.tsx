@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function Events() {
-  const TOTAL_SLOTS = 7;
+  const TOTAL_SLOTS = 60;
   const [rsvpCount, setRsvpCount] = useState<number>(0);
   const [isRsvped, setIsRsvped] = useState(false);
 
