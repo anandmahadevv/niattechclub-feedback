@@ -27,6 +27,7 @@ body {
   background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
   color: #111827;
   min-height: 100vh;
+  scroll-behavior: smooth;
 }
 
 /* Custom background pattern for Homepage Hero */
