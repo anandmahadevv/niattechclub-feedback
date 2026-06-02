@@ -11,7 +11,7 @@ export default function Events() {
       const { count, error } = await supabase
         .from('rsvps')
         .select('*', { count: 'exact', head: true })
-        .eq('event_slug', 'web3-hackathon');
+        .eq('event_slug', 'promptwars');
         
       if (error) {
         console.error("Error fetching RSVP count:", error);
@@ -128,15 +128,15 @@ export default function Events() {
                     <i className="fas fa-clock"></i> Upcoming
                   </span>
                   <span className="text-gray-500 text-sm font-medium flex items-center gap-1 ml-auto">
-                    <i className="far fa-calendar-alt"></i> Aug 15
+                    <i className="far fa-calendar-alt"></i> Aug (TBD)
                   </span>
                 </div>
-                <h3 className="text-3xl font-extrabold text-gray-900 mb-4">Web3 & Decentralized Apps Hackathon</h3>
+                <h3 className="text-3xl font-extrabold text-gray-900 mb-4">PromptWars</h3>
                 <div className="inline-flex items-center gap-2 text-sm text-gray-700 font-semibold bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 mb-6 w-fit">
                   <i className="fas fa-map-marker-alt text-purple-500"></i> Main Auditorium
                 </div>
                 <p className="text-gray-600 leading-relaxed mb-6">
-                  Join us for a 24-hour hackathon to build decentralized applications (dApps) using smart contracts. Connect with industry experts, learn about blockchain architecture, and build the future of the web.
+                  PromptWars is a generative AI hackathon by Google for Developers and Hack2skill. Participants use "vibe coding"—building apps entirely via prompts to AI agents instead of manual coding—leveraging Google Antigravity and AI Studio to rapidly build and deploy projects.
                 </p>
                 <div className="mt-auto">
                   <p className="text-sm font-bold text-gray-900 mb-2">Prizes include:</p>
@@ -181,7 +181,7 @@ export default function Events() {
                     const { supabase } = await import('../lib/supabase');
                     const { toast } = await import('sonner');
                     const { error } = await supabase.from('rsvps').insert([
-                      { event_slug: 'web3-hackathon', name, email }
+                      { event_slug: 'promptwars', name, email }
                     ]);
                     
                     if (error) throw error;
