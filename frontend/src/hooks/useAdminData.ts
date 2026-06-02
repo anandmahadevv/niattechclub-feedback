@@ -111,11 +111,12 @@ export function useAdminData() {
     }
   };
 
-  const addProject = async (project: Omit<Project, "id" | "date" | "status">) => {
+  const addProject = async (project: Omit<Project, "id" | "date" | "status" | "upvotes">) => {
     const newProject = {
       ...project,
       date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-      status: "pending"
+      status: "pending",
+      upvotes: 0
     };
     
     // Optimistic UI update
