@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 
 interface Member {
+  id?: number;
   name: string;
   role: string;
 }
@@ -9,53 +11,35 @@ const defaultMembers: Member[] = [
   { name: "DINESH A", role: "President" },
   { name: "Divya", role: "Vice President" },
   { name: "Anand M", role: "Member" },
-  { name: "Darshan Dharmar", role: "Member" },
-  { name: "Dhanush Shenoy H", role: "Member" },
-  { name: "Raza Abbas Rizwan Haider Rizvi", role: "Member" },
-  { name: "Lin Joel Pais", role: "Member" },
-  { name: "Akshay Krishna", role: "Member" },
-  { name: "Prathik BG", role: "Member" },
-  { name: "Madhu K M", role: "Member" },
-  { name: "Ajmeera Tharun", role: "Member" },
-  { name: "G R HARSHA", role: "Member" },
-  { name: "Nidhi Deepak Shetty", role: "Member" },
-  { name: "Ajay s m", role: "Member" },
-  { name: "Sangam J K", role: "Member" },
-  { name: "K K V N Saiteja", role: "Member" },
-  { name: "Muhammed sufail M M", role: "Member" },
-  { name: "Nishan V", role: "Member" },
-  { name: "Samarth Shetty", role: "Member" },
-  { name: "Yashas Y", role: "Member" },
-  { name: "Surya Narayana c k", role: "Member" },
-  { name: "Deekshith k R", role: "Member" },
-  { name: "Bindu S H", role: "Member" },
-  { name: "Punyashree Y", role: "Member" },
-  { name: "Ananya Laxman Naik", role: "Member" },
 ];
 
 export default function Members() {
   const [members, setMembers] = useState<Member[]>([]);
 
   useEffect(() => {
-    // Fetch data from local JSON database
-    fetch("/data/members.json")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch members");
+    async function fetchMembers() {
+      try {
+        const { data, error } = await supabase
+          .from('members')
+          .select('*')
+          .order('id', { ascending: true });
+
+        if (error) {
+          throw error;
         }
-        return response.json();
-      })
-      .then((data) => {
-        if (data && data.members && data.members.length > 0) {
-          setMembers(data.members);
+
+        if (data && data.length > 0) {
+          setMembers(data);
         } else {
           setMembers(defaultMembers);
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching members, using fallback data:", error);
         setMembers(defaultMembers);
-      });
+      }
+    }
+
+    fetchMembers();
   }, []);
 
   const getInitials = (name: string) => {

@@ -3,6 +3,7 @@ import Tilt from "react-parallax-tilt";
 import { toast } from "sonner";
 import { useAdminData } from "../hooks/useAdminData";
 import ReactMarkdown from "react-markdown";
+import { supabase } from "../lib/supabase";
 
 export default function Showcase() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,8 +14,8 @@ export default function Showcase() {
     description: "",
     tags: "",
     link: "",
-    imageUrl: "",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const openModal = () => {
@@ -29,8 +30,14 @@ export default function Showcase() {
       description: "",
       tags: "",
       link: "",
-      imageUrl: "",
     });
+    setImageFile(null);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -52,14 +59,33 @@ export default function Showcase() {
     submissionData.append("link", formData.link);
 
     try {
-      // Save locally for the Admin Dashboard
-      addProject({
+      let uploadedImageUrl = "";
+
+      if (imageFile) {
+        toast.loading("Uploading image...", { id: toastId });
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('project_images')
+          .upload(fileName, imageFile);
+          
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('project_images')
+          .getPublicUrl(fileName);
+          
+        uploadedImageUrl = publicUrl;
+      }
+
+      // Save locally and to Supabase via Admin Dashboard hook
+      await addProject({
         name: formData.name,
         project_title: formData.project_title,
         description: formData.description,
         tags: formData.tags,
         link: formData.link,
-        imageUrl: formData.imageUrl
+        image_url: uploadedImageUrl
       });
 
       const response = await fetch("https://formspree.io/f/xdajvbdp", {
@@ -76,8 +102,10 @@ export default function Showcase() {
       } else {
         toast.error("Failed to submit project.", { id: toastId });
       }
-    } catch (error) {
-      toast.error("Oops! There was a problem submitting your project.", { id: toastId });
+    } catch (error: any) {
+      console.error("Submission error:", error);
+      const errorMsg = error?.message || "There was a problem submitting your project.";
+      toast.error(`Oops! ${errorMsg}`, { id: toastId });
     } finally {
       setIsSubmitting(false);
     }
@@ -101,9 +129,9 @@ export default function Showcase() {
           {projects.filter(p => (p.status || 'published') === 'published').map((project) => (
             <Tilt key={project.id} tiltMaxAngleX={2} tiltMaxAngleY={2} scale={1.01} transitionSpeed={2000} className="w-full">
               <article className="project-card flex flex-col md:flex-row w-full bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all">
-                {project.imageUrl && (
+                {project.image_url && (
                   <div className="w-full md:w-2/5 h-64 md:h-auto shrink-0 bg-gray-100 border-b md:border-b-0 md:border-r border-gray-100">
-                    <img src={project.imageUrl} alt={project.project_title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+                    <img src={project.image_url} alt={project.project_title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
                   </div>
                 )}
                 <div className="p-8 flex flex-col flex-grow w-full">
@@ -251,14 +279,12 @@ export default function Showcase() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Preview Image URL (Optional)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Preview Image (Optional)</label>
                   <input
-                    type="url"
-                    name="imageUrl"
-                    value={formData.imageUrl}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all text-sm"
-                    placeholder="https://example.com/image.png"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
                   />
                 </div>
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
 
 export interface Idea {
   id: number;
@@ -18,129 +19,138 @@ export interface Project {
   link: string;
   date: string;
   status: 'pending' | 'published';
-  imageUrl?: string;
+  image_url?: string;
 }
 
 export function useAdminData() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load from local storage on mount
+  // Load from Supabase on mount
   useEffect(() => {
-    const storedIdeas = localStorage.getItem("techclub_ideas");
-    if (storedIdeas) {
-      setIdeas(JSON.parse(storedIdeas));
-    } else {
-      // Default dummy data if empty
-      const defaultIdeas: Idea[] = [
-        { id: 1, name: "Rahul S", category: "Workshop", idea: "Docker for Beginners", tech: "Yes", date: "June 1, 2026" },
-        { id: 2, name: "Priya M", category: "Guest Lecture", idea: "Cybersecurity Basics", tech: "No", date: "June 2, 2026" }
-      ];
-      setIdeas(defaultIdeas);
-      localStorage.setItem("techclub_ideas", JSON.stringify(defaultIdeas));
+    async function fetchData() {
+      setLoading(true);
+      
+      // Fetch Ideas
+      const { data: ideasData, error: ideasError } = await supabase
+        .from('ideas')
+        .select('*')
+        .order('id', { ascending: false });
+        
+      if (!ideasError && ideasData) {
+        setIdeas(ideasData as Idea[]);
+      } else {
+        console.error("Error fetching ideas:", ideasError);
+      }
+
+      // Fetch Projects
+      const { data: projectsData, error: projectsError } = await supabase
+        .from('projects')
+        .select('*')
+        .order('id', { ascending: false });
+        
+      if (!projectsError && projectsData) {
+        setProjects(projectsData as Project[]);
+      } else {
+        console.error("Error fetching projects:", projectsError);
+      }
+      
+      setLoading(false);
     }
 
-    const storedProjects = localStorage.getItem("techclub_projects");
-    
-    const hackMateProject: Project = { 
-      id: 999, // use a high ID for the default force-inject
-      name: "Anand Mahadev, Dhanush Shenoy H, Dinesh A", 
-      project_title: "HACK-MATE", 
-      description: "An AI-powered hackathon co-pilot built to help teams build projects faster, collaborate better, and simplify hackathon workflows. Reached 1000+ users across 10+ countries with 1,280 Git clones in just one month. Built fully open-source with an active community.", 
-      tags: "React, TypeScript, AI, Open-Source", 
-      link: "https://hackmate.anandmahadev.in/", 
-      date: "June 1, 2026", 
-      status: "published",
-      imageUrl: "/hackmate.jpeg"
+    fetchData();
+
+    // Set up real-time subscriptions
+    const ideasSubscription = supabase.channel('custom-all-ideas')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ideas' }, () => {
+        fetchData(); // Simplest way to handle real-time sync is to re-fetch
+      })
+      .subscribe();
+
+    const projectsSubscription = supabase.channel('custom-all-projects')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ideasSubscription);
+      supabase.removeChannel(projectsSubscription);
     };
-
-    if (storedProjects) {
-      let parsed = JSON.parse(storedProjects);
-      
-      // Deduplicate by ID
-      const uniqueById: Project[] = [];
-      const seenIds = new Set();
-      for (const p of parsed) {
-        if (!seenIds.has(p.id)) {
-          uniqueById.push(p);
-          seenIds.add(p.id);
-        }
-      }
-      parsed = uniqueById;
-
-      // Ensure only one HACK-MATE project exists and it's up to date
-      const otherProjects = parsed.filter((p: Project) => p.project_title !== "HACK-MATE");
-      const hackMateProjects = parsed.filter((p: Project) => p.project_title === "HACK-MATE");
-      
-      if (hackMateProjects.length !== 1 || hackMateProjects[0].link !== hackMateProject.link) {
-        parsed = [hackMateProject, ...otherProjects];
-        localStorage.setItem("techclub_projects", JSON.stringify(parsed));
-      } else if (parsed.length !== JSON.parse(storedProjects).length) {
-        // Save if we removed duplicates by ID
-        localStorage.setItem("techclub_projects", JSON.stringify(parsed));
-      }
-      
-      setProjects(parsed);
-    } else {
-      // Default dummy data if empty
-      const defaultProjects: Project[] = [
-        hackMateProject,
-        { 
-          id: 2, 
-          name: "Divya K", 
-          project_title: "Campus Navigator App", 
-          description: "An interactive map to help freshmen find their classrooms across the university campus.", 
-          tags: "React Native, Firebase", 
-          link: "https://github.com", 
-          date: "June 1, 2026", 
-          status: "published",
-          imageUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800"
-        }
-      ];
-      setProjects(defaultProjects);
-      localStorage.setItem("techclub_projects", JSON.stringify(defaultProjects));
-    }
   }, []);
 
-  const addIdea = (idea: Omit<Idea, "id" | "date">) => {
+  const addIdea = async (idea: Omit<Idea, "id" | "date">) => {
     const newIdea = {
       ...idea,
-      id: Date.now(),
       date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
     };
-    const updated = [...ideas, newIdea];
-    setIdeas(updated);
-    localStorage.setItem("techclub_ideas", JSON.stringify(updated));
+    
+    // Optimistic UI update
+    const tempId = Date.now();
+    setIdeas((prev) => [{ ...newIdea, id: tempId }, ...prev]);
+    
+    const { error } = await supabase.from('ideas').insert(newIdea);
+    if (error) {
+      console.error("Failed to add idea to Supabase:", error);
+      // Revert optimistic update
+      setIdeas((prev) => prev.filter(i => i.id !== tempId));
+    }
   };
 
-  const deleteIdea = (id: number) => {
-    const updated = ideas.filter(i => i.id !== id);
-    setIdeas(updated);
-    localStorage.setItem("techclub_ideas", JSON.stringify(updated));
+  const deleteIdea = async (id: number) => {
+    // Optimistic UI update
+    const prevIdeas = [...ideas];
+    setIdeas((prev) => prev.filter((i) => i.id !== id));
+    
+    const { error } = await supabase.from('ideas').delete().eq('id', id);
+    if (error) {
+      console.error("Failed to delete idea from Supabase:", error);
+      setIdeas(prevIdeas);
+    }
   };
 
-  const addProject = (project: Omit<Project, "id" | "date" | "status">) => {
-    const newProject: Project = {
+  const addProject = async (project: Omit<Project, "id" | "date" | "status">) => {
+    const newProject = {
       ...project,
-      id: Date.now(),
       date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
       status: "pending"
     };
-    const updated = [...projects, newProject];
-    setProjects(updated);
-    localStorage.setItem("techclub_projects", JSON.stringify(updated));
+    
+    // Optimistic UI update
+    const tempId = Date.now();
+    setProjects((prev) => [{ ...newProject, id: tempId, status: 'pending' as const }, ...prev]);
+
+    const { error } = await supabase.from('projects').insert(newProject);
+    if (error) {
+      console.error("Failed to add project to Supabase:", error);
+      setProjects((prev) => prev.filter(p => p.id !== tempId));
+      throw error;
+    }
   };
 
-  const deleteProject = (id: number) => {
-    const updated = projects.filter(p => p.id !== id);
-    setProjects(updated);
-    localStorage.setItem("techclub_projects", JSON.stringify(updated));
+  const deleteProject = async (id: number) => {
+    // Optimistic UI update
+    const prevProjects = [...projects];
+    setProjects((prev) => prev.filter((p) => p.id !== id));
+    
+    const { error } = await supabase.from('projects').delete().eq('id', id);
+    if (error) {
+      console.error("Failed to delete project from Supabase:", error);
+      setProjects(prevProjects);
+    }
   };
 
-  const publishProject = (id: number) => {
-    const updated = projects.map(p => p.id === id ? { ...p, status: 'published' as const } : p);
-    setProjects(updated);
-    localStorage.setItem("techclub_projects", JSON.stringify(updated));
+  const publishProject = async (id: number) => {
+    // Optimistic UI update
+    const prevProjects = [...projects];
+    setProjects((prev) => prev.map((p) => p.id === id ? { ...p, status: 'published' as const } : p));
+    
+    const { error } = await supabase.from('projects').update({ status: 'published' }).eq('id', id);
+    if (error) {
+      console.error("Failed to publish project in Supabase:", error);
+      setProjects(prevProjects);
+    }
   };
 
   return {
@@ -150,6 +160,7 @@ export function useAdminData() {
     projects,
     addProject,
     deleteProject,
-    publishProject
+    publishProject,
+    loading
   };
 }
