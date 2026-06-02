@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function Events() {
@@ -9,22 +9,22 @@ export default function Events() {
   const [attendees, setAttendees] = useState<{ id: number; name: string; created_at: string }[]>([]);
   const [showAttendees, setShowAttendees] = useState(false);
 
-  useEffect(() => {
-    async function fetchRsvps() {
-      const { data, error, count } = await supabase
-        .from('rsvps')
-        .select('id, name, created_at', { count: 'exact' })
-        .eq('event_slug', 'promptwars')
-        .order('created_at', { ascending: true });
-        
-      if (error) {
-        console.error("Error fetching RSVPs:", error);
-      } else if (data) {
-        setAttendees(data);
-        if (count !== null) setRsvpCount(count);
-      }
+  const fetchRsvps = useCallback(async () => {
+    const { data, error, count } = await supabase
+      .from('rsvps')
+      .select('id, name, created_at', { count: 'exact' })
+      .eq('event_slug', 'promptwars')
+      .order('created_at', { ascending: true });
+      
+    if (error) {
+      console.error("Error fetching RSVPs:", error);
+    } else if (data) {
+      setAttendees(data);
+      if (count !== null) setRsvpCount(count);
     }
-    
+  }, []);
+
+  useEffect(() => {
     fetchRsvps();
 
     // Set up Supabase Realtime subscription for live updates
@@ -42,7 +42,7 @@ export default function Events() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchRsvps]);
 
   const remainingSlots = Math.max(0, TOTAL_SLOTS - rsvpCount);
   const isFull = remainingSlots === 0;
