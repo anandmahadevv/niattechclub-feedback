@@ -18,15 +18,15 @@ import Profile from "./pages/Profile";
 
 function AppContent() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAuthOrAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/login';
   
   return (
-    <div className={`flex flex-col min-h-screen font-sans antialiased ${isAdminRoute ? 'bg-gray-100' : 'bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900'}`}>
+    <div className={`flex flex-col min-h-screen font-sans antialiased ${isAuthOrAdminRoute ? 'bg-gray-100 dark:bg-slate-950' : 'bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900'}`}>
       <PageLoader />
       <Toaster position="bottom-right" richColors />
       
       {/* Conditionally render public layout components */}
-      {!isAdminRoute && (
+      {!isAuthOrAdminRoute && (
         <>
           <Navbar />
           <UpgradeBannerDemo />
@@ -50,7 +50,7 @@ function AppContent() {
       </AnimatePresence>
 
       {/* Footer */}
-      {!isAdminRoute && <Footer />}
+      {!isAuthOrAdminRoute && <Footer />}
     </div>
   );
 }
