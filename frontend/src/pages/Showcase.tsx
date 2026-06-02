@@ -184,7 +184,7 @@ export default function Showcase() {
 
               <form onSubmit={submitProjectForm} className="space-y-4 text-left">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Your Name</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Contributors / Authors Names</label>
                   <input
                     type="text"
                     name="name"
@@ -192,7 +192,7 @@ export default function Showcase() {
                     value={formData.name}
                     onChange={handleInputChange}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
-                    placeholder="e.g. Divya"
+                    placeholder="e.g. Divya, Rahul"
                   />
                 </div>
 

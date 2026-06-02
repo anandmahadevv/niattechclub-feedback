@@ -56,15 +56,30 @@ export function useAdminData() {
 
     if (storedProjects) {
       let parsed = JSON.parse(storedProjects);
-      // Force inject HACK-MATE if missing, OR update if it has old link
-      const existingIndex = parsed.findIndex((p: Project) => p.project_title === "HACK-MATE");
-      if (existingIndex === -1) {
-        parsed = [hackMateProject, ...parsed];
+      
+      // Deduplicate by ID
+      const uniqueById: Project[] = [];
+      const seenIds = new Set();
+      for (const p of parsed) {
+        if (!seenIds.has(p.id)) {
+          uniqueById.push(p);
+          seenIds.add(p.id);
+        }
+      }
+      parsed = uniqueById;
+
+      // Ensure only one HACK-MATE project exists and it's up to date
+      const otherProjects = parsed.filter((p: Project) => p.project_title !== "HACK-MATE");
+      const hackMateProjects = parsed.filter((p: Project) => p.project_title === "HACK-MATE");
+      
+      if (hackMateProjects.length !== 1 || hackMateProjects[0].link !== hackMateProject.link) {
+        parsed = [hackMateProject, ...otherProjects];
         localStorage.setItem("techclub_projects", JSON.stringify(parsed));
-      } else if (parsed[existingIndex].link !== hackMateProject.link) {
-        parsed[existingIndex] = hackMateProject;
+      } else if (parsed.length !== JSON.parse(storedProjects).length) {
+        // Save if we removed duplicates by ID
         localStorage.setItem("techclub_projects", JSON.stringify(parsed));
       }
+      
       setProjects(parsed);
     } else {
       // Default dummy data if empty
