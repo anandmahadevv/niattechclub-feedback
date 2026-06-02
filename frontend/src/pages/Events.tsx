@@ -132,6 +132,13 @@ export default function Events() {
                   </span>
                 </div>
                 <h3 className="text-3xl font-extrabold text-gray-900 mb-4">PromptWars</h3>
+                
+                <img 
+                  src="https://bwnveqipiqlnjjukicah.supabase.co/storage/v1/object/sign/project_images/promptwar.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8yZjRiZDA4ZC0wZjZkLTRhMDQtOGMzYy03MzZhNzYwMzMxNzQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9qZWN0X2ltYWdlcy9wcm9tcHR3YXIuanBnIiwiaWF0IjoxNzgwMzkzODE2LCJleHAiOjE4MTE5Mjk4MTZ9.qPoe0GNLwj2xo2YMpxN7hTAg8rru1RPU_7dA8pUIxmk" 
+                  alt="PromptWars 2026 Banner" 
+                  className="w-full rounded-2xl shadow-sm mb-6 object-cover border border-gray-100" 
+                />
+
                 <div className="inline-flex items-center gap-2 text-sm text-gray-700 font-semibold bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 mb-6 w-fit">
                   <i className="fas fa-map-marker-alt text-purple-500"></i> Main Auditorium
                 </div>
