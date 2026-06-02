@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -16,13 +16,11 @@ export default function PageLoader() {
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [statusMessage, setStatusMessage] = useState("Loading...");
-  const prevPath = useRef<string | null>(null);
+
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const topClass = isAdminRoute ? "top-0" : "top-20";
 
   useEffect(() => {
-    // Only trigger on actual path change
-    if (prevPath.current === location.pathname) return;
-    prevPath.current = location.pathname;
-
     // Get current message or fallback
     const message = MESSAGES[location.pathname] || "Loading system resources...";
     setStatusMessage(message);
@@ -72,7 +70,7 @@ export default function PageLoader() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white text-gray-900 select-none overflow-hidden"
+          className={`fixed left-0 right-0 bottom-0 ${topClass} z-40 flex flex-col items-center justify-center bg-white text-gray-900 select-none overflow-hidden`}
         >
           {/* Subtle grid/dot background */}
           <div className="absolute inset-0 bg-[radial-gradient(rgba(220,38,38,0.04)_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none" />
