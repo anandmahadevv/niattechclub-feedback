@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 export default function Events() {
   const TOTAL_SLOTS = 50;
   const [rsvpCount, setRsvpCount] = useState<number>(0);
+  const [isRsvped, setIsRsvped] = useState(false);
 
   useEffect(() => {
     async function fetchRsvpCount() {
@@ -160,49 +161,74 @@ export default function Events() {
                 <h4 className="text-xl font-bold text-gray-900 mb-2">Reserve Your Spot</h4>
                 <p className="text-sm text-gray-500 mb-6">Fill out the form below to register for this event.</p>
                 
-                <div className="mb-6">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${isFull ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                    <i className={`fas ${isFull ? 'fa-times-circle' : 'fa-check-circle'}`}></i>
-                    {isFull ? 'Event is Full' : `${remainingSlots} Slots Remaining`}
-                  </span>
-                </div>
-                
-                <form className="space-y-4" onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (isFull) return;
-                  const form = e.target as HTMLFormElement;
-                  const name = (form.elements.namedItem('name') as HTMLInputElement).value;
-                  const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-                  const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-                  
-                  if (!email.endsWith('@yenepoya.edu.in')) {
-                    const { toast } = await import('sonner');
-                    toast.error('Only @yenepoya.edu.in email addresses are allowed to RSVP.');
-                    return;
-                  }
-                  
-                  submitBtn.disabled = true;
-                  submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
-                  
-                  try {
-                    const { supabase } = await import('../lib/supabase');
-                    const { toast } = await import('sonner');
-                    const { error } = await supabase.from('rsvps').insert([
-                      { event_slug: 'promptwars', name, email }
-                    ]);
+                {isRsvped ? (
+                  <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center animate-in fade-in zoom-in duration-300">
+                    <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                      <i className="fas fa-check-circle"></i>
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">Congrats for booking!</h4>
+                    <p className="text-sm text-gray-600">
+                      Your spot for PromptWars has been successfully reserved. Keep an eye on your email for further updates!
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-6">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${isFull ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                        <i className={`fas ${isFull ? 'fa-times-circle' : 'fa-check-circle'}`}></i>
+                        {isFull ? 'Event is Full' : `${remainingSlots} Slots Remaining`}
+                      </span>
+                    </div>
                     
-                    if (error) throw error;
-                    toast.success("RSVP successful! See you at the hackathon.");
-                    form.reset();
-                    setRsvpCount(prev => prev + 1);
-                  } catch (error: any) {
-                    const { toast } = await import('sonner');
-                    toast.error(error.message || "Failed to submit RSVP.");
-                  } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Confirm RSVP <i class="fas fa-check-circle"></i>';
-                  }
-                }}>
+                    <form className="space-y-4" onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (isFull) return;
+                      const form = e.target as HTMLFormElement;
+                      const name = (form.elements.namedItem('name') as HTMLInputElement).value;
+                      const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+                      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+                      
+                      if (!email.endsWith('@yenepoya.edu.in')) {
+                        const { toast } = await import('sonner');
+                        toast.error('Only @yenepoya.edu.in email addresses are allowed to RSVP.');
+                        return;
+                      }
+                      
+                      submitBtn.disabled = true;
+                      submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+                      
+                      try {
+                        const { supabase } = await import('../lib/supabase');
+                        const { toast } = await import('sonner');
+                        
+                        // Check if email already RSVP'd
+                        const { data: existingRsvp } = await supabase
+                          .from('rsvps')
+                          .select('id')
+                          .eq('event_slug', 'promptwars')
+                          .eq('email', email)
+                          .single();
+                          
+                        if (existingRsvp) {
+                          throw new Error("You have already RSVP'd for this event with this email.");
+                        }
+
+                        const { error } = await supabase.from('rsvps').insert([
+                          { event_slug: 'promptwars', name, email }
+                        ]);
+                        
+                        if (error) throw error;
+                        
+                        toast.success("RSVP successful!");
+                        setRsvpCount(prev => prev + 1);
+                        setIsRsvped(true);
+                      } catch (error: any) {
+                        const { toast } = await import('sonner');
+                        toast.error(error.message || "Failed to submit RSVP.");
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Confirm RSVP <i class="fas fa-check-circle"></i>';
+                      }
+                    }}>
                   <div>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
@@ -233,14 +259,16 @@ export default function Events() {
                       />
                     </div>
                   </div>
-                  <button
-                    type="submit"
-                    disabled={isFull}
-                    className="w-full py-3 px-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isFull ? 'Registration Closed' : 'Confirm RSVP'} <i className={`fas ${isFull ? 'fa-ban' : 'fa-check-circle'}`}></i>
-                  </button>
-                </form>
+                      <button
+                        type="submit"
+                        disabled={isFull}
+                        className="w-full py-3 px-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isFull ? 'Registration Closed' : 'Confirm RSVP'} <i className={`fas ${isFull ? 'fa-ban' : 'fa-check-circle'}`}></i>
+                      </button>
+                    </form>
+                  </>
+                )}
               </div>
             </div>
           </div>
