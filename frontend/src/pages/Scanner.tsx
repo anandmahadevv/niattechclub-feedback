@@ -61,7 +61,7 @@ export default function ScannerPage() {
               }
             }} 
             formats={['qr_code']}
-            components={{ tracker: true, audio: false }}
+            components={{ audio: false }}
           />
           {isProcessing && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
