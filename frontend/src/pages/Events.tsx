@@ -51,7 +51,7 @@ export default function Events() {
     <div className="flex-grow w-full flex flex-col">
       {/* Header Section */}
       <header className="max-w-4xl mx-auto px-6 pt-6 pb-8 text-center w-full">
-        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-gray-900 mb-6 drop-shadow-sm flex items-center justify-center gap-4">
+        <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-gray-900 mb-6 drop-shadow-sm flex items-center justify-center gap-4">
           Events <span className="text-red-500"><i className="far fa-calendar-check"></i></span>
         </h1>
         <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed font-medium">

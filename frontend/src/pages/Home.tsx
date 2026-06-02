@@ -19,7 +19,7 @@ export default function Home() {
               2025-26 Session Active
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
               Build the future with <br />
               <div className="inline-block mt-2">
                 <PointerHighlight

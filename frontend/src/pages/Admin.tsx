@@ -4,6 +4,7 @@ import { useAdminData } from "../hooks/useAdminData";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem("adminAuth") === "true";
   });
@@ -70,42 +71,60 @@ export default function Admin() {
 
   return (
     <div className="flex h-screen w-full bg-gray-50 overflow-hidden text-gray-900">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-gray-900/50 z-20 md:hidden backdrop-blur-sm" 
+          onClick={() => setIsSidebarOpen(false)} 
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 relative z-20 shadow-sm">
+      <aside 
+        className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 z-30 shadow-2xl md:shadow-sm transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
           <h2 className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-800">
             Admin Panel
           </h2>
+          <button 
+            className="md:hidden text-gray-400 hover:text-gray-600"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <i className="fas fa-times text-xl"></i>
+          </button>
         </div>
         
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <SidebarButton 
             active={activeTab === "overview"} 
-            onClick={() => setActiveTab("overview")}
+            onClick={() => { setActiveTab("overview"); setIsSidebarOpen(false); }}
             icon="fa-chart-pie"
             label="Overview"
           />
           <SidebarButton 
             active={activeTab === "events"} 
-            onClick={() => setActiveTab("events")}
+            onClick={() => { setActiveTab("events"); setIsSidebarOpen(false); }}
             icon="fa-calendar-alt"
             label="Events"
           />
           <SidebarButton 
             active={activeTab === "ideas"} 
-            onClick={() => setActiveTab("ideas")}
+            onClick={() => { setActiveTab("ideas"); setIsSidebarOpen(false); }}
             icon="fa-lightbulb"
             label="Ideas"
           />
           <SidebarButton 
             active={activeTab === "projects"} 
-            onClick={() => setActiveTab("projects")}
+            onClick={() => { setActiveTab("projects"); setIsSidebarOpen(false); }}
             icon="fa-laptop-code"
             label="Projects"
           />
         </nav>
 
-        <div className="p-4 border-t border-gray-100">
+        <div className="p-4 border-t border-gray-100 bg-white">
           <button 
             onClick={handleLogout}
             className="flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-red-600 hover:bg-red-50 transition-colors"
@@ -122,8 +141,21 @@ export default function Admin() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 h-full overflow-y-auto relative bg-gray-50/50">
-        <div className="p-8 max-w-7xl mx-auto">
+      <main className="flex-1 h-full overflow-y-auto relative bg-gray-50/50 w-full">
+        {/* Mobile Header */}
+        <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-10">
+          <h2 className="text-lg font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-800">
+            Dashboard
+          </h2>
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <i className="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+        
+        <div className="p-4 md:p-8 max-w-7xl mx-auto">
           {activeTab === "overview" && <OverviewTab />}
           {activeTab === "events" && <EventsTab />}
           {activeTab === "ideas" && <IdeasTab />}

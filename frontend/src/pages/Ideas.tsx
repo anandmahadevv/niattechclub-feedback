@@ -106,7 +106,7 @@ export default function Ideas() {
 
       {/* Form Container */}
       <div className="flex-grow flex items-start justify-center px-4 w-full">
-        <div className="w-full max-w-3xl form-card p-8 md:p-12 relative overflow-hidden bg-white/75 dark:bg-zinc-900/60 backdrop-blur-xl border border-gray-200/55 dark:border-zinc-800/60 shadow-2xl rounded-3xl">
+        <div className="w-full max-w-3xl form-card p-6 md:p-12 relative overflow-hidden bg-white/75 dark:bg-zinc-900/60 backdrop-blur-xl border border-gray-200/55 dark:border-zinc-800/60 shadow-2xl rounded-3xl">
           <form onSubmit={submitIdeaForm} className="space-y-6">
             {/* Name */}
             <div>
