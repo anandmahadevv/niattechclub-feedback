@@ -55,7 +55,7 @@ export default function ScannerPage() {
         <div className="bg-black rounded-3xl overflow-hidden border-4 border-gray-800 shadow-2xl relative">
           {/* Camera Scanner */}
           <Scanner 
-            onScan={(detectedCodes) => {
+            onScan={(detectedCodes: any) => {
               if (detectedCodes && detectedCodes.length > 0) {
                 handleRawValue(detectedCodes[0].rawValue);
               }
