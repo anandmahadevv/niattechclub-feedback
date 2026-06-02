@@ -103,7 +103,23 @@ export function Banner({
   const globalKey = id ? `nd-banner-${id}` : null;
 
   useEffect(() => {
-    if (globalKey) setOpen(localStorage.getItem(globalKey) !== "true");
+    if (globalKey) {
+      const dismissedAt = localStorage.getItem(globalKey);
+      if (dismissedAt) {
+        const timePassed = Date.now() - parseInt(dismissedAt, 10);
+        if (timePassed < 60000) {
+          setOpen(false);
+          const timer = setTimeout(() => {
+            setOpen(true);
+            localStorage.removeItem(globalKey);
+          }, 60000 - timePassed);
+          return () => clearTimeout(timer);
+        } else {
+          setOpen(true);
+          localStorage.removeItem(globalKey);
+        }
+      }
+    }
   }, [globalKey]);
 
   if (!open) return null;
@@ -136,7 +152,7 @@ export function Banner({
       {globalKey ? (
         <script
           dangerouslySetInnerHTML={{
-            __html: `if (localStorage.getItem('${globalKey}') === 'true') document.documentElement.classList.add('${globalKey}');`,
+            __html: `var dismissedAt = localStorage.getItem('${globalKey}'); if (dismissedAt) { if (Date.now() - parseInt(dismissedAt, 10) < 60000) { document.documentElement.classList.add('${globalKey}'); } else { localStorage.removeItem('${globalKey}'); } }`,
           }}
         />
       ) : null}
@@ -154,8 +170,12 @@ export function Banner({
           onClick={() => {
             setOpen(false);
             if (globalKey) {
-              localStorage.setItem(globalKey, "true");
+              localStorage.setItem(globalKey, Date.now().toString());
               window.dispatchEvent(new Event("banner-status-changed"));
+              setTimeout(() => {
+                setOpen(true);
+                localStorage.removeItem(globalKey);
+              }, 60000);
             }
           }}
           className={cn(

@@ -4,8 +4,31 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 function UpgradeBannerDemo() {
   const [isVisible, setIsVisible] = React.useState(() => {
-    return localStorage.getItem("upgrade-banner-dismissed-v2") !== "true";
+    const dismissedAt = localStorage.getItem("upgrade-banner-dismissed-v2");
+    if (dismissedAt) {
+      if (Date.now() - parseInt(dismissedAt, 10) < 60000) {
+        return false;
+      } else {
+        localStorage.removeItem("upgrade-banner-dismissed-v2");
+        return true;
+      }
+    }
+    return true;
   });
+
+  React.useEffect(() => {
+    const dismissedAt = localStorage.getItem("upgrade-banner-dismissed-v2");
+    if (dismissedAt) {
+      const timePassed = Date.now() - parseInt(dismissedAt, 10);
+      if (timePassed < 60000) {
+        const timer = setTimeout(() => {
+          setIsVisible(true);
+          localStorage.removeItem("upgrade-banner-dismissed-v2");
+        }, 60000 - timePassed);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -15,7 +38,11 @@ function UpgradeBannerDemo() {
 
   const handleClose = () => {
     setIsVisible(false);
-    localStorage.setItem("upgrade-banner-dismissed-v2", "true");
+    localStorage.setItem("upgrade-banner-dismissed-v2", Date.now().toString());
+    setTimeout(() => {
+      setIsVisible(true);
+      localStorage.removeItem("upgrade-banner-dismissed-v2");
+    }, 60000);
   };
 
   return (
