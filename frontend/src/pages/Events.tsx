@@ -6,22 +6,25 @@ export default function Events() {
   const TOTAL_SLOTS = 60;
   const [rsvpCount, setRsvpCount] = useState<number>(0);
   const [isRsvped, setIsRsvped] = useState(false);
+  const [attendees, setAttendees] = useState<{ id: number; name: string; created_at: string }[]>([]);
 
   useEffect(() => {
-    async function fetchRsvpCount() {
-      const { count, error } = await supabase
+    async function fetchRsvps() {
+      const { data, error, count } = await supabase
         .from('rsvps')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_slug', 'promptwars');
+        .select('id, name, created_at', { count: 'exact' })
+        .eq('event_slug', 'promptwars')
+        .order('created_at', { ascending: true });
         
       if (error) {
-        console.error("Error fetching RSVP count:", error);
-      } else if (count !== null) {
-        setRsvpCount(count);
+        console.error("Error fetching RSVPs:", error);
+      } else if (data) {
+        setAttendees(data);
+        if (count !== null) setRsvpCount(count);
       }
     }
     
-    fetchRsvpCount();
+    fetchRsvps();
 
     // Set up Supabase Realtime subscription for live updates
     const channel = supabase
@@ -30,7 +33,7 @@ export default function Events() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'rsvps', filter: 'event_slug=eq.promptwars' },
         () => {
-          fetchRsvpCount();
+          fetchRsvps();
         }
       )
       .subscribe();
@@ -247,7 +250,7 @@ export default function Events() {
                         }
                         
                         toast.success("RSVP successful! Confirmation email sent.");
-                        setRsvpCount(prev => prev + 1);
+                        fetchRsvps(); // Instantly fetch new list
                         setIsRsvped(true);
                       } catch (error: any) {
                         const { toast } = await import('sonner');
@@ -299,6 +302,30 @@ export default function Events() {
             </div>
           </div>
         </div>
+
+        {/* Attendees Section */}
+        {attendees.length > 0 && (
+          <div className="mt-12 bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6 border-b pb-4">
+              <i className="fas fa-users text-2xl text-purple-600"></i>
+              <h3 className="text-2xl font-extrabold text-gray-900">Who's Going?</h3>
+              <span className="ml-auto bg-gray-100 text-gray-700 text-sm font-bold px-3 py-1 rounded-full">
+                {attendees.length} Registered
+              </span>
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+              {attendees.map((attendee) => (
+                <div key={attendee.id} className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-full px-4 py-2 hover:bg-gray-100 hover:border-gray-200 transition-colors shadow-sm animate-in fade-in zoom-in duration-300">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold shadow-inner">
+                    {attendee.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-semibold text-gray-700">{attendee.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-16 text-center">
           <div className="inline-flex items-center justify-center p-6 bg-gray-50 rounded-2xl border border-gray-200 border-dashed w-full">
