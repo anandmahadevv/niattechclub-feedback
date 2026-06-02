@@ -218,9 +218,9 @@ export default function Events() {
                         
                         if (error) throw error;
                         
-                        // Send confirmation email via backend
+                        // Send confirmation email via Vercel Serverless Function
                         try {
-                          await fetch('http://localhost:5000/api/send-rsvp-email', {
+                          await fetch('/api/send-rsvp-email', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ name, email })
