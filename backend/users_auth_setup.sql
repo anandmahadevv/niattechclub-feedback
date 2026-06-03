@@ -30,6 +30,7 @@ CREATE TABLE public.users_auth (
     roll_number TEXT NOT NULL,
     department TEXT NOT NULL,
     bio TEXT,
+    github_username TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

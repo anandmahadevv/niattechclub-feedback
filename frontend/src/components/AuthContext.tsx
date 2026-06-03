@@ -8,6 +8,7 @@ export interface CustomUser {
   roll_number: string;
   department: string;
   bio: string;
+  github_username?: string | null;
 }
 
 interface AuthContextType {
@@ -38,20 +39,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initSession = () => {
+    const initSession = async () => {
       try {
-        const storedUser = localStorage.getItem("auth_user");
-        const loginTimeStr = localStorage.getItem("auth_login_time");
+        const { data } = await supabase.auth.getSession();
+        const session = data?.session;
 
-        if (storedUser && loginTimeStr) {
-          const loginTime = parseInt(loginTimeStr, 10);
-          if (!isNaN(loginTime) && Date.now() - loginTime > TWO_MONTHS_MS) {
-            console.warn("Custom session expired (2 months limit reached).");
-            localStorage.removeItem("auth_user");
-            localStorage.removeItem("auth_login_time");
-            setUser(null);
+        if (session) {
+          const email = session.user.email;
+          const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || "Anonymous";
+          const github_username = session.user.user_metadata?.preferred_username || null;
+
+          const { data: existingUser } = await supabase
+            .from("users_auth")
+            .select("*")
+            .eq("email", email)
+            .single();
+
+          if (existingUser) {
+            setUser(existingUser);
+            localStorage.setItem("auth_user", JSON.stringify(existingUser));
           } else {
-            setUser(JSON.parse(storedUser));
+            const { data: newUser, error } = await supabase.from("users_auth").insert({
+              email: email,
+              password: "social_login_dummy",
+              name: name,
+              roll_number: "N/A",
+              department: "N/A",
+              bio: "Logged in via social provider.",
+              github_username: github_username
+            }).select().single();
+
+            if (!error && newUser) {
+              setUser(newUser);
+              localStorage.setItem("auth_user", JSON.stringify(newUser));
+            }
+          }
+        } else {
+          const storedUser = localStorage.getItem("auth_user");
+          const loginTimeStr = localStorage.getItem("auth_login_time");
+
+          if (storedUser && loginTimeStr) {
+            const loginTime = parseInt(loginTimeStr, 10);
+            if (!isNaN(loginTime) && Date.now() - loginTime > TWO_MONTHS_MS) {
+              localStorage.removeItem("auth_user");
+              localStorage.removeItem("auth_login_time");
+              setUser(null);
+            } else {
+              setUser(JSON.parse(storedUser));
+            }
           }
         }
       } catch (err) {
@@ -134,7 +169,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithProvider = async (provider: "google" | "github"): Promise<void> => {
-    const { error } = await supabase.auth.signInWithOAuth({ provider });
+    const options: any = {
+      redirectTo: window.location.origin + window.location.pathname,
+    };
+    if (provider === "github") {
+      options.scopes = "read:user user:email";
+    }
+    const { error } = await supabase.auth.signInWithOAuth({ provider, options });
     if (error) throw error;
   };
 
