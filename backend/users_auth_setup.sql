@@ -1,15 +1,3 @@
--- 0. Enable pgcrypto extension for bcrypt hashing
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
--- 0a. Trigger function: automatically bcrypt-hash passwords before INSERT or UPDATE
-CREATE OR REPLACE FUNCTION hash_user_password()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Only hash if the value is not already a bcrypt hash (starts with $2a$ or $2b$)
-    IF NEW.password IS NOT NULL
-       AND NEW.password NOT LIKE '$2a$%'
-       AND NEW.password NOT LIKE '$2b$%' THEN
-        NEW.password := crypt(NEW.password, gen_salt('bf', 8));
 -- 0. Create the sequence
 CREATE SEQUENCE IF NOT EXISTS use_auth_id_seq;
 
@@ -88,17 +76,34 @@ EXECUTE FUNCTION public.hash_user_password();
 -- ============================================================================
 
 -- 4. Secure RPC Function for Login Validation (bcrypt-aware)
-CREATE OR REPLACE FUNCTION login_user(email_input TEXT, password_input TEXT)
-RETURNS TABLE (id INT, email TEXT, name TEXT, roll_number TEXT, department TEXT, bio TEXT)
-LANGUAGE plpgsql SECURITY DEFINER AS $$
+CREATE OR REPLACE FUNCTION public.login_user(
+    email_input TEXT,
+    password_input TEXT
+)
+RETURNS TABLE (
+    id INTEGER,
+    email TEXT,
+    name TEXT,
+    roll_number TEXT,
+    department TEXT,
+    bio TEXT,
+    github_username TEXT
+) AS $$
 BEGIN
     RETURN QUERY
-    SELECT u.id, u.email, u.name, u.roll_number, u.department, u.bio
+    SELECT 
+        u.id, 
+        u.email, 
+        u.name, 
+        u.roll_number, 
+        u.department, 
+        u.bio,
+        u.github_username
     FROM public.use_auth u
     WHERE LOWER(u.email) = LOWER(email_input)
       AND u.password = crypt(password_input, u.password);
 END;
-$$;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 5. Secure RPC Function for Profile Updates
 CREATE OR REPLACE FUNCTION public.update_user_profile(

@@ -140,13 +140,18 @@ function FloatingInput({
 }
 
 // ─── Password Strength ──────────────────────────────────────────────────────
-function PasswordStrength({ password }: { password: string }) {
-  if (!password) return null;
+const getPasswordScore = (password: string) => {
+  if (!password) return 0;
   const len = password.length;
   const hasUpper = /[A-Z]/.test(password);
   const hasNum = /[0-9]/.test(password);
   const hasSpec = /[^A-Za-z0-9]/.test(password);
-  const score = [len >= 8, hasUpper, hasNum, hasSpec].filter(Boolean).length;
+  return [len >= 8, hasUpper, hasNum, hasSpec].filter(Boolean).length;
+};
+
+function PasswordStrength({ password }: { password: string }) {
+  if (!password) return null;
+  const score = getPasswordScore(password);
 
   const levels = [
     { label: "Too short", color: "bg-red-500", shadow: "shadow-red-500/50" },
@@ -216,8 +221,14 @@ export default function Login() {
     const newErrors: Record<string, string> = {};
     if (!formData.email) newErrors.email = "Email is required.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Enter a valid email.";
-    if (!formData.password) newErrors.password = "Password is required.";
-    else if (formData.password.length < 6) newErrors.password = "Must be at least 6 characters.";
+    
+    if (!formData.password) {
+      newErrors.password = "Password is required.";
+    } else if (isSignUp && getPasswordScore(formData.password) < 3) {
+      newErrors.password = "Password is too weak. Make it 'Good' or 'Strong'.";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Must be at least 6 characters.";
+    }
 
     if (isSignUp) {
       if (!formData.confirmPassword) newErrors.confirmPassword = "Confirm your password.";
