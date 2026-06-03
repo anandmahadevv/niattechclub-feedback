@@ -6,7 +6,8 @@ const { Resend } = require('resend');
 const app = express();
 const port = process.env.PORT || 5000;
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendEvents = new Resend(process.env.RESEND_API_KEY_EVENTS);
+const resendGeneral = new Resend(process.env.RESEND_API_KEY_GENERAL);
 
 app.use(cors());
 app.use(express.json());
@@ -19,7 +20,7 @@ app.post('/api/send-rsvp-email', async (req, res) => {
   }
 
   try {
-    const data = await resend.emails.send({
+    const data = await resendEvents.emails.send({
       from: 'event@techclub.niat.me',
       to: email,
       subject: 'PromptWars 2026 - Registration Confirmed! 🎉',
@@ -51,8 +52,8 @@ app.post('/api/send-reset-email', async (req, res) => {
   }
 
   try {
-    const data = await resend.emails.send({
-      from: 'event@techclub.niat.me',
+    const data = await resendGeneral.emails.send({
+      from: 'techclub@niat.me',
       to: email,
       subject: 'Password Reset Code - NIAT Tech Club',
       html: `
