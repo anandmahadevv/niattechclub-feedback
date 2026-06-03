@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || "Anonymous";
           const github_username = session.user.user_metadata?.preferred_username || null;
 
-          const { data, error: rpcError } = await supabase
+          const { data } = await supabase
             .rpc("get_user_by_email", { email_input: email });
           
           const existingUser = data && data.length > 0 ? data[0] : null;

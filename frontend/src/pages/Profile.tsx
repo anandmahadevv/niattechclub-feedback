@@ -13,7 +13,6 @@ export default function Profile() {
     name: "",
     rollNumber: "",
     department: "",
-    bio: "",
   });
 
   useEffect(() => {
@@ -26,7 +25,6 @@ export default function Profile() {
           name: user.name || "",
           rollNumber: user.roll_number || "",
           department: user.department || "",
-          bio: user.bio || "",
         });
       }
     }
@@ -45,20 +43,16 @@ export default function Profile() {
     const toastId = toast.loading("Updating profile details...");
 
     try {
-      const { data, error } = await supabase.rpc("update_user_profile", {
-        user_id: user.id,
-        name_input: formData.name,
-        roll_number_input: formData.rollNumber,
-        department_input: formData.department,
-        bio_input: formData.bio,
+      const { error } = await supabase.rpc("update_user_profile", {
+        user_email: user.email,
+        new_name: formData.name,
+        new_roll_number: formData.rollNumber,
+        new_department: formData.department,
       });
 
       if (error) throw error;
-      if (!data || data.length === 0) {
-        throw new Error("Failed to update profile.");
-      }
 
-      updateLocalUser(data[0]);
+      updateLocalUser({ ...user, name: formData.name, roll_number: formData.rollNumber, department: formData.department });
 
       toast.success("Profile updated successfully!", { id: toastId });
     } catch (err: any) {
@@ -164,21 +158,7 @@ export default function Profile() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider mb-2">
-              Bio / About You
-            </label>
-            <textarea
-              name="bio"
-              rows={4}
-              value={formData.bio}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-950/50 focus:ring-2 focus:ring-red-500 dark:focus:ring-red-500/50 outline-none transition-all text-sm text-gray-950 dark:text-white resize-none"
-              placeholder="Tell the community a little bit about yourself, interests, or stack..."
-            />
-          </div>
-
-          <div className="pt-4 border-t border-gray-200/60 dark:border-zinc-800/60 flex items-center justify-end">
+<div className="pt-4 border-t border-gray-200/60 dark:border-zinc-800/60 flex items-center justify-end">
             <button
               type="submit"
               disabled={saving}
