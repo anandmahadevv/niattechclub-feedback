@@ -43,6 +43,40 @@ app.post('/api/send-rsvp-email', async (req, res) => {
   }
 });
 
+app.post('/api/send-reset-email', async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ error: 'Email and OTP are required' });
+  }
+
+  try {
+    const data = await resend.emails.send({
+      from: 'event@techclub.niat.me',
+      to: email,
+      subject: 'Password Reset Code - NIAT Tech Club',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+          <h2 style="color: #4F46E5;">Password Reset</h2>
+          <p>We received a request to reset your password. Use the code below to reset it:</p>
+          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+            <span style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #111827;">${otp}</span>
+          </div>
+          <p>If you did not request a password reset, please ignore this email.</p>
+          <br />
+          <p>Best regards,</p>
+          <p><strong>The Tech Club Team</strong></p>
+        </div>
+      `
+    });
+
+    res.status(200).json({ message: 'Reset email sent successfully', data });
+  } catch (error) {
+    console.error('Error sending reset email:', error);
+    res.status(500).json({ error: 'Failed to send reset email' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

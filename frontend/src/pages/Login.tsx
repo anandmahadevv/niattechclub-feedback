@@ -240,16 +240,24 @@ function PasswordStrength({ password }: { password: string }) {
 
 // ─── Main component ────────────────────────────────────────────────────────────
 export default function Login() {
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, resetPassword } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect") || "/";
 
   const [isSignUp, setIsSignUp] = useState(false);
+  const [forgotMode, setForgotMode] = useState<'none' | 'email' | 'otp'>('none');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [resetData, setResetData] = useState({
+    email: "",
+    otp: "",
+    newPassword: "",
+    generatedOtp: ""
+  });
 
   const [formData, setFormData] = useState({
     email: "",
@@ -282,6 +290,56 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear field error on change
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleResetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setResetData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (forgotMode === 'email') {
+      if (!resetData.email) return toast.error("Please enter your email");
+      setLoading(true);
+      const toastId = toast.loading("Sending reset code...");
+      try {
+        const generated = Math.floor(100000 + Math.random() * 900000).toString();
+        // Determine backend URL
+        const backendUrl = window.location.hostname === "localhost" ? "http://localhost:5000" : window.location.origin;
+        const response = await fetch(`${backendUrl}/api/send-reset-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: resetData.email, otp: generated })
+        });
+        if (!response.ok) throw new Error("Failed to send email. Check if backend is running.");
+        setResetData(prev => ({ ...prev, generatedOtp: generated }));
+        setForgotMode('otp');
+        toast.success("Reset code sent to your email!", { id: toastId });
+      } catch (err: any) {
+        toast.error(err.message, { id: toastId });
+      } finally {
+        setLoading(false);
+      }
+    } else if (forgotMode === 'otp') {
+      if (!resetData.otp || !resetData.newPassword) return toast.error("Please fill all fields");
+      if (resetData.otp !== resetData.generatedOtp) return toast.error("Invalid reset code");
+      if (resetData.newPassword.length < 6) return toast.error("Password must be at least 6 characters");
+      
+      setLoading(true);
+      const toastId = toast.loading("Resetting password...");
+      try {
+        if (!resetPassword) throw new Error("Reset password function not available");
+        await resetPassword(resetData.email, resetData.newPassword);
+        toast.success("Password reset successfully! Please log in.", { id: toastId });
+        setForgotMode('none');
+        setResetData({ email: '', otp: '', newPassword: '', generatedOtp: '' });
+      } catch (err: any) {
+        toast.error(err.message, { id: toastId });
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const validate = (): boolean => {
@@ -387,42 +445,44 @@ export default function Login() {
               <span className="font-black text-sm text-gray-900">NIAT Tech Club</span>
             </div>
 
-            {/* Tab switcher */}
-            <div className="flex bg-slate-100 p-1 rounded-2xl mb-8">
-              {(["Sign In", "Sign Up"] as const).map((tab, i) => {
-                const active = (i === 0 && !isSignUp) || (i === 1 && isSignUp);
-                return (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => setIsSignUp(i === 1)}
-                    className="flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-200"
-                    style={{
-                      background: active ? "#fff" : "transparent",
-                      color: active ? "#0f172a" : "#64748b",
-                      boxShadow: active ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-                    }}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-            </div>
+            {forgotMode === 'none' ? (
+              <>
+                {/* Tab switcher */}
+                <div className="flex bg-slate-100 p-1 rounded-2xl mb-8">
+                  {(["Sign In", "Sign Up"] as const).map((tab, i) => {
+                    const active = (i === 0 && !isSignUp) || (i === 1 && isSignUp);
+                    return (
+                      <button
+                        key={tab}
+                        type="button"
+                        onClick={() => setIsSignUp(i === 1)}
+                        className="flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-200"
+                        style={{
+                          background: active ? "#fff" : "transparent",
+                          color: active ? "#0f172a" : "#64748b",
+                          boxShadow: active ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+                        }}
+                      >
+                        {tab}
+                      </button>
+                    );
+                  })}
+                </div>
 
-            {/* Heading */}
-            <div className="mb-7">
-              <h1 className="text-2xl font-black text-gray-900" style={{ letterSpacing: "-0.02em" }}>
-                {isSignUp ? "Create Account" : "Welcome Back"}
-              </h1>
-              <p className="text-sm text-slate-500 mt-1">
-                {isSignUp
-                  ? "Fill in the details below to join the club."
-                  : "Enter your credentials to access your account."}
-              </p>
-            </div>
+                {/* Heading */}
+                <div className="mb-7">
+                  <h1 className="text-2xl font-black text-gray-900" style={{ letterSpacing: "-0.02em" }}>
+                    {isSignUp ? "Create Account" : "Welcome Back"}
+                  </h1>
+                  <p className="text-sm text-slate-500 mt-1">
+                    {isSignUp
+                      ? "Fill in the details below to join the club."
+                      : "Enter your credentials to access your account."}
+                  </p>
+                </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                {/* Form */}
+                <form onSubmit={handleSubmit} noValidate className="space-y-4">
               {/* Email */}
               <FloatingInput
                 id="email" name="email" type="email" label="Email Address"
@@ -433,15 +493,26 @@ export default function Login() {
               />
 
               {/* Password */}
-              <FloatingInput
-                id="password" name="password"
-                type={showPassword ? "text" : "password"}
-                label="Password" value={formData.password}
-                onChange={handleChange} required placeholder="Min. 6 characters"
-                icon={<IconLock />} error={errors.password}
-                autoComplete={isSignUp ? "new-password" : "current-password"}
-                rightElement={<EyeToggle show={showPassword} onToggle={() => setShowPassword(v => !v)} />}
-              />
+              <div className="relative">
+                <FloatingInput
+                  id="password" name="password"
+                  type={showPassword ? "text" : "password"}
+                  label="Password" value={formData.password}
+                  onChange={handleChange} required placeholder="Min. 6 characters"
+                  icon={<IconLock />} error={errors.password}
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                  rightElement={<EyeToggle show={showPassword} onToggle={() => setShowPassword(v => !v)} />}
+                />
+                {!isSignUp && (
+                  <button
+                    type="button"
+                    onClick={() => setForgotMode('email')}
+                    className="absolute right-0 -bottom-6 text-xs font-semibold text-red-600 hover:text-red-700 transition-colors"
+                  >
+                    Forgot password?
+                  </button>
+                )}
+              </div>
               {isSignUp && <PasswordStrength password={formData.password} />}
 
               {/* Confirm Password (sign-up only) */}
@@ -565,6 +636,71 @@ export default function Login() {
                 </button>
               </p>
             </form>
+            </>
+            ) : (
+              /* Forgot Password Flow */
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <button 
+                  onClick={() => setForgotMode('none')}
+                  className="mb-6 flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back to login
+                </button>
+                <div className="mb-7">
+                  <h1 className="text-2xl font-black text-gray-900" style={{ letterSpacing: "-0.02em" }}>
+                    {forgotMode === 'email' ? "Reset Password" : "Enter Reset Code"}
+                  </h1>
+                  <p className="text-sm text-slate-500 mt-1">
+                    {forgotMode === 'email' 
+                      ? "Enter your email and we'll send you a 6-digit reset code."
+                      : "Check your email for the code, and enter your new password below."}
+                  </p>
+                </div>
+                
+                <form onSubmit={handleForgotSubmit} noValidate className="space-y-4">
+                  {forgotMode === 'email' ? (
+                    <FloatingInput
+                      id="resetEmail" name="email" type="email" label="Email Address"
+                      value={resetData.email} onChange={handleResetChange}
+                      required placeholder="you@example.com"
+                      icon={<IconMail />}
+                    />
+                  ) : (
+                    <>
+                      <FloatingInput
+                        id="otp" name="otp" type="text" label="6-Digit Code"
+                        value={resetData.otp} onChange={handleResetChange}
+                        required placeholder="123456"
+                        icon={<IconLock />}
+                      />
+                      <FloatingInput
+                        id="newPassword" name="newPassword" 
+                        type={showPassword ? "text" : "password"} 
+                        label="New Password"
+                        value={resetData.newPassword} onChange={handleResetChange}
+                        required placeholder="Min. 6 characters"
+                        icon={<IconLock />}
+                        rightElement={<EyeToggle show={showPassword} onToggle={() => setShowPassword(v => !v)} />}
+                      />
+                    </>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full relative overflow-hidden rounded-xl font-bold text-white text-sm py-4 flex items-center justify-center gap-2.5 transition-all duration-200 mt-2"
+                    style={{
+                      background: loading ? "#9ca3af" : "linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f97316 100%)",
+                      boxShadow: loading ? "none" : "0 4px 20px rgba(239,68,68,0.4)"
+                    }}
+                  >
+                    {loading ? "Processing..." : (forgotMode === 'email' ? "Send Reset Code" : "Reset Password")}
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
         </div>
       </div>
