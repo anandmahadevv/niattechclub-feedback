@@ -24,6 +24,8 @@ interface AuthContextType {
   ) => Promise<void>;
   signOut: () => void;
   updateLocalUser: (updatedUser: CustomUser) => void;
+  signInWithProvider: (provider: "google" | "github") => Promise<void>;
+  resetPassword: (email: string, newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -107,10 +109,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signOut = () => {
+  const signOut = async () => {
     localStorage.removeItem("auth_user");
     localStorage.removeItem("auth_login_time");
     setUser(null);
+    await supabase.auth.signOut().catch(console.error);
+  };
+
+  const resetPassword = async (email: string, newPassword: string): Promise<void> => {
+    // Note: This relies on the 'Allow Public Update' RLS policy on users_auth
+    const { error } = await supabase
+      .from("users_auth")
+      .update({ password: newPassword })
+      .eq("email", email.toLowerCase());
+
+    if (error) {
+      throw new Error(error.message || "Failed to reset password");
+    }
   };
 
   const updateLocalUser = (updatedUser: CustomUser) => {
@@ -118,8 +133,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(updatedUser);
   };
 
+  const signInWithProvider = async (provider: "google" | "github"): Promise<void> => {
+    const { error } = await supabase.auth.signInWithOAuth({ provider });
+    if (error) throw error;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateLocalUser }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateLocalUser, signInWithProvider, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );
