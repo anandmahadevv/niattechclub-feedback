@@ -28,9 +28,8 @@ export default function Home() {
                   pointerClassName="text-red-700"
                 >
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-800">
-                    NIAT Tech Club Mangaluru
+                    NIAT Tech Club
                   </span>
-                  
                 </PointerHighlight>
               </div>
             </h1>
