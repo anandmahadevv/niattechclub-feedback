@@ -178,7 +178,7 @@ function PasswordStrength({ password }: { password: string }) {
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 export default function Login() {
-  const { signIn, signUp, resetPassword, signInWithProvider } = useAuth();
+  const { signIn, signUp, signInWithProvider } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect") || "/";
