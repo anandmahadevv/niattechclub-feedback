@@ -131,7 +131,7 @@ export default function Ideas() {
                     required
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-gray-900 bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 adppearance-none cursor-pointer"
+                    className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-gray-900 bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 appearance-none cursor-pointer"
                   >
                     <option value="" disabled>
                       Select your name...
@@ -231,7 +231,7 @@ export default function Ideas() {
                     required
                     className="custom-radio border-gray-300 dark:border-zinc-700"
                   />
-                  <span className="text-sm text-gray-600 dark:text-zinc-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                  <span className="text-sm text-blue-600 dark:text-blue-500 font-semibold group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                     Yes, I need support.
                   </span>
                 </label>
@@ -245,7 +245,7 @@ export default function Ideas() {
                     required
                     className="custom-radio border-gray-300 dark:border-zinc-700"
                   />
-                  <span className="text-sm text-gray-600 dark:text-zinc-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                  <span className="text-sm text-blue-600 dark:text-blue-500 font-semibold group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                     No, I'm good.
                   </span>
                 </label>
