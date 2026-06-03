@@ -113,15 +113,60 @@ export default function Ideas() {
               <label className="block text-sm font-semibold text-slate-900 dark:text-slate-900 mb-2" htmlFor="name">
                 Name <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                required
-                disabled
-                value={user ? (user.name || user.email || "") : "Please log in to auto-fill your name"}
-                className="w-full input-field rounded-xl px-4 py-3 text-sm bg-gray-50 dark:bg-zinc-900/40 text-gray-500 dark:text-zinc-500 border border-gray-200 dark:border-zinc-800 cursor-not-allowed outline-none font-medium"
-              />
+              {user ? (
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  disabled
+                  value={user.name || user.email || ""}
+                  className="w-full input-field rounded-xl px-4 py-3 text-sm bg-gray-50 dark:bg-zinc-900/40 text-gray-400 dark:text-zinc-555 border border-gray-200 dark:border-zinc-800 cursor-not-allowed outline-none font-medium"
+                />
+              ) : (
+                <div className="relative">
+                  <select
+                    id="name"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-gray-900 bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 appearance-none cursor-pointer"
+                  >
+                    <option value="" disabled>
+                      Select your name...
+                    </option>
+                    <option value="DINESH A">DINESH A</option>
+                    <option value="Divya">Divya</option>
+                    <option value="Anand M">Anand M</option>
+                    <option value="Darshan Dharmar">Darshan Dharmar</option>
+                    <option value="Dhanush Shenoy H">Dhanush Shenoy H</option>
+                    <option value="Raza Abbas Rizwan Haider Rizvi">Raza Abbas Rizwan Haider Rizvi</option>
+                    <option value="Lin Joel Pais">Lin Joel Pais</option>
+                    <option value="Akshay Krishna">Akshay Krishna</option>
+                    <option value="Prathik BG">Prathik BG</option>
+                    <option value="Madhu K M">Madhu K M</option>
+                    <option value="Ajmeera Tharun">Ajmeera Tharun</option>
+                    <option value="G R HARSHA">G R HARSHA</option>
+                    <option value="Nidhi Deepak Shetty">Nidhi Deepak Shetty</option>
+                    <option value="Ajay s m">Ajay s m</option>
+                    <option value="Sangam J K">Sangam J K</option>
+                    <option value="K K V N Saiteja">K K V N Saiteja</option>
+                    <option value="Muhammed sufail M M">Muhammed sufail M M</option>
+                    <option value="Nishan V">Nishan V</option>
+                    <option value="Samarth Shetty">Samarth Shetty</option>
+                    <option value="Yashas Y">Yashas Y</option>
+                    <option value="Surya Narayana c k">Surya Narayana c k</option>
+                    <option value="Deekshith k R">Deekshith k R</option>
+                    <option value="Bindu S H">Bindu S H</option>
+                    <option value="Punyashree Y">Punyashree Y</option>
+                    <option value="Ananya Laxman Naik">Ananya Laxman Naik</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                    <i className="fas fa-chevron-down text-xs"></i>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Category */}
@@ -175,8 +220,8 @@ export default function Ideas() {
               <label className="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3">
                 Do you need any technical support for your project or idea? <span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-6 flex-wrap mt-2">
-                <label className="flex items-center cursor-pointer group px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200">
+              <div className="flex gap-8 flex-wrap">
+                <label className="flex items-center cursor-pointer group">
                   <input
                     type="radio"
                     name="tech_support"
@@ -184,13 +229,13 @@ export default function Ideas() {
                     checked={formData.tech_support === "yes"}
                     onChange={() => handleRadioChange("yes")}
                     required
-                    className="custom-radio border-gray-300 dark:border-zinc-600"
+                    className="custom-radio border-gray-300 dark:border-zinc-700"
                   />
-                  <span className="text-base font-medium text-gray-800 dark:text-zinc-200 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                  <span className="text-sm text-blue-600 dark:text-blue-500 font-semibold group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                     Yes, I need support.
                   </span>
                 </label>
-                <label className="flex items-center cursor-pointer group px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200">
+                <label className="flex items-center cursor-pointer group">
                   <input
                     type="radio"
                     name="tech_support"
@@ -198,9 +243,9 @@ export default function Ideas() {
                     checked={formData.tech_support === "no"}
                     onChange={() => handleRadioChange("no")}
                     required
-                    className="custom-radio border-gray-300 dark:border-zinc-600"
+                    className="custom-radio border-gray-300 dark:border-zinc-700"
                   />
-                  <span className="text-base font-medium text-gray-800 dark:text-zinc-200 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                  <span className="text-sm text-blue-600 dark:text-blue-500 font-semibold group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                     No, I'm good.
                   </span>
                 </label>
