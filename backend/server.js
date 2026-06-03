@@ -7,7 +7,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 const resendEvents = new Resend(process.env.RESEND_API_KEY_EVENTS);
-const resendGeneral = new Resend(process.env.RESEND_API_KEY_GENERAL);
+const resendMain = new Resend(process.env.RESEND_API_KEY_MAIN);
+const resendSupport = new Resend(process.env.RESEND_API_KEY_SUPPORT);
 
 app.use(cors());
 app.use(express.json());
@@ -52,8 +53,8 @@ app.post('/api/send-reset-email', async (req, res) => {
   }
 
   try {
-    const data = await resendGeneral.emails.send({
-      from: 'techclub@niat.me',
+    const data = await resendSupport.emails.send({
+      from: 'support@techclub.niat.me',
       to: email,
       subject: 'Password Reset Code - NIAT Tech Club',
       html: `
