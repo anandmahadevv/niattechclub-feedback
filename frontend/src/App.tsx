@@ -9,6 +9,7 @@ import Events from "./pages/Events";
 import Showcase from "./pages/Showcase";
 import Ideas from "./pages/Ideas";
 import Admin from "./pages/Admin";
+import OpenSource from "./pages/OpenSource";
 import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 import { AuthProvider } from "./components/AuthContext";
 import Login from "./pages/Login";
@@ -37,6 +38,7 @@ function AppContent() {
           <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
           <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
           <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
+          <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
           <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
           <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />

@@ -42,6 +42,14 @@ export default function Navbar() {
           >
             Showcase
           </NavLink>
+          <NavLink
+            to="/open-source"
+            className={({ isActive }) =>
+              isActive ? "text-red-700 font-semibold" : "hover:text-red-700 transition-colors"
+            }
+          >
+            Open Source
+          </NavLink>
 
           <NavLink
             to="/ideas"
@@ -131,6 +139,15 @@ export default function Navbar() {
             }
           >
             Showcase
+          </NavLink>
+          <NavLink
+            to="/open-source"
+            onClick={closeMenu}
+            className={({ isActive }) =>
+              isActive ? "text-red-700 font-bold" : "hover:text-red-700 transition-colors"
+            }
+          >
+            Open Source
           </NavLink>
 
           <NavLink
