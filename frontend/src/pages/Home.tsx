@@ -35,8 +35,7 @@ export default function Home() {
             </h1>
 
             <p className="text-lg md:text-xl text-gray-500 leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0">
-              We are a community of passionate developers, engineers, and creators at Mangaluru. Join us to learn new
-              technologies, build impactful projects, and grow your network.
+              We are a community of passionate developers, engineers, and creators. As one of the premier <strong>NIAT student clubs</strong> at the <strong>NIAT Mangalore campus</strong>, the <strong>NIAT Tech Club</strong> invites you to learn new technologies, build impactful projects, and grow your network in <strong>NIAT Manglore</strong>.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -60,7 +59,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-tr from-red-100 to-orange-50 rounded-full blur-3xl opacity-50 transform -translate-y-10"></div>
             <img
               src="/photo.png"
-              alt="Tech Club Logo"
+              alt="NIAT Tech Club Logo - Leading NIAT Student Clubs at NIAT Mangalore Campus"
               className="relative z-10 h-80 object-contain drop-shadow-2xl mix-blend-multiply transform hover:scale-105 transition-transform duration-500"
             />
           </div>
