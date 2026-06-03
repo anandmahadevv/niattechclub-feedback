@@ -178,7 +178,7 @@ function PasswordStrength({ password }: { password: string }) {
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 export default function Login() {
-  const { signIn, signUp, signInWithProvider } = useAuth();
+  const { signUp, signInWithProvider, updateLocalUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect") || "/";
@@ -189,6 +189,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [loginStep, setLoginStep] = useState<'credentials' | 'otp'>('credentials');
+  const [loginOtp, setLoginOtp] = useState("");
 
   const [formData, setFormData] = useState({
     email: "", password: "", confirmPassword: "", name: "", rollNumber: "", department: ""
@@ -205,6 +208,8 @@ export default function Login() {
     setShowConfirm(false);
     setForgotMode('none');
     setResetData({ email: "", otp: "", newPassword: "" });
+    setLoginStep('credentials');
+    setLoginOtp('');
   }, [isSignUp]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -220,23 +225,41 @@ export default function Login() {
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-    if (!formData.email) newErrors.email = "Email is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Enter a valid email.";
     
-    if (!formData.password) {
-      newErrors.password = "Password is required.";
-    } else if (isSignUp && getPasswordScore(formData.password) < 3) {
-      newErrors.password = "Password is too weak. Make it 'Good' or 'Strong'.";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Must be at least 6 characters.";
-    }
-
     if (isSignUp) {
+      if (!formData.email) newErrors.email = "Email is required.";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Enter a valid email.";
+      
+      if (!formData.password) {
+        newErrors.password = "Password is required.";
+      } else if (getPasswordScore(formData.password) < 3) {
+        newErrors.password = "Password is too weak. Make it 'Good' or 'Strong'.";
+      } else if (formData.password.length < 6) {
+        newErrors.password = "Must be at least 6 characters.";
+      }
+      
       if (!formData.confirmPassword) newErrors.confirmPassword = "Confirm your password.";
       else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match.";
       if (!formData.name.trim()) newErrors.name = "Full name is required.";
       if (!formData.rollNumber.trim()) newErrors.rollNumber = "Roll number is required.";
       if (!formData.department.trim()) newErrors.department = "Department is required.";
+    } else {
+      if (loginStep === 'credentials') {
+        if (!formData.email) newErrors.email = "Email is required.";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Enter a valid email.";
+        
+        if (!formData.password) {
+          newErrors.password = "Password is required.";
+        } else if (formData.password.length < 6) {
+          newErrors.password = "Must be at least 6 characters.";
+        }
+      } else {
+        if (!loginOtp) {
+          newErrors.loginOtp = "Verification code is required.";
+        } else if (!/^\d{6}$/.test(loginOtp)) {
+          newErrors.loginOtp = "Enter a valid 6-digit code.";
+        }
+      }
     }
 
     setErrors(newErrors);
@@ -247,16 +270,40 @@ export default function Login() {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    const toastId = toast.loading(isSignUp ? "Creating account..." : "Signing in...");
+    const toastId = toast.loading(isSignUp ? "Creating account..." : loginStep === 'credentials' ? "Verifying credentials..." : "Completing login...");
     try {
       if (isSignUp) {
         await signUp(formData.email, formData.password, formData.name, formData.rollNumber, formData.department);
         toast.success("Account created! Please sign in.", { id: toastId });
         setIsSignUp(false);
       } else {
-        await signIn(formData.email, formData.password);
-        toast.success("Signed in successfully.", { id: toastId });
-        navigate(redirect);
+        if (loginStep === 'credentials') {
+          const response = await fetch("/api/login-step1", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: formData.email, password: formData.password }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || "Failed to verify credentials.");
+          setLoginStep('otp');
+          toast.success("Verification code sent! Check your email inbox.", { id: toastId });
+        } else {
+          const response = await fetch("/api/login-step2", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: formData.email, password: formData.password, otp: loginOtp }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || "Failed to verify code.");
+
+          // Establish user session
+          localStorage.setItem("auth_user", JSON.stringify(result.user));
+          localStorage.setItem("auth_login_time", Date.now().toString());
+          updateLocalUser(result.user);
+
+          toast.success("Signed in successfully.", { id: toastId });
+          navigate(redirect);
+        }
       }
     } catch (err: any) {
       toast.error(err.message || "An error occurred.", { id: toastId });
@@ -410,98 +457,132 @@ export default function Login() {
             {forgotMode === 'none' ? (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Tab Switcher */}
-                <div className="flex bg-slate-200/50 backdrop-blur-sm p-1.5 rounded-2xl mb-10 border border-white/60 shadow-inner">
-                  {(["Sign In", "Sign Up"] as const).map((tab, i) => {
-                    const active = (i === 0 && !isSignUp) || (i === 1 && isSignUp);
-                    return (
-                      <button
-                        key={tab} type="button" onClick={() => setIsSignUp(i === 1)}
-                        className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${
-                          active ? "bg-white text-indigo-900 shadow-[0_4px_15px_rgba(0,0,0,0.05)]" : "text-slate-500 hover:text-slate-700"
-                        }`}
-                      >
-                        {tab}
-                      </button>
-                    );
-                  })}
-                </div>
+                {loginStep === 'credentials' && (
+                  <div className="flex bg-slate-200/50 backdrop-blur-sm p-1.5 rounded-2xl mb-10 border border-white/60 shadow-inner">
+                    {(["Sign In", "Sign Up"] as const).map((tab, i) => {
+                      const active = (i === 0 && !isSignUp) || (i === 1 && isSignUp);
+                      return (
+                        <button
+                          key={tab} type="button" onClick={() => setIsSignUp(i === 1)}
+                          className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${
+                            active ? "bg-white text-indigo-900 shadow-[0_4px_15px_rgba(0,0,0,0.05)]" : "text-slate-500 hover:text-slate-700"
+                          }`}
+                        >
+                          {tab}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
 
                 <div className="mb-8 text-center sm:text-left">
                   <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-2">
-                    {isSignUp ? "Create an account" : "Welcome back"}
+                    {isSignUp 
+                      ? "Create an account" 
+                      : loginStep === 'credentials' 
+                        ? "Welcome back" 
+                        : "Verify Your Identity"}
                   </h2>
                   <p className="text-slate-500 font-medium">
-                    {isSignUp ? "Enter your details to join the community." : "Enter your credentials to access your account."}
+                    {isSignUp 
+                      ? "Enter your details to join the community." 
+                      : loginStep === 'credentials' 
+                        ? "Enter your credentials to access your account." 
+                        : `We've sent a 6-digit verification code to ${formData.email}.`}
                   </p>
                 </div>
 
                 {/* Social Login */}
-                <div className="mb-8">
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin('github')}
-                    className="w-full relative flex items-center justify-center gap-3 px-4 py-3.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-indigo-300 hover:shadow-[0_4px_20px_rgba(99,102,241,0.1)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-100 group"
-                  >
-                    <span className="group-hover:scale-110 transition-transform duration-300 text-slate-900"><IconGithub /></span>
-                    Continue with GitHub
-                  </button>
-                </div>
+                {loginStep === 'credentials' && (
+                  <div className="mb-8">
+                    <button
+                      type="button"
+                      onClick={() => handleSocialLogin('github')}
+                      className="w-full relative flex items-center justify-center gap-3 px-4 py-3.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-indigo-300 hover:shadow-[0_4px_20px_rgba(99,102,241,0.1)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-100 group"
+                    >
+                      <span className="group-hover:scale-110 transition-transform duration-300 text-slate-900"><IconGithub /></span>
+                      Continue with GitHub
+                    </button>
+                  </div>
+                )}
 
-                <div className="relative flex items-center mb-8">
-                  <div className="flex-grow border-t border-slate-200"></div>
-                  <span className="flex-shrink-0 mx-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Or continue with email</span>
-                  <div className="flex-grow border-t border-slate-200"></div>
-                </div>
+                {loginStep === 'credentials' && (
+                  <div className="relative flex items-center mb-8">
+                    <div className="flex-grow border-t border-slate-200"></div>
+                    <span className="flex-shrink-0 mx-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Or continue with email</span>
+                    <div className="flex-grow border-t border-slate-200"></div>
+                  </div>
+                )}
 
                 <form onSubmit={handleSubmit} noValidate className="space-y-5">
-                  <FloatingInput
-                    id="email" name="email" type="email" label="Email Address"
-                    value={formData.email} onChange={handleChange} required placeholder="you@example.com"
-                    icon={<IconMail />} error={errors.email} autoComplete="email"
-                  />
+                  {loginStep === 'credentials' ? (
+                    <>
+                      <FloatingInput
+                        id="email" name="email" type="email" label="Email Address"
+                        value={formData.email} onChange={handleChange} required placeholder="you@example.com"
+                        icon={<IconMail />} error={errors.email} autoComplete="email"
+                      />
 
-                  <div className="relative">
-                    <FloatingInput
-                      id="password" name="password" type={showPassword ? "text" : "password"}
-                      label="Password" value={formData.password} onChange={handleChange} required placeholder="Min. 6 characters"
-                      icon={<IconLock />} error={errors.password} autoComplete={isSignUp ? "new-password" : "current-password"}
-                      rightElement={<EyeToggle show={showPassword} onToggle={() => setShowPassword(v => !v)} />}
-                    />
-                    {!isSignUp && (
-                      <button
-                        type="button" onClick={() => setForgotMode('email')}
-                        className="absolute right-1 -bottom-7 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
-                      >
-                        Forgot password?
-                      </button>
-                    )}
-                  </div>
-                  {isSignUp && <PasswordStrength password={formData.password} />}
-
-                  {isSignUp && (
-                    <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                      <div className="pt-2 pb-5">
+                      <div className="relative">
                         <FloatingInput
-                          id="confirmPassword" name="confirmPassword" type={showConfirm ? "text" : "password"}
-                          label="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required placeholder="Repeat your password"
-                          icon={<IconLock />} error={errors.confirmPassword} autoComplete="new-password"
-                          rightElement={
-                            formData.confirmPassword && !errors.confirmPassword && formData.password === formData.confirmPassword ? (
-                              <div className="p-2 text-emerald-500 animate-in zoom-in"><IconCheck /></div>
-                            ) : <EyeToggle show={showConfirm} onToggle={() => setShowConfirm(v => !v)} />
-                          }
+                          id="password" name="password" type={showPassword ? "text" : "password"}
+                          label="Password" value={formData.password} onChange={handleChange} required placeholder="Min. 6 characters"
+                          icon={<IconLock />} error={errors.password} autoComplete={isSignUp ? "new-password" : "current-password"}
+                          rightElement={<EyeToggle show={showPassword} onToggle={() => setShowPassword(v => !v)} />}
                         />
+                        {!isSignUp && (
+                          <button
+                            type="button" onClick={() => setForgotMode('email')}
+                            className="absolute right-1 -bottom-7 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+                          >
+                            Forgot password?
+                          </button>
+                        )}
                       </div>
+                      {isSignUp && <PasswordStrength password={formData.password} />}
 
-                      <div className="pt-2 pb-4 border-t border-slate-100">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Profile Details</p>
-                        <div className="space-y-5">
-                          <FloatingInput id="name" name="name" label="Full Name" value={formData.name} onChange={handleChange} required placeholder="e.g. Riya Sharma" icon={<IconUser />} error={errors.name} autoComplete="name" />
-                          <div className="grid grid-cols-2 gap-4">
-                            <FloatingInput id="rollNumber" name="rollNumber" label="Campus ID" value={formData.rollNumber} onChange={handleChange} required placeholder="e.g. 44226" icon={<IconID />} error={errors.rollNumber} />
-                            <FloatingInput id="department" name="department" label="Department" value={formData.department} onChange={handleChange} required placeholder="CSE / ISE" icon={<IconBuildingOffice />} error={errors.department} />
+                      {isSignUp && (
+                        <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                          <div className="pt-2 pb-5">
+                            <FloatingInput
+                              id="confirmPassword" name="confirmPassword" type={showConfirm ? "text" : "password"}
+                              label="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required placeholder="Repeat your password"
+                              icon={<IconLock />} error={errors.confirmPassword} autoComplete="new-password"
+                              rightElement={
+                                formData.confirmPassword && !errors.confirmPassword && formData.password === formData.confirmPassword ? (
+                                  <div className="p-2 text-emerald-500 animate-in zoom-in"><IconCheck /></div>
+                                ) : <EyeToggle show={showConfirm} onToggle={() => setShowConfirm(v => !v)} />
+                              }
+                            />
+                          </div>
+
+                          <div className="pt-2 pb-4 border-t border-slate-100">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Profile Details</p>
+                            <div className="space-y-5">
+                              <FloatingInput id="name" name="name" label="Full Name" value={formData.name} onChange={handleChange} required placeholder="e.g. Riya Sharma" icon={<IconUser />} error={errors.name} autoComplete="name" />
+                              <div className="grid grid-cols-2 gap-4">
+                                <FloatingInput id="rollNumber" name="rollNumber" label="Campus ID" value={formData.rollNumber} onChange={handleChange} required placeholder="e.g. 44226" icon={<IconID />} error={errors.rollNumber} />
+                                <FloatingInput id="department" name="department" label="Department" value={formData.department} onChange={handleChange} required placeholder="CSE / ISE" icon={<IconBuildingOffice />} error={errors.department} />
+                              </div>
+                            </div>
                           </div>
                         </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-5">
+                      <FloatingInput
+                        id="loginOtp" name="loginOtp" type="text" label="Verification Code"
+                        value={loginOtp} onChange={(e) => setLoginOtp(e.target.value)} required placeholder="123456"
+                        icon={<IconLock />} error={errors.loginOtp}
+                      />
+                      <div className="flex justify-between items-center">
+                        <button
+                          type="button" onClick={() => { setLoginStep('credentials'); setLoginOtp(''); }}
+                          className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+                        >
+                          Back to credentials entry
+                        </button>
                       </div>
                     </div>
                   )}
@@ -517,19 +598,21 @@ export default function Login() {
                       </span>
                     ) : (
                       <span className="flex items-center justify-center gap-2">
-                        {isSignUp ? "Create Account" : "Sign In"}
+                        {isSignUp ? "Create Account" : loginStep === 'credentials' ? "Sign In" : "Verify & Sign In"}
                         <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4"><path d="M3 8H13M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </span>
                     )}
                   </button>
                 </form>
 
-                <p className="mt-8 text-center text-slate-500 font-medium text-sm">
-                  {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-                  <button type="button" onClick={() => setIsSignUp(v => !v)} className="font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
-                    {isSignUp ? "Sign In" : "Sign Up"}
-                  </button>
-                </p>
+                {loginStep === 'credentials' && (
+                  <p className="mt-8 text-center text-slate-500 font-medium text-sm">
+                    {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+                    <button type="button" onClick={() => setIsSignUp(v => !v)} className="font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+                      {isSignUp ? "Sign In" : "Sign Up"}
+                    </button>
+                  </p>
+                )}
               </div>
             ) : (
               /* ─── Forgot Password Flow ─── */

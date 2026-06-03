@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../components/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Resource {
@@ -300,7 +301,24 @@ function ResourceCard({ r }: { r: Resource }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Learn() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
   const [activeCategory, setActiveCategory] = useState<string>("web");
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/login?redirect=/learn");
+    }
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex-grow w-full flex items-center justify-center bg-white">
+        <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
   const [levelFilter, setLevelFilter] = useState<string>("All");
 
   const category = CATEGORIES.find(c => c.id === activeCategory)!;

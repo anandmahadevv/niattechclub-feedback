@@ -127,6 +127,120 @@ app.post('/api/verify-otp', async (req, res) => {
   }
 });
 
+app.post('/api/login-step1', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
+  try {
+    // 1. Verify credentials
+    const { data: users, error: loginError } = await supabase
+      .rpc('login_user', {
+        email_input: email.toLowerCase().trim(),
+        password_input: password
+      });
+
+    if (loginError) {
+      console.error('Login error:', loginError);
+      return res.status(500).json({ error: 'Verification failed' });
+    }
+
+    if (!users || users.length === 0) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    const user = users[0];
+
+    // 2. Generate a secure 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // 3. Store OTP in Supabase using create_otp
+    const { error: dbError } = await supabase.rpc('create_otp', {
+      email_input: email.toLowerCase().trim(),
+      otp_input: otp
+    });
+
+    if (dbError) {
+      console.error('Error storing OTP:', dbError);
+      return res.status(500).json({ error: 'Failed to prepare OTP securely' });
+    }
+
+    // 4. Send email via Resend (using support key)
+    const data = await resendSupport.emails.send({
+      from: 'support@techclub.niat.me',
+      to: email,
+      subject: 'Your Login Verification Code — NIAT Tech Club',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+          <h2 style="color: #4F46E5;">Two-Factor Authentication</h2>
+          <p>Hello ${user.name || 'Member'},</p>
+          <p>To complete your sign-in, please use the 6-digit verification code below. It is valid for 10 minutes:</p>
+          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+            <span style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #111827;">${otp}</span>
+          </div>
+          <p>If you did not attempt to sign in to your NIAT Tech Club account, please reset your password immediately.</p>
+          <br />
+          <p>Best regards,</p>
+          <p><strong>The Tech Club Team</strong></p>
+        </div>
+      `
+    });
+
+    res.status(200).json({ message: 'Verification code sent successfully', data });
+  } catch (error) {
+    console.error('Error in login step 1:', error);
+    res.status(500).json({ error: 'Failed to send login verification code' });
+  }
+});
+
+app.post('/api/login-step2', async (req, res) => {
+  const { email, password, otp } = req.body;
+
+  if (!email || !password || !otp) {
+    return res.status(400).json({ error: 'Email, password, and OTP are required' });
+  }
+
+  try {
+    // 1. Verify OTP
+    const { data: isValid, error: verifyError } = await supabase.rpc('verify_otp', {
+      email_input: email.toLowerCase().trim(),
+      otp_input: otp.trim()
+    });
+
+    if (verifyError) {
+      console.error('OTP verification error:', verifyError);
+      return res.status(500).json({ error: 'Failed to verify OTP' });
+    }
+
+    if (!isValid) {
+      return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+
+    // 2. Fetch user profile
+    const { data: users, error: loginError } = await supabase
+      .rpc('login_user', {
+        email_input: email.toLowerCase().trim(),
+        password_input: password
+      });
+
+    if (loginError) {
+      console.error('Fetch profile error:', loginError);
+      return res.status(500).json({ error: 'Failed to retrieve profile data' });
+    }
+
+    if (!users || users.length === 0) {
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
+
+    res.status(200).json({ user: users[0] });
+  } catch (error) {
+    console.error('Error in login step 2:', error);
+    res.status(500).json({ error: 'Internal server error during authentication' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
