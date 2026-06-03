@@ -12,7 +12,6 @@ CREATE TABLE public.use_auth (
     name TEXT NOT NULL,
     roll_number TEXT NOT NULL,
     department TEXT NOT NULL,
-    bio TEXT,
     github_username TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -86,7 +85,6 @@ RETURNS TABLE (
     name TEXT,
     roll_number TEXT,
     department TEXT,
-    bio TEXT,
     github_username TEXT
 ) AS $$
 BEGIN
@@ -97,7 +95,6 @@ BEGIN
         u.name, 
         u.roll_number, 
         u.department, 
-        u.bio,
         u.github_username
     FROM public.use_auth u
     WHERE LOWER(u.email) = LOWER(email_input)
@@ -110,8 +107,7 @@ CREATE OR REPLACE FUNCTION public.update_user_profile(
     user_email TEXT,
     new_name TEXT,
     new_roll_number TEXT,
-    new_department TEXT,
-    new_bio TEXT
+    new_department TEXT
 )
 RETURNS BOOLEAN AS $$
 BEGIN
@@ -119,8 +115,7 @@ BEGIN
     SET 
         name = COALESCE(new_name, name),
         roll_number = COALESCE(new_roll_number, roll_number),
-        department = COALESCE(new_department, department),
-        bio = COALESCE(new_bio, bio)
+        department = COALESCE(new_department, department)
     WHERE email = user_email;
     
     RETURN FOUND;
