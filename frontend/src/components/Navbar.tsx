@@ -52,6 +52,15 @@ export default function Navbar() {
           </NavLink>
 
           <NavLink
+            to="/learn"
+            className={({ isActive }) =>
+              isActive ? "text-red-700 font-semibold" : "hover:text-red-700 transition-colors"
+            }
+          >
+            Learn
+          </NavLink>
+
+          <NavLink
             to="/ideas"
             className={({ isActive }) =>
               isActive
@@ -151,6 +160,16 @@ export default function Navbar() {
           </NavLink>
 
           <NavLink
+            to="/learn"
+            onClick={closeMenu}
+            className={({ isActive }) =>
+              isActive ? "text-red-700 font-bold" : "hover:text-red-700 transition-colors"
+            }
+          >
+            Learn
+          </NavLink>
+
+          <NavLink
             to="/ideas"
             onClick={closeMenu}
             className={({ isActive }) =>
@@ -159,7 +178,7 @@ export default function Navbar() {
                 : "hover:text-red-700 transition-colors py-2 inline-block w-fit"
             }
           >
-            <i className="fas fa-lightbulb mr-2"></i> Ideas
+            <i className="fas fa-lightbulb mr-2" />Ideas
           </NavLink>
 
           <hr className="border-gray-100 my-2" />
