@@ -241,6 +241,85 @@ app.post('/api/login-step2', async (req, res) => {
   }
 });
 
+app.post('/api/fetch-tickets', async (req, res) => {
+  const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
+  const TESTMAIL_NAMESPACE = process.env.TESTMAIL_NAMESPACE;
+
+  if (!TESTMAIL_API_KEY || !TESTMAIL_NAMESPACE || TESTMAIL_NAMESPACE === 'put_your_namespace_here') {
+    return res.status(500).json({ error: 'Testmail credentials not properly configured in .env' });
+  }
+
+  const query = `
+    query {
+      inbox (
+        namespace: "${TESTMAIL_NAMESPACE}",
+        limit: 20
+      ) {
+        result
+        message
+        emails {
+          id
+          from
+          subject
+          text
+        }
+      }
+    }
+  `;
+
+  try {
+    const response = await fetch('https://api.testmail.app/api/graphql', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${TESTMAIL_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ query })
+    });
+
+    const data = await response.json();
+    
+    if (data.errors) {
+      console.error('Testmail API error:', data.errors);
+      return res.status(500).json({ error: 'Testmail API returned an error', details: data.errors });
+    }
+
+    const emails = data.data.inbox.emails;
+    let newTicketsImported = 0;
+
+    for (const email of emails) {
+      const sender = email.from || 'unknown@example.com';
+      const subject = email.subject || 'No Subject';
+      const body = email.text || 'No content provided.';
+      const testmail_id = email.id;
+
+      // Safely import into Supabase using the RPC
+      const { data: inserted, error: dbError } = await supabase.rpc('import_ticket', {
+        sender_input: sender,
+        subject_input: subject,
+        body_input: body,
+        testmail_id_input: testmail_id
+      });
+
+      if (dbError) {
+        console.error('Error importing ticket to Supabase:', dbError);
+      } else if (inserted) {
+        newTicketsImported++;
+      }
+    }
+
+    res.status(200).json({ 
+      message: 'Tickets fetched successfully', 
+      total_emails_checked: emails.length,
+      new_tickets_imported: newTicketsImported 
+    });
+
+  } catch (error) {
+    console.error('Error fetching tickets from Testmail:', error);
+    res.status(500).json({ error: 'Internal server error while fetching tickets' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
