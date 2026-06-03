@@ -10,6 +10,11 @@ const resendEvents = new Resend(process.env.RESEND_API_KEY_EVENTS);
 const resendMain = new Resend(process.env.RESEND_API_KEY_MAIN);
 const resendSupport = new Resend(process.env.RESEND_API_KEY_SUPPORT);
 
+const { createClient } = require('@supabase/supabase-js');
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 app.use(cors());
 app.use(express.json());
 
@@ -46,10 +51,24 @@ app.post('/api/send-rsvp-email', async (req, res) => {
 });
 
 app.post('/api/send-reset-email', async (req, res) => {
-  const { email, otp } = req.body;
+  const { email } = req.body;
 
-  if (!email || !otp) {
-    return res.status(400).json({ error: 'Email and OTP are required' });
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  // Generate a secure 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Store the OTP in Supabase
+  const { error: dbError } = await supabase.rpc('create_otp', {
+    email_input: email,
+    otp_input: otp
+  });
+
+  if (dbError) {
+    console.error('Error storing OTP:', dbError);
+    return res.status(500).json({ error: 'Failed to prepare OTP securely' });
   }
 
   try {
@@ -76,6 +95,35 @@ app.post('/api/send-reset-email', async (req, res) => {
   } catch (error) {
     console.error('Error sending reset email:', error);
     res.status(500).json({ error: 'Failed to send reset email' });
+  }
+});
+
+app.post('/api/verify-otp', async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ error: 'Email and OTP are required' });
+  }
+
+  try {
+    const { data: isValid, error } = await supabase.rpc('verify_otp', {
+      email_input: email,
+      otp_input: otp
+    });
+
+    if (error) {
+      console.error('Error verifying OTP:', error);
+      return res.status(500).json({ error: 'Failed to verify OTP' });
+    }
+
+    if (isValid) {
+      return res.status(200).json({ message: 'OTP verified successfully' });
+    } else {
+      return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 

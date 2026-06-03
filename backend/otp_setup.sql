@@ -1,81 +1,53 @@
--- OTP Storage Table for Password Reset
--- Run this in your Supabase SQL Editor
-
-CREATE TABLE IF NOT EXISTS public.password_reset_otps (
+-- 1. Create the OTP table
+CREATE TABLE IF NOT EXISTS public.otp_codes (
     id SERIAL PRIMARY KEY,
     email TEXT NOT NULL,
-    otp TEXT NOT NULL,
+    otp_hash TEXT NOT NULL,
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    used BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Index for fast lookup by email
-CREATE INDEX IF NOT EXISTS idx_otp_email ON public.password_reset_otps(email);
+-- 2. Enable Row Level Security (RLS)
+ALTER TABLE public.otp_codes ENABLE ROW LEVEL SECURITY;
 
--- Enable RLS
-ALTER TABLE public.password_reset_otps ENABLE ROW LEVEL SECURITY;
+-- 3. We do NOT add public policies. This ensures that only the backend, 
+-- using the secure SECURITY DEFINER functions below, can access this table.
 
--- No public access — only accessible via SECURITY DEFINER RPCs
--- CREATE POLICY ... (intentionally left empty — all access via RPCs below)
-
--- ============================================================
--- RPC 1: Create / replace OTP for an email
--- ============================================================
-CREATE OR REPLACE FUNCTION public.create_reset_otp(
-    email_input TEXT,
-    otp_input TEXT
-)
+-- 4. Create RPC to generate and store a hashed OTP
+CREATE OR REPLACE FUNCTION public.create_otp(email_input TEXT, otp_input TEXT)
 RETURNS VOID AS $$
 BEGIN
-    -- Delete any existing OTPs for this email first (clean slate)
-    DELETE FROM public.password_reset_otps WHERE email = email_input;
-    
-    -- Insert fresh OTP, expires in 10 minutes
-    INSERT INTO public.password_reset_otps (email, otp, expires_at)
-    VALUES (email_input, otp_input, NOW() + INTERVAL '10 minutes');
+    -- Delete any existing OTPs for this user to keep the table clean
+    DELETE FROM public.otp_codes WHERE email = email_input;
+
+    -- Insert the new OTP, hashed for security, with a 10-minute expiration
+    INSERT INTO public.otp_codes (email, otp_hash, expires_at)
+    VALUES (
+        email_input,
+        crypt(otp_input, gen_salt('bf', 8)),
+        NOW() + INTERVAL '10 minutes'
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- ============================================================
--- RPC 2: Verify OTP — returns TRUE if valid, FALSE if not
--- ============================================================
-CREATE OR REPLACE FUNCTION public.verify_reset_otp(
-    email_input TEXT,
-    otp_input TEXT
-)
+-- 5. Create RPC to verify the OTP
+CREATE OR REPLACE FUNCTION public.verify_otp(email_input TEXT, otp_input TEXT)
 RETURNS BOOLEAN AS $$
 DECLARE
-    otp_record RECORD;
+    is_valid BOOLEAN := false;
 BEGIN
-    SELECT * INTO otp_record
-    FROM public.password_reset_otps
+    -- Check if there is a matching, unexpired OTP
+    SELECT true INTO is_valid
+    FROM public.otp_codes
     WHERE email = email_input
-      AND otp = otp_input
-      AND used = FALSE
-      AND expires_at > NOW()
-    ORDER BY created_at DESC
-    LIMIT 1;
-    
-    IF otp_record IS NULL THEN
-        RETURN FALSE;
-    END IF;
-    
-    -- Mark as used so it can't be replayed
-    UPDATE public.password_reset_otps
-    SET used = TRUE
-    WHERE id = otp_record.id;
-    
-    RETURN TRUE;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+      AND otp_hash = crypt(otp_input, otp_hash)
+      AND expires_at > NOW();
 
--- ============================================================
--- Cleanup: Auto-delete expired OTPs (run periodically or manually)
--- ============================================================
-CREATE OR REPLACE FUNCTION public.cleanup_expired_otps()
-RETURNS VOID AS $$
-BEGIN
-    DELETE FROM public.password_reset_otps WHERE expires_at < NOW();
+    -- If the OTP is valid, delete it so it cannot be reused
+    IF COALESCE(is_valid, false) THEN
+        DELETE FROM public.otp_codes WHERE email = email_input;
+    END IF;
+
+    RETURN COALESCE(is_valid, false);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
