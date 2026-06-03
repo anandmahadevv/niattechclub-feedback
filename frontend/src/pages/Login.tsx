@@ -195,7 +195,7 @@ export default function Login() {
   });
 
   const [resetData, setResetData] = useState({
-    email: "", otp: "", newPassword: "", generatedOtp: ""
+    email: "", otp: "", newPassword: ""
   });
 
   useEffect(() => {
@@ -204,6 +204,7 @@ export default function Login() {
     setShowPassword(false);
     setShowConfirm(false);
     setForgotMode('none');
+    setResetData({ email: "", otp: "", newPassword: "" });
   }, [isSignUp]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -279,16 +280,16 @@ export default function Login() {
       setLoading(true);
       const toastId = toast.loading("Sending reset code...");
       try {
-        const generated = Math.floor(100000 + Math.random() * 900000).toString();
-        const backendUrl = window.location.hostname === "localhost" ? "http://localhost:5000" : window.location.origin;
-        const response = await fetch(`${backendUrl}/api/send-reset-email`, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: resetData.email, otp: generated })
+        // OTP is generated SERVER-SIDE — never touches the frontend
+        const response = await fetch("/api/send-reset-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: resetData.email }),
         });
-        if (!response.ok) throw new Error("Failed to send email. Ensure backend is running.");
-        setResetData(prev => ({ ...prev, generatedOtp: generated }));
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Failed to send email.");
         setForgotMode('otp');
-        toast.success("Reset code sent!", { id: toastId });
+        toast.success("Reset code sent! Check your inbox.", { id: toastId });
       } catch (err: any) {
         toast.error(err.message, { id: toastId });
       } finally {
@@ -296,15 +297,25 @@ export default function Login() {
       }
     } else if (forgotMode === 'otp') {
       if (!resetData.otp || !resetData.newPassword) return toast.error("Fill all fields");
-      if (resetData.otp !== resetData.generatedOtp) return toast.error("Invalid reset code");
-      if (resetData.newPassword.length < 6) return toast.error("Password too short");
+      if (resetData.newPassword.length < 6) return toast.error("Password must be at least 6 characters");
       setLoading(true);
-      const toastId = toast.loading("Resetting password...");
+      const toastId = toast.loading("Verifying code & resetting password...");
       try {
-        await resetPassword(resetData.email, resetData.newPassword);
+        // Verify OTP and reset password in a single secure server-side call
+        const response = await fetch("/api/verify-reset-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: resetData.email,
+            otp: resetData.otp,
+            newPassword: resetData.newPassword,
+          }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Verification failed.");
         toast.success("Password reset successfully!", { id: toastId });
         setForgotMode('none');
-        setResetData({ email: '', otp: '', newPassword: '', generatedOtp: '' });
+        setResetData({ email: '', otp: '', newPassword: '' });
       } catch (err: any) {
         toast.error(err.message, { id: toastId });
       } finally {
