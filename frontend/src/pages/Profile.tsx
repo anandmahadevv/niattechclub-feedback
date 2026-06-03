@@ -74,23 +74,25 @@ export default function Profile() {
   const firstLetter = formData.name ? formData.name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase() || "U";
 
   return (
-    <div className="flex-grow w-full flex flex-col items-center justify-start py-16 px-6 relative overflow-hidden bg-gradient-to-b from-white via-slate-50 to-slate-100 dark:from-slate-950 dark:via-zinc-900 dark:to-black">
-      {/* Brand ambient glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-500/5 dark:bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="flex-grow w-full flex flex-col items-center justify-start py-16 px-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #1a1040 40%, #24243e 100%)' }}>
+      {/* Animated orbs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-30 pointer-events-none" style={{ background: 'radial-gradient(circle, #6366f1 0%, transparent 70%)', filter: 'blur(80px)', animation: 'pulse 8s ease-in-out infinite alternate' }} />
+      <div className="absolute bottom-[-5%] right-[-5%] w-[400px] h-[400px] rounded-full opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)', filter: 'blur(80px)', animation: 'pulse 10s ease-in-out infinite alternate-reverse' }} />
+      <div className="absolute top-[40%] left-[60%] w-[300px] h-[300px] rounded-full opacity-15 pointer-events-none" style={{ background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)', filter: 'blur(60px)', animation: 'pulse 12s ease-in-out infinite alternate' }} />
 
-      <div className="w-full max-w-2xl bg-white/70 dark:bg-zinc-900/60 backdrop-blur-xl border border-gray-200/55 dark:border-zinc-800/60 shadow-2xl rounded-3xl p-8 md:p-10 relative z-10">
-        <div className="flex flex-col sm:flex-row items-center gap-6 pb-8 border-b border-gray-200/60 dark:border-zinc-800/60 mb-8">
+      <div className="w-full max-w-2xl bg-white/10 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-8 md:p-10 relative z-10">
+        <div className="flex flex-col sm:flex-row items-center gap-6 pb-8 border-b border-white/10 mb-8">
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-600 to-orange-500 text-white font-black text-3xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-300">
             {firstLetter}
           </div>
           <div className="text-center sm:text-left flex-grow">
-            <h1 className="text-2xl font-black text-gray-950 dark:text-white leading-tight">
+            <h1 className="text-2xl font-black text-white leading-tight">
               {formData.name || "Member Profile"}
             </h1>
-            <p className="text-sm font-semibold text-red-600 dark:text-red-400 mt-1">
+            <p className="text-sm font-semibold text-indigo-300 mt-1">
               {formData.rollNumber ? `${formData.rollNumber} • ${formData.department}` : "Update your profile info below"}
             </p>
-            <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               Registered email: {user.email}
             </p>
           </div>
