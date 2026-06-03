@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const github_username = session.user.user_metadata?.preferred_username || null;
 
           const { data: existingUser } = await supabase
-            .from("users_auth")
+            .from("use_auth")
             .select("*")
             .eq("email", email)
             .single();
@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(existingUser);
             localStorage.setItem("auth_user", JSON.stringify(existingUser));
           } else {
-            const { data: newUser, error } = await supabase.from("users_auth").insert({
+            const { data: newUser, error } = await supabase.from("use_auth").insert({
               email: email,
               password: "social_login_dummy",
               name: name,
@@ -127,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     department: string,
     bio: string
   ): Promise<void> => {
-    const { error } = await supabase.from("users_auth").insert({
+    const { error } = await supabase.from("use_auth").insert({
       email: email.toLowerCase(),
       password,
       name,
@@ -152,9 +152,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetPassword = async (email: string, newPassword: string): Promise<void> => {
-    // Note: This relies on the 'Allow Public Update' RLS policy on users_auth
+    // Note: This relies on the 'Allow Public Update' RLS policy on use_auth
     const { error } = await supabase
-      .from("users_auth")
+      .from("use_auth")
       .update({ password: newPassword })
       .eq("email", email.toLowerCase());
 
