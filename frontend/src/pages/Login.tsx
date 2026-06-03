@@ -498,7 +498,7 @@ export default function Login() {
                         <div className="space-y-5">
                           <FloatingInput id="name" name="name" label="Full Name" value={formData.name} onChange={handleChange} required placeholder="e.g. Riya Sharma" icon={<IconUser />} error={errors.name} autoComplete="name" />
                           <div className="grid grid-cols-2 gap-4">
-                            <FloatingInput id="rollNumber" name="campusID" label="Campus ID" value={formData.rollNumber} onChange={handleChange} required placeholder="e.g. 44226" icon={<IconID />} error={errors.rollNumber} />
+                            <FloatingInput id="rollNumber" name="rollNumber" label="Campus ID" value={formData.rollNumber} onChange={handleChange} required placeholder="e.g. 44226" icon={<IconID />} error={errors.rollNumber} />
                             <FloatingInput id="department" name="department" label="Department" value={formData.department} onChange={handleChange} required placeholder="CSE / ISE" icon={<IconBuildingOffice />} error={errors.department} />
                           </div>
                         </div>
