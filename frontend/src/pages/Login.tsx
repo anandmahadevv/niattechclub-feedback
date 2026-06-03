@@ -321,6 +321,17 @@ export default function Login() {
 
   return (
     <div className="flex-grow w-full min-h-screen flex items-center justify-center p-4 sm:p-8 relative bg-slate-50 overflow-hidden font-sans">
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="absolute top-5 left-5 z-50 flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-600 hover:text-indigo-700 bg-white/70 hover:bg-white backdrop-blur-sm border border-white/60 hover:border-indigo-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group"
+      >
+        <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform">
+          <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+        </svg>
+        Back
+      </button>
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 blur-[100px] animate-[pulse_8s_ease-in-out_infinite_alternate]" />

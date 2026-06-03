@@ -164,7 +164,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithProvider = async (provider: "google" | "github"): Promise<void> => {
     const options: any = {
-      redirectTo: window.location.origin + window.location.pathname,
+      redirectTo: window.location.origin + "/",
     };
     if (provider === "github") {
       options.scopes = "read:user user:email";
