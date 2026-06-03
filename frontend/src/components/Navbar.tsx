@@ -119,9 +119,9 @@ export default function Navbar() {
 
       {/* Mobile Navigation Menu */}
       <div 
-        className={`md:hidden absolute top-20 left-0 w-full bg-white/95 backdrop-blur-md transition-all duration-300 overflow-hidden shadow-xl shadow-black/5 ${isMobileMenuOpen ? 'max-h-96 border-b border-gray-100' : 'max-h-0'}`}
+        className={`md:hidden absolute top-20 left-0 w-full bg-zinc-400 backdrop-blur-md transition-all duration-300 overflow-hidden shadow-xl shadow-black/5 ${isMobileMenuOpen ? 'max-h-96 border-b border-gray-100' : 'max-h-0'}`}
       >
-        <div className="px-6 py-6 flex flex-col gap-4 text-base font-medium text-gray-600">
+        <div className="px-6 py-6 flex flex-col gap-4 text-base font-medium text-black">
           <NavLink
             to="/"
             onClick={closeMenu}
