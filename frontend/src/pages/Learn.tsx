@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../components/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -302,20 +302,48 @@ function ResourceCard({ r }: { r: Resource }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Learn() {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
 
   const [activeCategory, setActiveCategory] = useState<string>("web");
 
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/login?redirect=/learn");
-    }
-  }, [user, loading, navigate]);
-
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="flex-grow w-full flex items-center justify-center bg-white">
         <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex-grow w-full min-h-[60vh] flex flex-col items-center justify-center p-6 relative bg-slate-50 overflow-hidden font-sans">
+        {/* Dynamic Background Elements */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[20%] left-[10%] w-[30vw] h-[30vw] rounded-full bg-gradient-to-br from-red-500/10 to-orange-500/10 blur-[80px]" />
+          <div className="absolute bottom-[20%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-tr from-indigo-400/10 to-purple-400/10 blur-[100px]" />
+        </div>
+
+        <div className="relative z-10 max-w-md w-full bg-white/60 backdrop-blur-3xl rounded-3xl p-8 sm:p-10 border border-white/50 shadow-[0_8px_40px_rgba(0,0,0,0.06)] text-center flex flex-col items-center">
+          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-6 shadow-inner animate-bounce">
+            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-3">
+            Member Access Only
+          </h2>
+          <p className="text-slate-500 font-medium leading-relaxed mb-8">
+            Please sign in to access teaching videos, developer roadmaps, and custom tutorials handpicked by the NIAT Tech Club team.
+          </p>
+
+          <Link
+            to="/login?redirect=/learn"
+            className="w-full relative overflow-hidden rounded-2xl font-bold text-white text-sm py-4 transition-all duration-300 shadow-[0_8px_25px_rgba(220,38,38,0.25)] hover:shadow-[0_12px_35px_rgba(220,38,38,0.35)] hover:-translate-y-1 active:translate-y-0 bg-gradient-to-r from-red-600 to-orange-600 flex items-center justify-center gap-2 group"
+          >
+            <span>Sign In to Access</span>
+            <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"><path d="M3 8H13M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </Link>
+        </div>
       </div>
     );
   }

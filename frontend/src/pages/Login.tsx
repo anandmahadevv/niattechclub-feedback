@@ -153,25 +153,64 @@ function PasswordStrength({ password }: { password: string }) {
   if (!password) return null;
   const score = getPasswordScore(password);
 
-  const levels = [
-    { label: "Too short", color: "bg-red-500", shadow: "shadow-red-500/50" },
-    { label: "Weak", color: "bg-orange-500", shadow: "shadow-orange-500/50" },
-    { label: "Fair", color: "bg-yellow-400", shadow: "shadow-yellow-400/50" },
-    { label: "Good", color: "bg-emerald-400", shadow: "shadow-emerald-400/50" },
-    { label: "Strong", color: "bg-emerald-600", shadow: "shadow-emerald-600/50" },
+  const checks = [
+    { label: "At least 8 characters", met: password.length >= 8 },
+    { label: "At least one uppercase letter (A-Z)", met: /[A-Z]/.test(password) },
+    { label: "At least one number (0-9)", met: /[0-9]/.test(password) },
+    { label: "At least one special character (@$!%*?&)", met: /[^A-Za-z0-9]/.test(password) },
   ];
-  const { label, color, shadow } = levels[Math.min(score, 4)];
+
+  const levels = [
+    { label: "Too Short", color: "text-rose-500", progressColor: "bg-rose-500", desc: "Choose a longer password to keep your account secure." },
+    { label: "Weak", color: "text-amber-500", progressColor: "bg-amber-500", desc: "Add uppercase letters, numbers, or symbols." },
+    { label: "Fair", color: "text-yellow-500", progressColor: "bg-yellow-500", desc: "Almost there! Make it stronger for better security." },
+    { label: "Good", color: "text-emerald-500", progressColor: "bg-emerald-500", desc: "Solid password. Meets the club safety requirements." },
+    { label: "Strong", color: "text-teal-500", progressColor: "bg-teal-500", desc: "Excellent password! Very secure." },
+  ];
+  const currentLevel = levels[Math.min(score, 4)];
 
   return (
-    <div className="mt-3 px-1 animate-in fade-in">
-      <div className="flex gap-1.5 mb-2">
+    <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 animate-in fade-in slide-in-from-top-2 duration-300">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Strength</span>
+        <span className={`text-[10px] font-black uppercase tracking-wider ${currentLevel.color}`}>
+          {currentLevel.label}
+        </span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="flex gap-1.5 mb-4">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="h-1.5 flex-1 rounded-full bg-slate-200 overflow-hidden">
-            <div className={`h-full transition-all duration-500 w-full ${i < score ? color + " " + shadow : "translate-x-[-100%]"}`} />
+            <div className={`h-full transition-all duration-500 w-full ${i < score ? currentLevel.progressColor : "translate-x-[-100%]"}`} />
           </div>
         ))}
       </div>
-      <p className={`text-xs font-bold uppercase tracking-wider ${color.replace('bg-', 'text-')}`}>{label}</p>
+
+      {/* Checklist */}
+      <div className="space-y-2">
+        {checks.map((c, idx) => (
+          <div key={idx} className="flex items-center gap-2.5 text-xs transition-colors duration-300">
+            <div className={`w-4 h-4 rounded-full flex items-center justify-center border transition-all duration-300 ${
+              c.met 
+                ? "bg-emerald-500 border-emerald-500 text-white scale-110" 
+                : "border-slate-300 text-transparent"
+            }`}>
+              <svg viewBox="0 0 12 12" fill="none" className="w-2.5 h-2.5 stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 8 9 4" />
+              </svg>
+            </div>
+            <span className={`font-semibold ${c.met ? "text-slate-600" : "text-slate-400"}`}>
+              {c.label}
+            </span>
+          </div>
+        ))}
+      </div>
+      
+      {/* Short security tip */}
+      <p className="mt-3.5 pt-3 border-t border-slate-200/50 text-[10px] font-medium text-slate-400 leading-normal">
+        {currentLevel.desc}
+      </p>
     </div>
   );
 }
