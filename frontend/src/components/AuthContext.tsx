@@ -47,11 +47,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || "Anonymous";
           const github_username = session.user.user_metadata?.preferred_username || null;
 
-          const { data: existingUser } = await supabase
-            .from("use_auth")
-            .select("*")
-            .eq("email", email)
-            .single();
+          const { data, error: rpcError } = await supabase
+            .rpc("get_user_by_email", { email_input: email });
+          
+          const existingUser = data && data.length > 0 ? data[0] : null;
 
           if (existingUser) {
             setUser(existingUser);
@@ -147,11 +146,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetPassword = async (email: string, newPassword: string): Promise<void> => {
-    // Note: This relies on the 'Allow Public Update' RLS policy on use_auth
     const { error } = await supabase
-      .from("use_auth")
-      .update({ password: newPassword })
-      .eq("email", email.toLowerCase());
+      .rpc("reset_user_password", {
+        user_email: email.toLowerCase(),
+        new_password: newPassword
+      });
 
     if (error) {
       throw new Error(error.message || "Failed to reset password");

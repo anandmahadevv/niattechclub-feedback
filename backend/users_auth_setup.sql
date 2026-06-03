@@ -19,12 +19,8 @@ CREATE TABLE public.use_auth (
 -- Enable Row Level Security
 ALTER TABLE public.use_auth ENABLE ROW LEVEL SECURITY;
 
--- Policy for reading: Allow authenticated or anonymous users to read non-sensitive fields
--- Note: Adjust this policy based on your specific requirements
-CREATE POLICY "Allow Public Read" 
-ON public.use_auth
-FOR SELECT 
-USING (true);
+-- Policy for reading: Disabled for public to prevent database scraping
+-- CREATE POLICY "Allow Public Read" ON public.use_auth FOR SELECT USING (true);
 
 -- Policy for inserting: Allow anyone to create an account
 CREATE POLICY "Allow Public Insert" 
@@ -32,12 +28,9 @@ ON public.use_auth
 FOR INSERT 
 WITH CHECK (true);
 
--- Policy for updating: Allow users to update their own profile
-CREATE POLICY "Allow Public Update" 
-ON public.use_auth
-FOR UPDATE
-USING (true)
-WITH CHECK (true);
+-- Policy for updating: Disabled for public to prevent unauthorized modifications
+-- Updates must be done via secure SECURITY DEFINER RPC functions.
+-- CREATE POLICY "Allow Public Update" ON public.use_auth FOR UPDATE USING (true) WITH CHECK (true);
 
 -- ============================================================================
 -- Section 2: Password Hashing Trigger
@@ -119,5 +112,46 @@ BEGIN
     WHERE email = user_email;
     
     RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 6. Secure RPC Function for Password Resets
+CREATE OR REPLACE FUNCTION public.reset_user_password(
+    user_email TEXT,
+    new_password TEXT
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    UPDATE public.use_auth
+    SET password = new_password
+    WHERE email = user_email;
+    
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 7. Secure RPC Function to fetch user by email (for social login)
+CREATE OR REPLACE FUNCTION public.get_user_by_email(
+    email_input TEXT
+)
+RETURNS TABLE (
+    id INTEGER,
+    email TEXT,
+    name TEXT,
+    roll_number TEXT,
+    department TEXT,
+    github_username TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        u.id, 
+        u.email, 
+        u.name, 
+        u.roll_number, 
+        u.department, 
+        u.github_username
+    FROM public.use_auth u
+    WHERE u.email = email_input;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
