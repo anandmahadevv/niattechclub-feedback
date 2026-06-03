@@ -32,7 +32,7 @@ export default async function handler(req, res) {
 
   // ── 3. Store OTP in Supabase (server-side, with 10 min expiry) ──────────
   const { error: storeError } = await supabase
-    .rpc('create_reset_otp', {
+    .rpc('create_otp', {
       email_input: email.toLowerCase(),
       otp_input: otp,
     });

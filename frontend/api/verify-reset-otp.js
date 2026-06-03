@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
   // ── 1. Verify OTP server-side ────────────────────────────────────────────
   const { data: isValid, error: verifyError } = await supabase
-    .rpc('verify_reset_otp', {
+    .rpc('verify_otp', {
       email_input: email.toLowerCase(),
       otp_input: otp,
     });
