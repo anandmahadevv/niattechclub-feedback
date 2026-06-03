@@ -191,7 +191,7 @@ export default function Login() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
-    email: "", password: "", confirmPassword: "", name: "", rollNumber: "", department: "", bio: "",
+    email: "", password: "", confirmPassword: "", name: "", rollNumber: "", department: ""
   });
 
   const [resetData, setResetData] = useState({
@@ -200,7 +200,7 @@ export default function Login() {
 
   useEffect(() => {
     setErrors({});
-    setFormData({ email: "", password: "", confirmPassword: "", name: "", rollNumber: "", department: "", bio: "" });
+    setFormData({ email: "", password: "", confirmPassword: "", name: "", rollNumber: "", department: "" });
     setShowPassword(false);
     setShowConfirm(false);
     setForgotMode('none');
@@ -249,7 +249,7 @@ export default function Login() {
     const toastId = toast.loading(isSignUp ? "Creating account..." : "Signing in...");
     try {
       if (isSignUp) {
-        await signUp(formData.email, formData.password, formData.name, formData.rollNumber, formData.department, formData.bio);
+        await signUp(formData.email, formData.password, formData.name, formData.rollNumber, formData.department);
         toast.success("Account created! Please sign in.", { id: toastId });
         setIsSignUp(false);
       } else {
@@ -479,7 +479,6 @@ export default function Login() {
                             <FloatingInput id="rollNumber" name="rollNumber" label="Roll Number" value={formData.rollNumber} onChange={handleChange} required placeholder="21CS045" icon={<IconID />} error={errors.rollNumber} />
                             <FloatingInput id="department" name="department" label="Department" value={formData.department} onChange={handleChange} required placeholder="CSE / ISE" icon={<IconBuildingOffice />} error={errors.department} />
                           </div>
-                          <FloatingInput id="bio" name="bio" label="Bio (Optional)" value={formData.bio} onChange={handleChange} placeholder="A short intro about yourself, your stack, interests…" isTextArea rows={2} />
                         </div>
                       </div>
                     </div>

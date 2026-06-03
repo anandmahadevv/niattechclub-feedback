@@ -7,7 +7,6 @@ export interface CustomUser {
   name: string;
   roll_number: string;
   department: string;
-  bio: string;
   github_username?: string | null;
 }
 
@@ -20,8 +19,7 @@ interface AuthContextType {
     password: string,
     name: string,
     rollNumber: string,
-    department: string,
-    bio: string
+    department: string
   ) => Promise<void>;
   signOut: () => void;
   updateLocalUser: (updatedUser: CustomUser) => void;
@@ -65,7 +63,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               name: name,
               roll_number: "N/A",
               department: "N/A",
-              bio: "Logged in via social provider.",
               github_username: github_username
             }).select().single();
 
@@ -124,8 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     password: string,
     name: string,
     rollNumber: string,
-    department: string,
-    bio: string
+    department: string
   ): Promise<void> => {
     const { error } = await supabase.from("use_auth").insert({
       email: email.toLowerCase(),
@@ -133,7 +129,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name,
       roll_number: rollNumber,
       department,
-      bio,
     });
 
     if (error) {
