@@ -14,6 +14,7 @@ import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 import { AuthProvider } from "./components/AuthContext";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import Learn from "./pages/Learn";
 
 function AppContent() {
   const location = useLocation();
@@ -41,6 +42,7 @@ function AppContent() {
           <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
           <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+          <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
           <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
           {/* Catch-all route to redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
