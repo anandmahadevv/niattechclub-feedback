@@ -1,4 +1,5 @@
 import Tilt from "react-parallax-tilt";
+import Leaderboard from "../components/Leaderboard";
 
 const repos = [
   {
@@ -70,6 +71,18 @@ export default function OpenSource() {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 w-full flex-grow flex flex-col items-center">
+        
+        <Leaderboard />
+
+        <div className="w-full text-center mt-8 mb-8 border-t border-gray-200 pt-16">
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900 mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
+            Tracked Repositories
+          </h2>
+          <p className="text-gray-500 max-w-2xl mx-auto">
+            Get your PRs merged in these repositories to climb the leaderboard!
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {repos.map((repo) => (
             <Tilt key={repo.id} tiltMaxAngleX={4} tiltMaxAngleY={4} scale={1.02} transitionSpeed={2000} className="w-full flex">
