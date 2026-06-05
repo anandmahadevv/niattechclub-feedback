@@ -26,6 +26,24 @@ export default function Events() {
   }, []);
 
   useEffect(() => {
+    if (user?.email) {
+      const checkUserRsvp = async () => {
+        const { data } = await supabase
+          .from('rsvps')
+          .select('id')
+          .eq('event_slug', 'promptwars')
+          .eq('email', user.email)
+          .maybeSingle();
+          
+        if (data) {
+          setIsRsvped(true);
+        }
+      };
+      checkUserRsvp();
+    }
+  }, [user?.email]);
+
+  useEffect(() => {
     fetchRsvps();
 
     // Set up Supabase Realtime subscription for live updates with unique channel
@@ -185,14 +203,20 @@ export default function Events() {
                 <p className="text-sm text-gray-500 mb-6">Fill out the form below to register for this event.</p>
                 
                 {isRsvped ? (
-                  <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center animate-in fade-in zoom-in duration-300">
-                    <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
-                      <i className="fas fa-check-circle"></i>
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-3xl p-8 text-center shadow-sm relative overflow-hidden animate-in fade-in zoom-in duration-500">
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-green-200 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+                    <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-emerald-200 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+                    
+                    <div className="w-20 h-20 bg-white text-green-500 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-md border border-green-100 relative z-10">
+                      <i className="fas fa-ticket-alt"></i>
                     </div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">Congrats for booking!</h4>
-                    <p className="text-sm text-gray-600">
-                      Your spot for PromptWars has been successfully reserved. Keep an eye on your email for further updates!
+                    <h4 className="text-2xl font-extrabold text-gray-900 mb-2 relative z-10">See you there! 🎉</h4>
+                    <p className="text-gray-600 font-medium relative z-10 mb-4">
+                      Your slot for PromptWars is <span className="text-green-700 font-bold">100% Confirmed</span>.
                     </p>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-green-100 shadow-sm text-sm font-semibold text-green-700 relative z-10">
+                      <i className="fas fa-check-circle"></i> RSVP Verified
+                    </div>
                   </div>
                 ) : !user ? (
                   <div className="text-center py-6 bg-white border border-gray-200 rounded-2xl shadow-sm animate-in fade-in duration-300">
