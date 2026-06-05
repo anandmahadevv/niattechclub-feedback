@@ -18,7 +18,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 app.use(cors());
 app.use(express.json());
 
-app.post('/api/send-rsvp-email', async (req, res) => {
+app.post(['/api/send-rsvp-email', '/send-rsvp-email'], async (req, res) => {
   const { name, email } = req.body;
 
   if (!email || !name) {
@@ -50,7 +50,7 @@ app.post('/api/send-rsvp-email', async (req, res) => {
   }
 });
 
-app.post('/api/send-reset-email', async (req, res) => {
+app.post(['/api/send-reset-email', '/send-reset-email'], async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -98,7 +98,7 @@ app.post('/api/send-reset-email', async (req, res) => {
   }
 });
 
-app.post('/api/verify-otp', async (req, res) => {
+app.post(['/api/verify-otp', '/verify-otp'], async (req, res) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
@@ -127,7 +127,7 @@ app.post('/api/verify-otp', async (req, res) => {
   }
 });
 
-app.post('/api/login-step1', async (req, res) => {
+app.post(['/api/login-step1', '/login-step1'], async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -195,7 +195,7 @@ app.post('/api/login-step1', async (req, res) => {
   }
 });
 
-app.post('/api/login-step2', async (req, res) => {
+app.post(['/api/login-step2', '/login-step2'], async (req, res) => {
   const { email, password, otp } = req.body;
 
   if (!email || !password || !otp) {
@@ -241,7 +241,7 @@ app.post('/api/login-step2', async (req, res) => {
   }
 });
 
-app.post('/api/fetch-tickets', async (req, res) => {
+app.post(['/api/fetch-tickets', '/fetch-tickets'], async (req, res) => {
   const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
   const TESTMAIL_NAMESPACE = process.env.TESTMAIL_NAMESPACE;
 
