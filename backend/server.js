@@ -82,16 +82,34 @@ app.post(['/api/send-reset-email', '/send-reset-email'], async (req, res) => {
       to: email,
       subject: 'Password Reset Code - NIAT Tech Club',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-          <h2 style="color: #4F46E5;">Password Reset</h2>
-          <p>We received a request to reset your password. Use the code below to reset it:</p>
-          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-            <span style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #111827;">${otp}</span>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb;">
+          <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 40px 32px; text-align: center;">
+            <h1 style="color: white; font-size: 28px; font-weight: 900; margin: 0; letter-spacing: -0.5px;">NIAT Tech Club</h1>
+            <p style="color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 14px;">Password Reset</p>
           </div>
-          <p>If you did not request a password reset, please ignore this email.</p>
-          <br />
-          <p>Best regards,</p>
-          <p><strong>The Tech Club Team</strong></p>
+          
+          <div style="padding: 40px 32px;">
+            <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">Hello,</p>
+            <p style="color: #374151; font-size: 16px; margin: 0 0 32px; line-height: 1.6;">
+              We received a request to reset your password. Please use the 6-digit verification code below to proceed. 
+              It is valid for <strong>10 minutes</strong> and can only be used once.
+            </p>
+
+            <div style="background: #f3f4f6; border-radius: 12px; padding: 32px; text-align: center; margin: 0 0 32px;">
+              <p style="color: #6b7280; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 12px;">Your Reset Code</p>
+              <p style="font-size: 48px; font-weight: 900; letter-spacing: 12px; color: #4f46e5; margin: 0; font-family: 'Courier New', monospace;">${otp}</p>
+            </div>
+
+            <div style="background: #fef9ec; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 0 0 32px;">
+              <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.5;">
+                ⚠️ If you did not request a password reset, you can safely ignore this email. Your password will remain unchanged.
+              </p>
+            </div>
+
+            <p style="color: #9ca3af; font-size: 13px; margin: 0; line-height: 1.6;">
+              — The NIAT Tech Club Team
+            </p>
+          </div>
         </div>
       `
     });
@@ -179,17 +197,34 @@ app.post(['/api/login-step1', '/login-step1'], async (req, res) => {
       to: email,
       subject: 'Your Login Verification Code — NIAT Tech Club',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-          <h2 style="color: #4F46E5;">Two-Factor Authentication</h2>
-          <p>Hello ${user.name || 'Member'},</p>
-          <p>To complete your sign-in, please use the 6-digit verification code below. It is valid for 10 minutes:</p>
-          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-            <span style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #111827;">${otp}</span>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb;">
+          <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 40px 32px; text-align: center;">
+            <h1 style="color: white; font-size: 28px; font-weight: 900; margin: 0; letter-spacing: -0.5px;">NIAT Tech Club</h1>
+            <p style="color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 14px;">Two-Factor Authentication</p>
           </div>
-          <p>If you did not attempt to sign in to your NIAT Tech Club account, please reset your password immediately.</p>
-          <br />
-          <p>Best regards,</p>
-          <p><strong>The Tech Club Team</strong></p>
+          
+          <div style="padding: 40px 32px;">
+            <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">Hello ${user.name || 'Member'},</p>
+            <p style="color: #374151; font-size: 16px; margin: 0 0 32px; line-height: 1.6;">
+              To complete your sign-in, please use the 6-digit verification code below. 
+              It is valid for <strong>10 minutes</strong> and can only be used once.
+            </p>
+
+            <div style="background: #f3f4f6; border-radius: 12px; padding: 32px; text-align: center; margin: 0 0 32px;">
+              <p style="color: #6b7280; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 12px;">Your Verification Code</p>
+              <p style="font-size: 48px; font-weight: 900; letter-spacing: 12px; color: #4f46e5; margin: 0; font-family: 'Courier New', monospace;">${otp}</p>
+            </div>
+
+            <div style="background: #fef9ec; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 0 0 32px;">
+              <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.5;">
+                ⚠️ If you did not attempt to sign in to your NIAT Tech Club account, please reset your password immediately as your password might have been compromised.
+              </p>
+            </div>
+
+            <p style="color: #9ca3af; font-size: 13px; margin: 0; line-height: 1.6;">
+              — The NIAT Tech Club Team
+            </p>
+          </div>
         </div>
       `
     });
