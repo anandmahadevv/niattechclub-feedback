@@ -11,10 +11,14 @@ const resendMain = new Resend(process.env.RESEND_API_KEY_MAIN);
 const resendSupport = new Resend(process.env.RESEND_API_KEY_SUPPORT);
 
 const { createClient } = require('@supabase/supabase-js');
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
+const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || '';
+let supabase;
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey);
+} else {
+  console.warn('WARNING: Supabase URL or Key is missing. Database calls will fail.');
+}
 app.use(cors());
 app.use(express.json());
 
@@ -322,6 +326,11 @@ app.post(['/api/fetch-tickets', '/fetch-tickets'], async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+});
+
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal Server Error', details: err.message });
 });
 
 module.exports = app;
