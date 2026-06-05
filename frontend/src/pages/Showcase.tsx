@@ -6,7 +6,6 @@ import { useAdminData } from "../hooks/useAdminData";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../components/AuthContext";
-import { LazyImage } from "../components/LazyImage";
 
 export default function Showcase() {
   const { user } = useAuth();
@@ -149,7 +148,7 @@ export default function Showcase() {
               <article className="project-card flex flex-col w-full bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all">
                 {project.image_url && (
                   <div className="w-full h-48 bg-gray-100 border-b border-gray-100 overflow-hidden shrink-0">
-                    <LazyImage src={project.image_url} alt={project.project_title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+                    <img src={project.image_url} alt={project.project_title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
                   </div>
                 )}
                 <div className="p-6 flex flex-col flex-grow w-full">

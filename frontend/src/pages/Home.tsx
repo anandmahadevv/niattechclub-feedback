@@ -1,6 +1,5 @@
 import { PointerHighlight } from "../components/PointerHighlight";
 import { Link } from "react-router-dom";
-import { LazyImage } from "../components/LazyImage";
 
 export default function Home() {
   return (
@@ -58,11 +57,10 @@ export default function Home() {
           {/* Graphic/Illustration Side */}
           <div className="hidden lg:flex justify-center relative">
             <div className="absolute inset-0 bg-gradient-to-tr from-red-100 to-orange-50 rounded-full blur-3xl opacity-50 transform -translate-y-10"></div>
-            <LazyImage
+            <img
               src="/photo.png"
               alt="NIAT Tech Club Logo - Leading NIAT Student Clubs at NIAT Mangalore Campus"
               className="relative z-10 h-80 object-contain drop-shadow-2xl mix-blend-multiply transform hover:scale-105 transition-transform duration-500"
-              skeletonClassName="h-80 w-80 rounded-full"
             />
           </div>
         </div>
