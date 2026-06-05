@@ -77,7 +77,8 @@ app.post(['/api/send-reset-email', '/send-reset-email'], async (req, res) => {
 
   try {
     const data = await resendSupport.emails.send({
-      from: 'support@techclub.niat.me',
+      from: 'noreply@techclub.niat.me',
+      reply_to: 'support@techclub.niat.me',
       to: email,
       subject: 'Password Reset Code - NIAT Tech Club',
       html: `
@@ -173,7 +174,8 @@ app.post(['/api/login-step1', '/login-step1'], async (req, res) => {
 
     // 4. Send email via Resend (using support key)
     const data = await resendSupport.emails.send({
-      from: 'support@techclub.niat.me',
+      from: 'noreply@techclub.niat.me',
+      reply_to: 'support@techclub.niat.me',
       to: email,
       subject: 'Your Login Verification Code — NIAT Tech Club',
       html: `
