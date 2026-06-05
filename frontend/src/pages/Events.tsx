@@ -7,7 +7,6 @@ export default function Events() {
   const [rsvpCount, setRsvpCount] = useState<number>(0);
   const [isRsvped, setIsRsvped] = useState(false);
   const [attendees, setAttendees] = useState<{ id: number; name: string; created_at: string }[]>([]);
-  const [showAttendees, setShowAttendees] = useState(false);
 
   const fetchRsvps = useCallback(async () => {
     const { data, error, count } = await supabase
