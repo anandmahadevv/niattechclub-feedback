@@ -316,7 +316,7 @@ export default function Events() {
                     </button>
                     
                     {showAttendees && (
-                      <div className="mt-4 flex flex-wrap gap-2 animate-in slide-in-from-top-2 fade-in duration-300">
+                      <div className="mt-4 flex flex-wrap gap-2 animate-in slide-in-from-top-2 fade-in duration-300 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                         {attendees.map((attendee) => (
                           <div key={attendee.id} className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-sm">
                             <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-[9px] font-bold shadow-inner">
