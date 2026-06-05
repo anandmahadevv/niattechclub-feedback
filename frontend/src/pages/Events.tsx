@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../components/AuthContext";
 
 export default function Events() {
+  const { user } = useAuth();
   const TOTAL_SLOTS = 60;
   const [rsvpCount, setRsvpCount] = useState<number>(0);
   const [isRsvped, setIsRsvped] = useState(false);
@@ -192,6 +194,22 @@ export default function Events() {
                       Your spot for PromptWars has been successfully reserved. Keep an eye on your email for further updates!
                     </p>
                   </div>
+                ) : !user ? (
+                  <div className="text-center py-6 bg-white border border-gray-200 rounded-2xl shadow-sm animate-in fade-in duration-300">
+                    <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                      <i className="fas fa-lock"></i>
+                    </div>
+                    <h4 className="text-lg font-bold text-gray-900 mb-2">Login Required</h4>
+                    <p className="text-sm text-gray-500 mb-4 px-4">
+                      You must be logged in to RSVP for events.
+                    </p>
+                    <Link
+                      to="/login?redirect=/events"
+                      className="inline-flex items-center justify-center bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2 px-6 rounded-lg transition-colors text-sm shadow-sm"
+                    >
+                      Login to RSVP <i className="fas fa-arrow-right ml-2 text-xs"></i>
+                    </Link>
+                  </div>
                 ) : (
                   <>
                     <div className="mb-6">
@@ -268,6 +286,7 @@ export default function Events() {
                         type="text"
                         name="name"
                         required
+                        defaultValue={user?.name || ""}
                         className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all text-sm"
                         placeholder="Full Name"
                       />
@@ -282,6 +301,7 @@ export default function Events() {
                         type="email"
                         name="email"
                         required
+                        defaultValue={user?.email || ""}
                         pattern=".*@yenepoya\.edu\.in$"
                         title="Please enter your @yenepoya.edu.in email address"
                         className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all text-sm"
