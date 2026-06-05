@@ -301,32 +301,34 @@ export default function Events() {
                   </>
                 )}
 
-                {/* Integrated Attendees Dropdown */}
+                {/* Attendees Avatar Stack */}
                 {attendees.length > 0 && (
-                  <div className="mt-8 border-t border-gray-200 pt-6">
-                    <button 
-                      onClick={() => setShowAttendees(!showAttendees)}
-                      className="w-full flex items-center justify-between text-left focus:outline-none group"
-                    >
-                      <div className="flex items-center gap-2 text-gray-900 font-bold">
-                        <i className="fas fa-users text-purple-600"></i>
-                        <span>Who's Going? <span className="text-gray-500 font-medium text-sm ml-1">({attendees.length} Registered)</span></span>
-                      </div>
-                      <i className={`fas fa-chevron-down text-gray-400 transition-transform duration-300 ${showAttendees ? 'rotate-180' : ''}`}></i>
-                    </button>
-                    
-                    {showAttendees && (
-                      <div className="mt-4 flex flex-wrap gap-2 animate-in slide-in-from-top-2 fade-in duration-300 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-                        {attendees.map((attendee) => (
-                          <div key={attendee.id} className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-sm">
-                            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-[9px] font-bold shadow-inner">
-                              {attendee.name.charAt(0).toUpperCase()}
-                            </div>
-                            <span className="text-xs font-semibold text-gray-700">{attendee.name}</span>
+                  <div className="mt-8 border-t border-gray-200 pt-6 flex items-center gap-4">
+                    <div className="flex -space-x-3">
+                      {attendees.slice(0, 5).map((attendee, i) => (
+                        <div 
+                          key={attendee.id} 
+                          className="w-10 h-10 rounded-full border-2 border-white bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-sm font-bold shadow-sm relative group cursor-pointer"
+                          style={{ zIndex: 10 - i }}
+                        >
+                          {attendee.name.charAt(0).toUpperCase()}
+                          
+                          {/* Tooltip on hover */}
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                            {attendee.name}
                           </div>
-                        ))}
-                      </div>
-                    )}
+                        </div>
+                      ))}
+                      {attendees.length > 5 && (
+                        <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 text-gray-600 flex items-center justify-center text-xs font-bold shadow-sm z-0">
+                          +{attendees.length - 5}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">Who's Going?</p>
+                      <p className="text-xs font-medium text-gray-500">{attendees.length} people registered</p>
+                    </div>
                   </div>
                 )}
               </div>
