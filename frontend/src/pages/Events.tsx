@@ -190,9 +190,9 @@ export default function Events() {
                 <div className="mt-auto">
                   <p className="text-sm font-bold text-gray-900 mb-2">Prizes include:</p>
                   <ul className="text-sm text-gray-600 space-y-1">
-                    <li><i className="fas fa-trophy text-yellow-500 w-5"></i> ₹50,000 Grand Prize</li>
-                    <li><i className="fas fa-medal text-gray-400 w-5"></i> Internship Opportunities</li>
-                    <li><i className="fas fa-swimmer text-blue-400 w-5"></i> Exclusive Swag</li>
+                    <li><i className="fas fa-trophy text-yellow-500 w-5"></i> ₹40,000+ Grand Prize</li>
+                    <li><i className="fas fa-certificate text-gray-400 w-5"></i> Participation Certification by Google</li>
+                    <li><i className="fas fa-gift text-blue-400 w-5"></i> Exclusive Swag</li>
                   </ul>
                 </div>
               </div>
