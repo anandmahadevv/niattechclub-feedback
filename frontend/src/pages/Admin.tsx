@@ -684,9 +684,14 @@ function CommunicationsTab() {
           <div>
             <div className="flex justify-between items-center mb-2">
               <label className="block text-sm font-semibold text-gray-700">Message (HTML Supported)</label>
-              <button type="button" onClick={() => setShowPreview(!showPreview)} className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
-                {showPreview ? "Hide Preview" : "Show Preview"}
-              </button>
+              <div className="flex items-center gap-4">
+                <button type="button" onClick={() => { setSubject("Your Entry Ticket - Tech Club"); setHtml(`<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">\n  <h2 style="color: #4F46E5;">Your Entry Ticket, {{NAME}}!</h2>\n  <p>The event is tomorrow! Please find your official entry ticket below.</p>\n  {{QR_CODE}}\n  <p>Have this QR code ready on your phone when you arrive at the venue for a smooth check-in.</p>\n  <br />\n  <p>Best regards,</p>\n  <p><strong>The Tech Club Team</strong></p>\n</div>`); }} className="text-xs font-bold text-green-600 hover:text-green-800 transition-colors">
+                  <i className="fas fa-magic mr-1"></i> Use Scanner Template
+                </button>
+                <button type="button" onClick={() => setShowPreview(!showPreview)} className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
+                  {showPreview ? "Hide Preview" : "Show Preview"}
+                </button>
+              </div>
             </div>
             {showPreview ? (
               <div className="w-full border border-gray-200 p-4 rounded-xl min-h-[200px] max-h-[500px] overflow-auto bg-white shadow-inner" dangerouslySetInnerHTML={{ __html: html || '<p class="text-gray-400">Nothing to preview yet...</p>' }}></div>
