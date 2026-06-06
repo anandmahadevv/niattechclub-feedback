@@ -36,6 +36,7 @@ export interface RSVP {
   name: string;
   email: string;
   phone: string | null;
+  attended: boolean;
   created_at: string;
 }
 
@@ -286,6 +287,27 @@ export function useAdminData() {
     if (error) throw error;
   };
 
+  const markAttendance = async (id: number) => {
+    // Optimistic UI update
+    setRsvps((prev) => 
+      prev.map((r) => r.id === id ? { ...r, attended: true } : r)
+    );
+    
+    const { error } = await supabase
+      .from('rsvps')
+      .update({ attended: true })
+      .eq('id', id);
+      
+    if (error) {
+      console.error("Failed to mark attendance:", error);
+      // Revert if error
+      setRsvps((prev) => 
+        prev.map((r) => r.id === id ? { ...r, attended: false } : r)
+      );
+      throw error;
+    }
+  };
+
   return {
     ideas,
     addIdea,
@@ -302,6 +324,7 @@ export function useAdminData() {
     events,
     addEvent,
     deleteEvent,
+    markAttendance,
     loading
   };
 }

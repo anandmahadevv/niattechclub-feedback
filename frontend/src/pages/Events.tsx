@@ -277,18 +277,20 @@ export default function Events() {
                           throw new Error("You have already RSVP'd for this event with this email.");
                         }
 
-                        const { error } = await supabase.from('rsvps').insert([
+                        const { data: newRsvpData, error } = await supabase.from('rsvps').insert([
                           { event_slug: 'promptwars', name, email }
-                        ]);
+                        ]).select();
                         
                         if (error) throw error;
+                        
+                        const rsvpId = newRsvpData && newRsvpData[0] ? newRsvpData[0].id : null;
                         
                         // Send confirmation email via Vercel Serverless Function
                         try {
                           await fetch('/api/send-rsvp-email', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name, email })
+                            body: JSON.stringify({ name, email, rsvpId })
                           });
                         } catch (emailError) {
                           console.error("Failed to send confirmation email:", emailError);

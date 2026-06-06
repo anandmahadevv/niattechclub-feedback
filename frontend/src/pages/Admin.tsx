@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAdminData } from "../hooks/useAdminData";
 import { useAuth } from "../components/AuthContext";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+import { Html5QrcodeScanner } from "html5-qrcode";
 
 const exportCSV = (data: any[], filename: string) => {
   if (data.length === 0) return;
@@ -120,6 +122,12 @@ export default function Admin() {
             label="Events"
           />
           <SidebarButton 
+            active={activeTab === "scanner"} 
+            onClick={() => { setActiveTab("scanner"); setIsSidebarOpen(false); }}
+            icon="fa-qrcode"
+            label="Scanner"
+          />
+          <SidebarButton 
             active={activeTab === "ideas"} 
             onClick={() => { setActiveTab("ideas"); setIsSidebarOpen(false); }}
             icon="fa-lightbulb"
@@ -179,6 +187,7 @@ export default function Admin() {
         <div className="p-4 md:p-8 max-w-7xl mx-auto">
           {activeTab === "overview" && <OverviewTab />}
           {activeTab === "events" && <EventsTab />}
+          {activeTab === "scanner" && <ScannerTab />}
           {activeTab === "ideas" && <IdeasTab />}
           {activeTab === "projects" && <ProjectsTab />}
           {activeTab === "members" && <MembersTab />}
@@ -205,22 +214,68 @@ function SidebarButton({ active, onClick, icon, label }: { active: boolean, onCl
 }
 
 function OverviewTab() {
-  const { ideas, projects, loading } = useAdminData();
+  const { ideas, projects, rsvps, events, loading } = useAdminData();
+
+  if (loading) return <div className="p-8 text-center text-gray-500">Loading analytics...</div>;
+
+  // Prepare data for BarChart (RSVPs per Event)
+  const rsvpsByEvent = events.map(ev => ({
+    name: ev.title,
+    RSVPs: rsvps.filter(r => r.event_slug === ev.slug).length
+  }));
+
+  // Prepare data for PieChart (Ideas by Category)
+  const ideaCategories = ideas.reduce((acc, curr) => {
+    acc[curr.category] = (acc[curr.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const ideasPieData = Object.keys(ideaCategories).map(key => ({
+    name: key, value: ideaCategories[key]
+  }));
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h1 className="text-3xl font-bold mb-8">Dashboard Overview</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Total Events" value="2" icon="fa-calendar-check" color="blue" />
-        <StatCard title="Ideas Submitted" value={loading ? "..." : ideas.length.toString()} icon="fa-lightbulb" color="yellow" />
-        <StatCard title="Active Projects" value={loading ? "..." : projects.length.toString()} icon="fa-laptop-code" color="green" />
+      <h1 className="text-3xl font-bold mb-8">Analytics Dashboard</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <StatCard title="Total Events" value={events.length.toString()} icon="fa-calendar-check" color="blue" />
+        <StatCard title="Ideas Submitted" value={ideas.length.toString()} icon="fa-lightbulb" color="yellow" />
+        <StatCard title="Active Projects" value={projects.length.toString()} icon="fa-laptop-code" color="green" />
       </div>
       
-      <div className="mt-10 bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
-        <h3 className="text-xl font-bold mb-4">Welcome to the Admin Panel</h3>
-        <p className="text-gray-600">
-          This dashboard is now connected to Supabase! Any changes made here are instantly reflected in the live database.
-        </p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+          <h3 className="text-lg font-bold mb-6 text-gray-800">RSVPs per Event</h3>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={rsvpsByEvent} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <XAxis dataKey="name" tick={{fontSize: 12}} />
+                <YAxis allowDecimals={false} />
+                <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                <Bar dataKey="RSVPs" fill="#ef4444" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+          <h3 className="text-lg font-bold mb-6 text-gray-800">Ideas by Category</h3>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={ideasPieData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                  {ideasPieData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -343,6 +398,7 @@ function EventsTab() {
             <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
               <th className="p-4 font-semibold">Name</th>
               <th className="p-4 font-semibold">Email</th>
+              <th className="p-4 font-semibold">Attendance</th>
               <th className="p-4 font-semibold">RSVP Date</th>
             </tr>
           </thead>
@@ -351,12 +407,19 @@ function EventsTab() {
               <tr key={rsvp.id} className="hover:bg-gray-50/50 transition-colors">
                 <td className="p-4 font-semibold text-gray-900">{rsvp.name}</td>
                 <td className="p-4 text-gray-600">{rsvp.email}</td>
+                <td className="p-4">
+                  {rsvp.attended ? (
+                    <span className="px-2.5 py-1 rounded-md bg-green-50 text-green-700 text-xs font-bold"><i className="fas fa-check-circle mr-1"></i> Checked In</span>
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-md bg-gray-100 text-gray-500 text-xs font-semibold">Pending</span>
+                  )}
+                </td>
                 <td className="p-4 text-gray-600">{new Date(rsvp.created_at).toLocaleDateString()}</td>
               </tr>
             ))}
             {filteredRsvps.length === 0 && (
               <tr>
-                <td colSpan={3} className="p-8 text-center text-gray-500">No RSVPs yet for this event.</td>
+                <td colSpan={4} className="p-8 text-center text-gray-500">No RSVPs yet for this event.</td>
               </tr>
             )}
           </tbody>
@@ -605,6 +668,93 @@ function CommunicationsTab() {
           </button>
         </form>
       </div>
+    </div>
+  );
+}
+
+function ScannerTab() {
+  const { markAttendance, rsvps } = useAdminData();
+  const [scanResult, setScanResult] = useState<{status: 'success' | 'error' | null, message: string}>({status: null, message: ""});
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+
+  useEffect(() => {
+    if (!scannerRef.current) {
+      scannerRef.current = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+      scannerRef.current.render(onScanSuccess, onScanFailure);
+    }
+
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+      }
+    };
+  }, [rsvps]);
+
+  const onScanSuccess = async (decodedText: string) => {
+    if (scannerRef.current) {
+      scannerRef.current.pause(true); // Pause scanning after success to prevent multiple calls
+    }
+    const rsvpId = parseInt(decodedText);
+    if (isNaN(rsvpId)) {
+      setScanResult({status: 'error', message: "Invalid QR Code format. Please scan a valid Tech Club ticket."});
+      setTimeout(() => scannerRef.current?.resume(), 3000);
+      return;
+    }
+
+    // Check if valid RSVP
+    const ticket = rsvps.find(r => r.id === rsvpId);
+    if (!ticket) {
+      setScanResult({status: 'error', message: `Ticket #${rsvpId} not found in the system.`});
+      setTimeout(() => scannerRef.current?.resume(), 3000);
+      return;
+    }
+
+    if (ticket.attended) {
+      setScanResult({status: 'error', message: `${ticket.name} (Ticket #${rsvpId}) has already checked in!`});
+      setTimeout(() => scannerRef.current?.resume(), 3000);
+      return;
+    }
+
+    try {
+      await markAttendance(rsvpId);
+      setScanResult({status: 'success', message: `Successfully checked in ${ticket.name}!`});
+    } catch (err) {
+      setScanResult({status: 'error', message: "Database error while updating attendance."});
+    }
+    
+    // Resume scanning after 3 seconds
+    setTimeout(() => {
+      setScanResult({status: null, message: ""});
+      scannerRef.current?.resume();
+    }, 3000);
+  };
+
+  const onScanFailure = (_error: any) => {
+    // ignore normal scanning failures
+  };
+
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8 text-center">Ticket Scanner</h1>
+      
+      {scanResult.status === 'success' && (
+        <div className="bg-green-50 border border-green-200 text-green-800 p-6 rounded-3xl mb-8 text-center animate-in zoom-in duration-300 shadow-sm">
+          <i className="fas fa-check-circle text-4xl mb-3"></i>
+          <h3 className="text-xl font-bold">{scanResult.message}</h3>
+        </div>
+      )}
+      
+      {scanResult.status === 'error' && (
+        <div className="bg-red-50 border border-red-200 text-red-800 p-6 rounded-3xl mb-8 text-center animate-in zoom-in duration-300 shadow-sm">
+          <i className="fas fa-exclamation-circle text-4xl mb-3"></i>
+          <h3 className="text-xl font-bold">{scanResult.message}</h3>
+        </div>
+      )}
+
+      <div className="bg-white border border-gray-200 p-6 rounded-3xl shadow-sm overflow-hidden">
+        <div id="reader" className="w-full mx-auto" style={{ border: 'none' }}></div>
+      </div>
+      <p className="text-center text-gray-500 mt-6 text-sm">Please allow camera permissions if prompted.</p>
     </div>
   );
 }
