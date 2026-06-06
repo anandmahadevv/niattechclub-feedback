@@ -526,6 +526,7 @@ function MembersTab() {
 function CommunicationsTab() {
   const { events } = useAdminData();
   const [audience, setAudience] = useState("all");
+  const [customEmails, setCustomEmails] = useState("");
   const [subject, setSubject] = useState("");
   const [html, setHtml] = useState("");
   const [status, setStatus] = useState({ loading: false, error: "", success: "" });
@@ -537,13 +538,14 @@ function CommunicationsTab() {
       const res = await fetch("/api/send-mass-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ audience, subject, html })
+        body: JSON.stringify({ audience, subject, html, customEmails })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to send email");
       setStatus({ loading: false, error: "", success: data.message });
       setSubject("");
       setHtml("");
+      setCustomEmails("");
     } catch (err: any) {
       setStatus({ loading: false, error: err.message, success: "" });
     }
@@ -567,9 +569,17 @@ function CommunicationsTab() {
               {events.map(ev => (
                 <option key={ev.slug} value={ev.slug}>RSVPs for: {ev.title}</option>
               ))}
+              <option value="custom">Custom Emails</option>
             </select>
           </div>
           
+          {audience === "custom" && (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Custom Emails (comma separated)</label>
+              <textarea required rows={3} className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" placeholder="john@example.com, jane@example.com" value={customEmails} onChange={e => setCustomEmails(e.target.value)}></textarea>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Subject</label>
             <input required type="text" className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Email Subject" value={subject} onChange={e => setSubject(e.target.value)} />

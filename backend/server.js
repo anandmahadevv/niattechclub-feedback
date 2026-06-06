@@ -362,24 +362,34 @@ app.post(['/api/fetch-tickets', '/fetch-tickets'], async (req, res) => {
 });
 
 app.post(['/api/send-mass-email', '/send-mass-email'], async (req, res) => {
-  const { audience, subject, html } = req.body;
+  const { audience, subject, html, customEmails } = req.body;
 
   if (!audience || !subject || !html) {
     return res.status(400).json({ error: 'Audience, subject, and html are required' });
   }
 
   try {
-    let query = supabase.from('rsvps').select('email');
-    
-    if (audience !== 'all') {
-      query = query.eq('event_slug', audience);
-    }
-    
-    const { data: rsvps, error } = await query;
+    let rsvps = [];
+    if (audience === 'custom') {
+      if (!customEmails) {
+        return res.status(400).json({ error: 'Custom emails are required when audience is custom' });
+      }
+      const emailsList = customEmails.split(',').map(e => e.trim()).filter(e => e);
+      rsvps = emailsList.map(email => ({ email }));
+    } else {
+      let query = supabase.from('rsvps').select('email');
+      
+      if (audience !== 'all') {
+        query = query.eq('event_slug', audience);
+      }
+      
+      const { data, error } = await query;
 
-    if (error) {
-      console.error('Error fetching audience from Supabase:', error);
-      return res.status(500).json({ error: 'Failed to fetch audience list' });
+      if (error) {
+        console.error('Error fetching audience from Supabase:', error);
+        return res.status(500).json({ error: 'Failed to fetch audience list' });
+      }
+      rsvps = data;
     }
 
     if (!rsvps || rsvps.length === 0) {
