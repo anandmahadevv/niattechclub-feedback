@@ -61,6 +61,8 @@ export default function Home() {
               src="/photo.png"
               alt="NIAT Tech Club Logo - Leading NIAT Student Clubs at NIAT Mangalore Campus"
               className="relative z-10 h-80 object-contain drop-shadow-2xl mix-blend-multiply transform hover:scale-105 transition-transform duration-500"
+              loading="eager"
+              decoding="async"
             />
           </div>
         </div>

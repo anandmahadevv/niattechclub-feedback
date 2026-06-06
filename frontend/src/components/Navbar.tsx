@@ -12,7 +12,7 @@ export default function Navbar() {
     <nav className="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-[150] w-full">
       <div className="mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
         <Link to="/" onClick={closeMenu} className="flex items-center gap-3 hover:opacity-80 transition-opacity z-10">
-          <img src="/logo.png" alt="NIAT Tech Club" className="h-10 object-contain mix-blend-multiply" />
+          <img src="/logo.png" alt="NIAT Tech Club" className="h-10 object-contain mix-blend-multiply" loading="lazy" decoding="async" />
           <span className="font-bold tracking-tight text-gray-900 hidden sm:block">NIAT Tech Club</span>
         </Link>
         

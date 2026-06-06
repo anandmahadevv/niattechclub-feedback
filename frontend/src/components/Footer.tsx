@@ -7,6 +7,8 @@ export default function Footer() {
             src="/photo.png"
             alt="NIAT Tech Club"
             className="h-8 object-contain mix-blend-multiply opacity-50 grayscale hover:grayscale-0 transition-all"
+            loading="lazy"
+            decoding="async"
           />
           <span className="text-gray-400 font-semibold text-sm">© 2026 NIAT Tech Club</span>
         </div>

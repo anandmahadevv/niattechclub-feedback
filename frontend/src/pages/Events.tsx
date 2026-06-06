@@ -148,10 +148,10 @@ export default function Events() {
 
               {/* Image Grid in a single row */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <img src="/images/media__1780320484677.jpg" alt="AI Workshop Presentation" className="w-full h-32 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" />
-                <img src="/images/media__1780320485068.jpg" alt="AI Workshop Demo" className="w-full h-32 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" />
-                <img src="/images/media__1780320484934.jpg" alt="AI Workshop Crowd" className="w-full h-32 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" />
-                <img src="/images/media__1780320484800.jpg" alt="AI Workshop Overview" className="w-full h-32 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" />
+                <img src="/images/media__1780320484677.jpg" alt="AI Workshop Presentation" className="w-full h-32 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" loading="lazy" decoding="async" />
+                <img src="/images/media__1780320485068.jpg" alt="AI Workshop Demo" className="w-full h-32 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" loading="lazy" decoding="async" />
+                <img src="/images/media__1780320484934.jpg" alt="AI Workshop Crowd" className="w-full h-32 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" loading="lazy" decoding="async" />
+                <img src="/images/media__1780320484800.jpg" alt="AI Workshop Overview" className="w-full h-32 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500 shadow-sm" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>
@@ -179,6 +179,8 @@ export default function Events() {
                   src="https://bwnveqipiqlnjjukicah.supabase.co/storage/v1/object/sign/project_images/promptwar.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8yZjRiZDA4ZC0wZjZkLTRhMDQtOGMzYy03MzZhNzYwMzMxNzQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9qZWN0X2ltYWdlcy9wcm9tcHR3YXIuanBnIiwiaWF0IjoxNzgwMzkzODE2LCJleHAiOjE4MTE5Mjk4MTZ9.qPoe0GNLwj2xo2YMpxN7hTAg8rru1RPU_7dA8pUIxmk" 
                   alt="PromptWars 2026 Banner" 
                   className="w-full rounded-2xl shadow-sm mb-6 object-cover border border-gray-100" 
+                  loading="lazy"
+                  decoding="async"
                 />
 
                 <div className="inline-flex items-center gap-2 text-sm text-gray-700 font-semibold bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 mb-6 w-fit">

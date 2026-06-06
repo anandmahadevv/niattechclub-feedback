@@ -1,20 +1,23 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Suspense, lazy } from "react";
 import { AnimatePresence } from "motion/react";
 import { Toaster } from "sonner";
 import { PageWrapper } from "./components/PageWrapper";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import Events from "./pages/Events";
-import Showcase from "./pages/Showcase";
-import Ideas from "./pages/Ideas";
-import Admin from "./pages/Admin";
-import OpenSource from "./pages/OpenSource";
-import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 import { AuthProvider } from "./components/AuthContext";
-import Login from "./pages/Login";
-import Profile from "./pages/Profile";
-import Learn from "./pages/Learn";
+import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
+import PageLoader from "./components/PageLoader";
+
+const Home = lazy(() => import("./pages/Home"));
+const Events = lazy(() => import("./pages/Events"));
+const Showcase = lazy(() => import("./pages/Showcase"));
+const Ideas = lazy(() => import("./pages/Ideas"));
+const Admin = lazy(() => import("./pages/Admin"));
+const OpenSource = lazy(() => import("./pages/OpenSource"));
+const Login = lazy(() => import("./pages/Login"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Learn = lazy(() => import("./pages/Learn"));
 
 function AppContent() {
   const location = useLocation();
@@ -33,21 +36,23 @@ function AppContent() {
       )}
 
       {/* Dynamic Route Content with Transitions */}
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-          <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
-          <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
-          <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
-          <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
-          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-          <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
-          <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
-          <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
-          {/* Catch-all route to redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </AnimatePresence>
+      <Suspense fallback={<PageLoader />}>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+            <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
+            <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
+            <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
+            <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
+            <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+            <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+            <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
+            <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
+            {/* Catch-all route to redirect to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AnimatePresence>
+      </Suspense>
 
       {/* Footer */}
       {!isAuthOrAdminRoute && <Footer />}
