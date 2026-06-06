@@ -529,6 +529,7 @@ function CommunicationsTab() {
   const [customEmails, setCustomEmails] = useState("");
   const [subject, setSubject] = useState("");
   const [html, setHtml] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
   const [status, setStatus] = useState({ loading: false, error: "", success: "" });
 
   const handleSend = async (e: React.FormEvent) => {
@@ -586,8 +587,17 @@ function CommunicationsTab() {
           </div>
           
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Message (HTML Supported)</label>
-            <textarea required rows={8} className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" placeholder="<h1>Hello</h1><p>Event is starting soon!</p>" value={html} onChange={e => setHtml(e.target.value)}></textarea>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-semibold text-gray-700">Message (HTML Supported)</label>
+              <button type="button" onClick={() => setShowPreview(!showPreview)} className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
+                {showPreview ? "Hide Preview" : "Show Preview"}
+              </button>
+            </div>
+            {showPreview ? (
+              <div className="w-full border border-gray-200 p-4 rounded-xl min-h-[200px] max-h-[500px] overflow-auto bg-white shadow-inner" dangerouslySetInnerHTML={{ __html: html || '<p class="text-gray-400">Nothing to preview yet...</p>' }}></div>
+            ) : (
+              <textarea required rows={8} className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" placeholder="<h1>Hello</h1><p>Event is starting soon!</p>" value={html} onChange={e => setHtml(e.target.value)}></textarea>
+            )}
           </div>
           
           <button type="submit" disabled={status.loading} className="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50">
