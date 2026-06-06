@@ -66,11 +66,14 @@ interface FloatingInputProps {
   rightElement?: React.ReactNode;
   isTextArea?: boolean;
   rows?: number;
+  maxLength?: number;
+  pattern?: string;
+  title?: string;
 }
 
 function FloatingInput({
   id, name, type = "text", label, value, onChange,
-  required, placeholder, icon, error, autoComplete, rightElement, isTextArea, rows
+  required, placeholder, icon, error, autoComplete, rightElement, isTextArea, rows, maxLength, pattern, title
 }: FloatingInputProps) {
   const [focused, setFocused] = useState(false);
   const hasValue = value.length > 0;
@@ -111,6 +114,7 @@ function FloatingInput({
               onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
               placeholder={focused ? placeholder : ""}
               rows={rows || 3}
+              maxLength={maxLength}
               className="w-full bg-transparent outline-none text-slate-800 font-medium text-sm resize-none relative z-0"
               style={{ paddingTop: lifted ? "26px" : "16px", paddingBottom: "12px", paddingLeft: "16px", paddingRight: "16px" }}
             />
@@ -120,6 +124,9 @@ function FloatingInput({
               autoComplete={autoComplete}
               onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
               placeholder={focused ? placeholder : ""}
+              maxLength={maxLength}
+              pattern={pattern}
+              title={title}
               className="w-full bg-transparent outline-none text-slate-800 font-medium text-sm relative z-0"
               style={{ paddingTop: lifted ? "24px" : "16px", paddingBottom: "8px", paddingLeft: "16px", paddingRight: rightElement ? "48px" : "16px" }}
             />
@@ -559,7 +566,7 @@ export default function Login() {
                       <FloatingInput
                         id="email" name="email" type="email" label="Email Address"
                         value={formData.email} onChange={handleChange} required placeholder="you@example.com"
-                        icon={<IconMail />} error={errors.email} autoComplete="email"
+                        icon={<IconMail />} error={errors.email} autoComplete="email" maxLength={100}
                       />
 
                       <div className="relative">
@@ -568,6 +575,7 @@ export default function Login() {
                           label="Password" value={formData.password} onChange={handleChange} required placeholder="Min. 6 characters"
                           icon={<IconLock />} error={errors.password} autoComplete={isSignUp ? "new-password" : "current-password"}
                           rightElement={<EyeToggle show={showPassword} onToggle={() => setShowPassword(v => !v)} />}
+                          maxLength={100}
                         />
                         {!isSignUp && (
                           <button
@@ -592,16 +600,17 @@ export default function Login() {
                                   <div className="p-2 text-emerald-500 animate-in zoom-in"><IconCheck /></div>
                                 ) : <EyeToggle show={showConfirm} onToggle={() => setShowConfirm(v => !v)} />
                               }
+                              maxLength={100}
                             />
                           </div>
 
                           <div className="pt-2 pb-4 border-t border-slate-100">
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Profile Details</p>
                             <div className="space-y-5">
-                              <FloatingInput id="name" name="name" label="Full Name" value={formData.name} onChange={handleChange} required placeholder="e.g. Riya Sharma" icon={<IconUser />} error={errors.name} autoComplete="name" />
+                              <FloatingInput id="name" name="name" label="Full Name" value={formData.name} onChange={handleChange} required placeholder="e.g. Riya Sharma" icon={<IconUser />} error={errors.name} autoComplete="name" maxLength={50} pattern="^[a-zA-Z\s]+$" title="Only letters and spaces are allowed" />
                               <div className="grid grid-cols-2 gap-4">
-                                <FloatingInput id="rollNumber" name="rollNumber" label="Campus ID" value={formData.rollNumber} onChange={handleChange} required placeholder="e.g. 44226" icon={<IconID />} error={errors.rollNumber} />
-                                <FloatingInput id="department" name="department" label="Department" value={formData.department} onChange={handleChange} required placeholder="CSE / ISE" icon={<IconBuildingOffice />} error={errors.department} />
+                                <FloatingInput id="rollNumber" name="rollNumber" label="Campus ID" value={formData.rollNumber} onChange={handleChange} required placeholder="e.g. 44226" icon={<IconID />} error={errors.rollNumber} maxLength={20} pattern="^[a-zA-Z0-9]+$" title="Only alphanumeric characters are allowed" />
+                                <FloatingInput id="department" name="department" label="Department" value={formData.department} onChange={handleChange} required placeholder="CSE / ISE" icon={<IconBuildingOffice />} error={errors.department} maxLength={50} />
                               </div>
                             </div>
                           </div>
@@ -613,7 +622,7 @@ export default function Login() {
                       <FloatingInput
                         id="loginOtp" name="loginOtp" type="text" label="Verification Code"
                         value={loginOtp} onChange={(e) => setLoginOtp(e.target.value)} required placeholder="123456"
-                        icon={<IconLock />} error={errors.loginOtp}
+                        icon={<IconLock />} error={errors.loginOtp} maxLength={6} pattern="\d{6}" title="Enter a 6-digit verification code"
                       />
                       <div className="flex justify-between items-center">
                         <button
@@ -683,11 +692,11 @@ export default function Login() {
                 
                 <form onSubmit={handleForgotSubmit} noValidate className="space-y-5">
                   {forgotMode === 'email' ? (
-                    <FloatingInput id="resetEmail" name="email" type="email" label="Email Address" value={resetData.email} onChange={handleResetChange} required placeholder="you@example.com" icon={<IconMail />} />
+                    <FloatingInput id="resetEmail" name="email" type="email" label="Email Address" value={resetData.email} onChange={handleResetChange} required placeholder="you@example.com" icon={<IconMail />} maxLength={100} />
                   ) : (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-5">
-                      <FloatingInput id="otp" name="otp" type="text" label="6-Digit Code" value={resetData.otp} onChange={handleResetChange} required placeholder="123456" icon={<IconLock />} />
-                      <FloatingInput id="newPassword" name="newPassword" type={showPassword ? "text" : "password"} label="New Password" value={resetData.newPassword} onChange={handleResetChange} required placeholder="Min. 6 characters" icon={<IconLock />} rightElement={<EyeToggle show={showPassword} onToggle={() => setShowPassword(v => !v)} />} />
+                      <FloatingInput id="otp" name="otp" type="text" label="6-Digit Code" value={resetData.otp} onChange={handleResetChange} required placeholder="123456" icon={<IconLock />} maxLength={6} pattern="\d{6}" title="Enter a 6-digit verification code" />
+                      <FloatingInput id="newPassword" name="newPassword" type={showPassword ? "text" : "password"} label="New Password" value={resetData.newPassword} onChange={handleResetChange} required placeholder="Min. 6 characters" icon={<IconLock />} rightElement={<EyeToggle show={showPassword} onToggle={() => setShowPassword(v => !v)} />} maxLength={100} />
                       <PasswordStrength password={resetData.newPassword} />
                     </div>
                   )}

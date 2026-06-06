@@ -212,6 +212,7 @@ export default function Ideas() {
                 onChange={handleInputChange}
                 className="w-full input-field rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-slate-900 bg-white/50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 resize-none outline-none focus:ring-2 focus:ring-red-500"
                 placeholder="Describe your idea in detail..."
+                maxLength={1000}
               ></textarea>
             </div>
 

@@ -49,6 +49,7 @@ export default function Admin() {
                 onChange={(e) => setPassword(e.target.value)}
                 className={`w-full px-4 py-3 rounded-xl border ${error ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200'} focus:outline-none focus:ring-4 transition-all`}
                 autoFocus
+                maxLength={100}
               />
               {error && <p className="text-red-500 text-xs mt-2 font-semibold">Incorrect password.</p>}
             </div>

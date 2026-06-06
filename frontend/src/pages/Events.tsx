@@ -313,6 +313,7 @@ export default function Events() {
                         defaultValue={user?.name || ""}
                         className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all text-sm"
                         placeholder="Full Name"
+                        maxLength={50} pattern="^[a-zA-Z\s]+$" title="Only letters and spaces are allowed"
                       />
                     </div>
                   </div>
@@ -330,6 +331,7 @@ export default function Events() {
                         title="Please enter your @yenepoya.edu.in email address"
                         className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all text-sm"
                         placeholder="Email Address (@yenepoya.edu.in)"
+                        maxLength={100}
                       />
                     </div>
                   </div>

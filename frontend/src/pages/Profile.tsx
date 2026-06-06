@@ -356,19 +356,19 @@ export default function Profile() {
                 <Field label="Full Name">
                   <input type="text" name="name" required value={formData.name}
                     onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                    placeholder="Your full name" className={inputCls} />
+                    placeholder="Your full name" className={inputCls} maxLength={50} pattern="^[a-zA-Z\s]+$" title="Only letters and spaces are allowed" />
                 </Field>
                 <Field label="Roll Number / Campus ID">
                   <input type="text" name="rollNumber" required value={formData.rollNumber}
                     onChange={e => setFormData(p => ({ ...p, rollNumber: e.target.value }))}
-                    placeholder="e.g. 44226" className={inputCls} />
+                    placeholder="e.g. 44226" className={inputCls} maxLength={20} pattern="^[a-zA-Z0-9]+$" title="Only alphanumeric characters are allowed" />
                 </Field>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="Department">
                   <input type="text" name="department" required value={formData.department}
                     onChange={e => setFormData(p => ({ ...p, department: e.target.value }))}
-                    placeholder="e.g. CSE, ECE, ISE" className={inputCls} />
+                    placeholder="e.g. CSE, ECE, ISE" className={inputCls} maxLength={50} />
                 </Field>
                 <Field label="Email">
                   <input type="email" disabled value={user.email || ""}

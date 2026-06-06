@@ -259,6 +259,7 @@ export default function Showcase() {
                     onChange={handleInputChange}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
                     placeholder="e.g. Divya, Rahul"
+                    maxLength={100}
                   />
                 </div>
 
@@ -272,6 +273,7 @@ export default function Showcase() {
                     onChange={handleInputChange}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
                     placeholder="e.g. HACK-MATE"
+                    maxLength={100}
                   />
                 </div>
 
@@ -288,6 +290,7 @@ export default function Showcase() {
                     onChange={handleInputChange}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all resize-none"
                     placeholder="Briefly describe your project..."
+                    maxLength={2000}
                   ></textarea>
                 </div>
 
@@ -301,6 +304,7 @@ export default function Showcase() {
                       onChange={handleInputChange}
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all text-sm"
                       placeholder="e.g. React, Python"
+                      maxLength={100}
                     />
                   </div>
                   <div>
@@ -312,6 +316,7 @@ export default function Showcase() {
                       onChange={handleInputChange}
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all text-sm"
                       placeholder="https://github.com/..."
+                      maxLength={200}
                     />
                   </div>
                 </div>
