@@ -195,9 +195,9 @@ export default function Showcase() {
                           setLikedProjects(newLiked);
                           localStorage.setItem('techclub_liked_projects', JSON.stringify(newLiked));
                         }}
-                        className={`${likedProjects.includes(project.id) ? 'text-red-500 bg-red-50 border-red-200' : 'text-gray-500 hover:text-red-500 hover:bg-red-50 border-gray-100 hover:border-red-100 bg-white'} transition-all flex items-center gap-1.5 font-bold text-xs px-2.5 py-1.5 rounded-lg border shadow-sm hover:shadow active:scale-95`}
+                        className={`${likedProjects.includes(project.id) ? 'text-green-500 bg-green-50 border-green-200' : 'text-gray-500 hover:text-green-500 hover:bg-green-50 border-gray-100 hover:border-green-100 bg-white'} transition-all flex items-center gap-1.5 font-bold text-xs px-2.5 py-1.5 rounded-lg border shadow-sm hover:shadow active:scale-95`}
                       >
-                        <i className={`fas fa-caret-up text-sm leading-none ${likedProjects.includes(project.id) ? 'text-red-600' : ''}`}></i>
+                        <i className={`fas fa-caret-up text-sm leading-none ${likedProjects.includes(project.id) ? 'text-green-600' : ''}`}></i>
                         <span className="leading-none">{project.upvotes || 0}</span>
                       </button>
 
