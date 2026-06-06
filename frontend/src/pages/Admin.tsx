@@ -392,6 +392,32 @@ function EventsTab() {
         )}
       </div>
 
+      {filteredRsvps.length > 0 && (
+        <div className="flex flex-wrap gap-4 mb-6">
+          <div className="bg-blue-50 border border-blue-200 px-5 py-3 rounded-2xl flex items-center gap-4 min-w-[150px]">
+            <i className="fas fa-users text-blue-600 text-2xl"></i>
+            <div>
+              <div className="text-xs font-bold text-blue-800 uppercase tracking-wider">Total</div>
+              <div className="text-2xl font-black text-blue-700 leading-none">{filteredRsvps.length}</div>
+            </div>
+          </div>
+          <div className="bg-green-50 border border-green-200 px-5 py-3 rounded-2xl flex items-center gap-4 min-w-[150px]">
+            <i className="fas fa-check-circle text-green-600 text-2xl"></i>
+            <div>
+              <div className="text-xs font-bold text-green-800 uppercase tracking-wider">Checked In</div>
+              <div className="text-2xl font-black text-green-700 leading-none">{filteredRsvps.filter(r => r.attended).length}</div>
+            </div>
+          </div>
+          <div className="bg-orange-50 border border-orange-200 px-5 py-3 rounded-2xl flex items-center gap-4 min-w-[150px]">
+            <i className="fas fa-clock text-orange-600 text-2xl"></i>
+            <div>
+              <div className="text-xs font-bold text-orange-800 uppercase tracking-wider">Pending</div>
+              <div className="text-2xl font-black text-orange-700 leading-none">{filteredRsvps.filter(r => !r.attended).length}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
