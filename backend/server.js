@@ -30,11 +30,6 @@ app.post(['/api/send-rsvp-email', '/send-rsvp-email'], async (req, res) => {
   }
 
   try {
-    const qrCodeUrl = rsvpId ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${rsvpId}` : null;
-    const qrCodeHtml = qrCodeUrl 
-      ? `<div style="text-align: center; margin: 30px 0;"><p style="font-size: 14px; color: #666; margin-bottom: 10px;">Scan this QR code at the venue for check-in:</p><img src="${qrCodeUrl}" alt="Your Ticket QR Code" style="border-radius: 8px; border: 1px solid #eaeaea; padding: 10px; background: white;" /></div>`
-      : ``;
-
     const data = await resendEvents.emails.send({
       from: 'event@techclub.niat.me',
       to: email,
@@ -44,8 +39,8 @@ app.post(['/api/send-rsvp-email', '/send-rsvp-email'], async (req, res) => {
           <h2 style="color: #4F46E5;">Congratulations, ${name}!</h2>
           <p>You have successfully registered and secured your entry for <strong>PromptWars 2026</strong>.</p>
           <p>We are excited to see what you build using generative AI!</p>
-          ${qrCodeHtml}
           <p>Keep an eye on this email address for further updates regarding the schedule and venue details.</p>
+          <p><em>We will send your Entry Ticket & QR Code one day before the event.</em></p>
           <br />
           <p>Best regards,</p>
           <p><strong>The Tech Club Team</strong></p>
@@ -381,9 +376,15 @@ app.post(['/api/send-mass-email', '/send-mass-email'], async (req, res) => {
         return res.status(400).json({ error: 'Custom emails are required when audience is custom' });
       }
       const emailsList = customEmails.split(',').map(e => e.trim()).filter(e => e);
-      rsvps = emailsList.map(email => ({ email }));
+      
+      const { data, error } = await supabase.from('rsvps').select('id, email, name').in('email', emailsList);
+      if (data && data.length > 0) {
+        rsvps = data;
+      } else {
+        rsvps = emailsList.map(email => ({ email, name: 'Member' }));
+      }
     } else {
-      let query = supabase.from('rsvps').select('email');
+      let query = supabase.from('rsvps').select('id, email, name');
       
       if (audience !== 'all') {
         query = query.eq('event_slug', audience);
@@ -402,24 +403,50 @@ app.post(['/api/send-mass-email', '/send-mass-email'], async (req, res) => {
       return res.status(400).json({ error: 'No recipients found for this audience' });
     }
 
-    // Deduplicate emails
-    const uniqueEmails = [...new Set(rsvps.map(r => r.email))];
+    // Deduplicate emails while keeping the RSVP objects
+    const uniqueRsvpsMap = new Map();
+    for (const rsvp of rsvps) {
+      if (!uniqueRsvpsMap.has(rsvp.email)) {
+        uniqueRsvpsMap.set(rsvp.email, rsvp);
+      }
+    }
+    const uniqueRsvps = Array.from(uniqueRsvpsMap.values());
 
-    // Chunk emails into groups of 45 (Resend limit is 50 recipients per email)
+    const batchPayloads = uniqueRsvps.map(rsvp => {
+      let personalizedHtml = html;
+      
+      // Personalize Name
+      personalizedHtml = personalizedHtml.replace(/{{NAME}}/g, rsvp.name || 'Member');
+
+      // Inject QR Code if requested
+      if (personalizedHtml.includes('{{QR_CODE}}')) {
+        if (rsvp.id) {
+          const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${rsvp.id}`;
+          const qrHtml = `<div style="text-align: center; margin: 30px 0;"><p style="font-size: 14px; color: #666; margin-bottom: 10px;">Scan this QR code at the venue for check-in:</p><img src="${qrCodeUrl}" alt="Your Ticket QR Code" style="border-radius: 8px; border: 1px solid #eaeaea; padding: 10px; background: white;" /></div>`;
+          personalizedHtml = personalizedHtml.replace(/{{QR_CODE}}/g, qrHtml);
+        } else {
+          // If no ID exists, fallback empty
+          personalizedHtml = personalizedHtml.replace(/{{QR_CODE}}/g, '');
+        }
+      }
+
+      return {
+        from: 'Tech Club <event@techclub.niat.me>',
+        to: rsvp.email,
+        subject: subject,
+        html: personalizedHtml
+      };
+    });
+
+    // Chunk emails into groups of 50 (Resend batch limit is 100)
     const chunkArray = (arr, size) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
-    const chunks = chunkArray(uniqueEmails, 45);
+    const chunks = chunkArray(batchPayloads, 50);
 
     for (const chunk of chunks) {
-      await resendEvents.emails.send({
-        from: 'Tech Club <event@techclub.niat.me>',
-        to: 'event@techclub.niat.me', // Send to self
-        bcc: chunk, // BCC everyone else
-        subject: subject,
-        html: html
-      });
+      await resendEvents.batch.send(chunk);
     }
 
-    res.status(200).json({ message: `Successfully sent email to ${uniqueEmails.length} recipients.` });
+    res.status(200).json({ message: `Successfully sent email to ${uniqueRsvps.length} recipients.` });
   } catch (error) {
     console.error('Error sending mass email:', error);
     res.status(500).json({ error: 'Failed to send mass emails' });
