@@ -361,6 +361,55 @@ app.post(['/api/fetch-tickets', '/fetch-tickets'], async (req, res) => {
   }
 });
 
+app.post(['/api/send-mass-email', '/send-mass-email'], async (req, res) => {
+  const { audience, subject, html } = req.body;
+
+  if (!audience || !subject || !html) {
+    return res.status(400).json({ error: 'Audience, subject, and html are required' });
+  }
+
+  try {
+    let query = supabase.from('rsvps').select('email');
+    
+    if (audience !== 'all') {
+      query = query.eq('event_slug', audience);
+    }
+    
+    const { data: rsvps, error } = await query;
+
+    if (error) {
+      console.error('Error fetching audience from Supabase:', error);
+      return res.status(500).json({ error: 'Failed to fetch audience list' });
+    }
+
+    if (!rsvps || rsvps.length === 0) {
+      return res.status(400).json({ error: 'No recipients found for this audience' });
+    }
+
+    // Deduplicate emails
+    const uniqueEmails = [...new Set(rsvps.map(r => r.email))];
+
+    // Chunk emails into groups of 45 (Resend limit is 50 recipients per email)
+    const chunkArray = (arr, size) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
+    const chunks = chunkArray(uniqueEmails, 45);
+
+    for (const chunk of chunks) {
+      await resendEvents.emails.send({
+        from: 'Tech Club <event@techclub.niat.me>',
+        to: 'event@techclub.niat.me', // Send to self
+        bcc: chunk, // BCC everyone else
+        subject: subject,
+        html: html
+      });
+    }
+
+    res.status(200).json({ message: `Successfully sent email to ${uniqueEmails.length} recipients.` });
+  } catch (error) {
+    console.error('Error sending mass email:', error);
+    res.status(500).json({ error: 'Failed to send mass emails' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

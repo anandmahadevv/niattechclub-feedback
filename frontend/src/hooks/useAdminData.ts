@@ -10,6 +10,26 @@ export interface Idea {
   date: string;
 }
 
+export interface Member {
+  id: number;
+  name: string;
+  role: string;
+  created_at: string;
+}
+
+export interface Event {
+  id: number;
+  slug: string;
+  title: string;
+  type: string;
+  status: string;
+  date: string;
+  location: string | null;
+  description: string | null;
+  image_url: string | null;
+  created_at: string;
+}
+
 export interface RSVP {
   id: number;
   event_slug: string;
@@ -36,6 +56,8 @@ export function useAdminData() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load from Supabase on mount
@@ -78,6 +100,30 @@ export function useAdminData() {
       } else {
         console.error("Error fetching RSVPs:", rsvpsError);
       }
+
+      // Fetch Members
+      const { data: membersData, error: membersError } = await supabase
+        .from('members')
+        .select('*')
+        .order('id', { ascending: true });
+        
+      if (!membersError && membersData) {
+        setMembers(membersData as Member[]);
+      } else {
+        console.error("Error fetching Members:", membersError);
+      }
+
+      // Fetch Events
+      const { data: eventsData, error: eventsError } = await supabase
+        .from('events')
+        .select('*')
+        .order('id', { ascending: false });
+        
+      if (!eventsError && eventsData) {
+        setEvents(eventsData as Event[]);
+      } else {
+        console.error("Error fetching Events:", eventsError);
+      }
       
       setLoading(false);
     }
@@ -105,10 +151,24 @@ export function useAdminData() {
       })
       .subscribe();
 
+    const membersSubscription = supabase.channel(`custom-all-members-${channelId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
+    const eventsSubscription = supabase.channel(`custom-all-events-${channelId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(ideasSubscription);
       supabase.removeChannel(projectsSubscription);
       supabase.removeChannel(rsvpsSubscription);
+      supabase.removeChannel(membersSubscription);
+      supabase.removeChannel(eventsSubscription);
     };
   }, []);
 
@@ -206,6 +266,26 @@ export function useAdminData() {
     }
   };
 
+  const addMember = async (member: Omit<Member, "id" | "created_at">) => {
+    const { error } = await supabase.from('members').insert(member);
+    if (error) throw error;
+  };
+
+  const deleteMember = async (id: number) => {
+    const { error } = await supabase.from('members').delete().eq('id', id);
+    if (error) throw error;
+  };
+
+  const addEvent = async (event: Omit<Event, "id" | "created_at">) => {
+    const { error } = await supabase.from('events').insert(event);
+    if (error) throw error;
+  };
+
+  const deleteEvent = async (id: number) => {
+    const { error } = await supabase.from('events').delete().eq('id', id);
+    if (error) throw error;
+  };
+
   return {
     ideas,
     addIdea,
@@ -216,6 +296,12 @@ export function useAdminData() {
     publishProject,
     upvoteProject,
     rsvps,
+    members,
+    addMember,
+    deleteMember,
+    events,
+    addEvent,
+    deleteEvent,
     loading
   };
 }

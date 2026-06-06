@@ -3,6 +3,21 @@ import { Link } from "react-router-dom";
 import { useAdminData } from "../hooks/useAdminData";
 import { useAuth } from "../components/AuthContext";
 
+const exportCSV = (data: any[], filename: string) => {
+  if (data.length === 0) return;
+  const headers = Object.keys(data[0]).join(',');
+  const csvRows = data.map(row => 
+    Object.values(row).map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')
+  );
+  const csvContent = [headers, ...csvRows].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('href', url);
+  a.setAttribute('download', `${filename}.csv`);
+  a.click();
+};
+
 export default function Admin() {
   const { user, loading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
@@ -116,6 +131,18 @@ export default function Admin() {
             icon="fa-laptop-code"
             label="Projects"
           />
+          <SidebarButton 
+            active={activeTab === "members"} 
+            onClick={() => { setActiveTab("members"); setIsSidebarOpen(false); }}
+            icon="fa-users"
+            label="Members"
+          />
+          <SidebarButton 
+            active={activeTab === "communications"} 
+            onClick={() => { setActiveTab("communications"); setIsSidebarOpen(false); }}
+            icon="fa-envelope"
+            label="Communications"
+          />
         </nav>
 
         <div className="p-4 border-t border-gray-100 bg-white">
@@ -154,6 +181,8 @@ export default function Admin() {
           {activeTab === "events" && <EventsTab />}
           {activeTab === "ideas" && <IdeasTab />}
           {activeTab === "projects" && <ProjectsTab />}
+          {activeTab === "members" && <MembersTab />}
+          {activeTab === "communications" && <CommunicationsTab />}
         </div>
       </main>
     </div>
@@ -219,32 +248,93 @@ function StatCard({ title, value, icon, color }: { title: string, value: string,
 }
 
 function EventsTab() {
-  const { rsvps } = useAdminData();
-  const [selectedEvent, setSelectedEvent] = useState<string>("promptwars");
+  const { rsvps, events, addEvent, deleteEvent } = useAdminData();
+  const [selectedEvent, setSelectedEvent] = useState<string>("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newEvent, setNewEvent] = useState({ slug: "", title: "", type: "Workshop", date: "", location: "", description: "" });
 
-  const events = [
-    { slug: "promptwars", title: "PromptWars", type: "Hackathon" },
-    { slug: "ai-workshop", title: "AI Tools & Innovation Workshop", type: "Workshop" }
-  ];
+  // Default selection
+  if (!selectedEvent && events.length > 0) {
+    setSelectedEvent(events[0].slug);
+  }
 
   const filteredRsvps = rsvps.filter(r => r.event_slug === selectedEvent);
+
+  const handleAddEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await addEvent({ ...newEvent, status: "Upcoming", image_url: "" });
+    setShowAddForm(false);
+    setNewEvent({ slug: "", title: "", type: "Workshop", date: "", location: "", description: "" });
+  };
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Event RSVPs</h1>
+        <h1 className="text-3xl font-bold">Manage Events & RSVPs</h1>
+        <button onClick={() => setShowAddForm(!showAddForm)} className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl font-semibold shadow-sm transition-colors text-sm flex items-center gap-2">
+          <i className="fas fa-plus"></i> {showAddForm ? "Cancel" : "Add Event"}
+        </button>
+      </div>
+
+      {showAddForm && (
+        <form onSubmit={handleAddEvent} className="bg-white border border-gray-200 rounded-3xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input required placeholder="Event Title" className="border border-gray-200 p-3 rounded-xl" value={newEvent.title} onChange={e => setNewEvent({...newEvent, title: e.target.value})} />
+          <input required placeholder="URL Slug (e.g. promptwars)" className="border border-gray-200 p-3 rounded-xl" value={newEvent.slug} onChange={e => setNewEvent({...newEvent, slug: e.target.value})} />
+          <input required placeholder="Date (e.g. August 25, 2026)" className="border border-gray-200 p-3 rounded-xl" value={newEvent.date} onChange={e => setNewEvent({...newEvent, date: e.target.value})} />
+          <input required placeholder="Location" className="border border-gray-200 p-3 rounded-xl" value={newEvent.location} onChange={e => setNewEvent({...newEvent, location: e.target.value})} />
+          <select className="border border-gray-200 p-3 rounded-xl" value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})}>
+            <option value="Workshop">Workshop</option>
+            <option value="Hackathon">Hackathon</option>
+            <option value="Seminar">Seminar</option>
+          </select>
+          <button type="submit" className="bg-green-600 text-white p-3 rounded-xl font-bold">Save Event</button>
+        </form>
+      )}
+
+      {/* Events List */}
+      <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm mb-8">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
+              <th className="p-4 font-semibold">Event</th>
+              <th className="p-4 font-semibold">Date & Location</th>
+              <th className="p-4 font-semibold">Type</th>
+              <th className="p-4 font-semibold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {events.map((ev) => (
+              <tr key={ev.id} className="hover:bg-gray-50/50 transition-colors">
+                <td className="p-4 font-semibold text-gray-900">{ev.title} <div className="text-xs text-gray-400 font-normal">/{ev.slug}</div></td>
+                <td className="p-4 text-gray-600">{ev.date} <div className="text-xs">{ev.location}</div></td>
+                <td className="p-4"><span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-bold">{ev.type}</span></td>
+                <td className="p-4 text-right">
+                  <button onClick={() => deleteEvent(ev.id)} className="text-gray-400 hover:text-red-600 transition-colors"><i className="fas fa-trash"></i></button>
+                </td>
+              </tr>
+            ))}
+            {events.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-gray-500">No events found.</td></tr>}
+          </tbody>
+        </table>
       </div>
       
-      <div className="flex flex-wrap gap-4 mb-6">
-        {events.map(event => (
-          <button
-            key={event.slug}
-            onClick={() => setSelectedEvent(event.slug)}
-            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${selectedEvent === event.slug ? "bg-gray-900 text-white shadow-sm" : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"}`}
-          >
-            {event.title} <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">{rsvps.filter(r => r.event_slug === event.slug).length}</span>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-wrap gap-4">
+          {events.map(event => (
+            <button
+              key={event.slug}
+              onClick={() => setSelectedEvent(event.slug)}
+              className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${selectedEvent === event.slug ? "bg-gray-900 text-white shadow-sm" : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"}`}
+            >
+              {event.title} <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">{rsvps.filter(r => r.event_slug === event.slug).length}</span>
+            </button>
+          ))}
+        </div>
+        {filteredRsvps.length > 0 && (
+          <button onClick={() => exportCSV(filteredRsvps, `rsvps_${selectedEvent}`)} className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-2">
+            <i className="fas fa-download"></i> Export CSV
           </button>
-        ))}
+        )}
       </div>
 
       <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
@@ -281,7 +371,10 @@ function IdeasTab() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h1 className="text-3xl font-bold mb-8">Submitted Ideas</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Submitted Ideas</h1>
+        <button onClick={() => exportCSV(ideas, "ideas")} className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-2"><i className="fas fa-download"></i> Export CSV</button>
+      </div>
       <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -330,6 +423,7 @@ function ProjectsTab() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Manage Projects</h1>
+        <button onClick={() => exportCSV(projects, "projects")} className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-2"><i className="fas fa-download"></i> Export CSV</button>
       </div>
       <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
@@ -372,6 +466,124 @@ function ProjectsTab() {
             )}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+function MembersTab() {
+  const { members, addMember, deleteMember } = useAdminData();
+  const [newMember, setNewMember] = useState({ name: "", role: "" });
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if(newMember.name && newMember.role) {
+      await addMember(newMember);
+      setNewMember({ name: "", role: "" });
+    }
+  };
+
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Team Members</h1>
+        <button onClick={() => exportCSV(members, "members")} className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-2"><i className="fas fa-download"></i> Export CSV</button>
+      </div>
+
+      <form onSubmit={handleAdd} className="bg-white border border-gray-200 rounded-3xl p-6 mb-8 flex flex-col md:flex-row gap-4">
+        <input required placeholder="Name" className="flex-1 border border-gray-200 p-3 rounded-xl" value={newMember.name} onChange={e => setNewMember({...newMember, name: e.target.value})} />
+        <input required placeholder="Role (e.g. Developer)" className="flex-1 border border-gray-200 p-3 rounded-xl" value={newMember.role} onChange={e => setNewMember({...newMember, role: e.target.value})} />
+        <button type="submit" className="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold">Add Member</button>
+      </form>
+
+      <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
+              <th className="p-4 font-semibold">Name</th>
+              <th className="p-4 font-semibold">Role</th>
+              <th className="p-4 font-semibold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {members.map((member) => (
+              <tr key={member.id} className="hover:bg-gray-50/50 transition-colors">
+                <td className="p-4 font-semibold text-gray-900">{member.name}</td>
+                <td className="p-4 text-gray-600">{member.role}</td>
+                <td className="p-4 text-right">
+                  <button onClick={() => deleteMember(member.id)} className="text-gray-400 hover:text-red-600 transition-colors"><i className="fas fa-trash"></i></button>
+                </td>
+              </tr>
+            ))}
+            {members.length === 0 && <tr><td colSpan={3} className="p-8 text-center text-gray-500">No members found.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function CommunicationsTab() {
+  const { events } = useAdminData();
+  const [audience, setAudience] = useState("all");
+  const [subject, setSubject] = useState("");
+  const [html, setHtml] = useState("");
+  const [status, setStatus] = useState({ loading: false, error: "", success: "" });
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus({ loading: true, error: "", success: "" });
+    try {
+      const res = await fetch("/api/send-mass-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ audience, subject, html })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send email");
+      setStatus({ loading: false, error: "", success: data.message });
+      setSubject("");
+      setHtml("");
+    } catch (err: any) {
+      setStatus({ loading: false, error: err.message, success: "" });
+    }
+  };
+
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <h1 className="text-3xl font-bold mb-8">Communications</h1>
+      
+      <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm max-w-3xl">
+        <h2 className="text-xl font-bold mb-6">Send Mass Email</h2>
+        
+        {status.error && <div className="p-4 bg-red-50 text-red-700 rounded-xl mb-6 font-medium">{status.error}</div>}
+        {status.success && <div className="p-4 bg-green-50 text-green-700 rounded-xl mb-6 font-medium">{status.success}</div>}
+        
+        <form onSubmit={handleSend} className="space-y-6">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Audience</label>
+            <select className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" value={audience} onChange={e => setAudience(e.target.value)}>
+              <option value="all">All RSVP'd Users</option>
+              {events.map(ev => (
+                <option key={ev.slug} value={ev.slug}>RSVPs for: {ev.title}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Subject</label>
+            <input required type="text" className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Email Subject" value={subject} onChange={e => setSubject(e.target.value)} />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Message (HTML Supported)</label>
+            <textarea required rows={8} className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" placeholder="<h1>Hello</h1><p>Event is starting soon!</p>" value={html} onChange={e => setHtml(e.target.value)}></textarea>
+          </div>
+          
+          <button type="submit" disabled={status.loading} className="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50">
+            {status.loading ? "Sending Emails..." : "Send Mass Email"}
+          </button>
+        </form>
       </div>
     </div>
   );
