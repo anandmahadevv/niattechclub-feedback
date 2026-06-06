@@ -1,34 +1,28 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAdminData } from "../hooks/useAdminData";
+import { useAuth } from "../components/AuthContext";
 
 export default function Admin() {
+  const { user, loading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem("adminAuth") === "true";
-  });
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simple frontend hardcoded credential check
-    if (password === "43517@niat.me") {
-      setIsAuthenticated(true);
-      sessionStorage.setItem("adminAuth", "true");
-      setError(false);
-    } else {
-      setError(true);
-    }
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 w-full px-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  const isAdmin = user && user.email === "anandgowda82961@gmail.com";
+
+  const handleLogout = async () => {
+    await signOut();
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem("adminAuth");
-  };
-
-  if (!isAuthenticated) {
+  if (!isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 w-full px-4">
         <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 max-w-md w-full animate-in fade-in zoom-in-95 duration-300">
@@ -36,35 +30,34 @@ export default function Admin() {
             <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
               <i className="fas fa-lock"></i>
             </div>
-            <h2 className="text-2xl font-black text-gray-900">Admin Login</h2>
-            <p className="text-sm text-gray-500 mt-2">Enter your credentials to access the dashboard.</p>
+            <h2 className="text-2xl font-black text-gray-900">Admin Access Required</h2>
+            <p className="text-sm text-gray-500 mt-2">
+              {user ? "You do not have permission to access the admin dashboard." : "Please log in with an admin account to access the dashboard."}
+            </p>
           </div>
           
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <input 
-                type="password" 
-                placeholder="Password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`w-full px-4 py-3 rounded-xl border ${error ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200'} focus:outline-none focus:ring-4 transition-all`}
-                autoFocus
-                maxLength={100}
-              />
-              {error && <p className="text-red-500 text-xs mt-2 font-semibold">Incorrect password.</p>}
-            </div>
-            <button 
-              type="submit" 
-              className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-xl transition-colors shadow-sm"
-            >
-              Access Dashboard
-            </button>
+          <div className="space-y-4">
+            {!user ? (
+              <Link 
+                to="/login" 
+                className="flex justify-center w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-xl transition-colors shadow-sm"
+              >
+                Go to Login
+              </Link>
+            ) : (
+              <Link 
+                to="/" 
+                className="flex justify-center w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-xl transition-colors shadow-sm"
+              >
+                Return Home
+              </Link>
+            )}
             <div className="text-center pt-4">
               <Link to="/" className="text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">
                 &larr; Back to Home
               </Link>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     );
