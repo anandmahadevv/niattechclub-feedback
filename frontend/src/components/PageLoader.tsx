@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { Component as AiLoader } from "./ui/ai-loader";
+import { Component as LumaSpin } from "./ui/luma-spin";
 
 const MESSAGES: Record<string, string> = {
   "/": "Loading",
@@ -39,9 +39,14 @@ export default function PageLoader() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
-          className="fixed inset-0 z-50 select-none overflow-hidden"
+          className="fixed inset-0 z-50 select-none overflow-hidden bg-white flex items-center justify-center"
         >
-          <AiLoader text={statusMessage} />
+          <div className="flex flex-col items-center gap-4">
+            <LumaSpin />
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400">
+              {statusMessage}
+            </p>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

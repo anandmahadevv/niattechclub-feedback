@@ -1,4 +1,4 @@
-import { Component } from "@/components/ui/ai-loader";
+import { Component } from "@/components/ui/luma-spin";
 
 export default function DemoOne() {
   return <Component/>;
