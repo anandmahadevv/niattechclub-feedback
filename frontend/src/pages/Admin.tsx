@@ -431,7 +431,10 @@ function EventsTab() {
           <tbody className="divide-y divide-gray-100">
             {filteredRsvps.map((rsvp) => (
               <tr key={rsvp.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="p-4 font-semibold text-gray-900">{rsvp.name}</td>
+                <td className="p-4">
+                  <div className="font-semibold text-gray-900">{rsvp.name}</div>
+                  <div className="text-xs text-gray-400 font-medium">Ticket #{rsvp.id}</div>
+                </td>
                 <td className="p-4 text-gray-600">{rsvp.email}</td>
                 <td className="p-4">
                   {rsvp.attended ? (
