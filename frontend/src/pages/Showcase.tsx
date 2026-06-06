@@ -12,6 +12,7 @@ export default function Showcase() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { projects, addProject, upvoteProject } = useAdminData();
+  const publishedProjects = projects.filter((project) => (project.status || "published") === "published");
   const [likedProjects, setLikedProjects] = useState<number[]>(() => {
     const saved = localStorage.getItem('techclub_liked_projects');
     return saved ? JSON.parse(saved) : [];
@@ -143,12 +144,43 @@ export default function Showcase() {
       {/* Projects Grid */}
       <main className="max-w-6xl mx-auto px-6 w-full flex-grow flex flex-col items-center">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-          {projects.filter(p => (p.status || 'published') === 'published').map((project) => (
+          {publishedProjects.length === 0 ? (
+            Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="project-card flex flex-col w-full bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden animate-pulse">
+                <div className="w-full h-48 bg-gray-100" />
+                <div className="p-6 flex flex-col gap-4">
+                  <div className="space-y-3">
+                    <div className="h-5 w-3/4 rounded-full bg-gray-100" />
+                    <div className="h-3 w-1/3 rounded-full bg-gray-100" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 w-full rounded-full bg-gray-100" />
+                    <div className="h-3 w-11/12 rounded-full bg-gray-100" />
+                    <div className="h-3 w-2/3 rounded-full bg-gray-100" />
+                  </div>
+                  <div className="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
+                    <div className="flex gap-1.5">
+                      <div className="h-5 w-12 rounded-md bg-gray-100" />
+                      <div className="h-5 w-14 rounded-md bg-gray-100" />
+                    </div>
+                    <div className="h-8 w-14 rounded-lg bg-gray-100" />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : publishedProjects.map((project, index) => (
             <Tilt key={project.id} tiltMaxAngleX={4} tiltMaxAngleY={4} scale={1.02} transitionSpeed={2000} className="w-full flex">
               <article className="project-card flex flex-col w-full bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all">
                 {project.image_url && (
                   <div className="w-full h-48 bg-gray-100 border-b border-gray-100 overflow-hidden shrink-0">
-                    <img src={project.image_url} alt={project.project_title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" decoding="async" />
+                    <img
+                      src={project.image_url}
+                      alt={project.project_title}
+                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                      loading={index < 3 ? "eager" : "lazy"}
+                      fetchPriority={index < 3 ? "high" : "auto"}
+                      decoding="async"
+                    />
                   </div>
                 )}
                 <div className="p-6 flex flex-col flex-grow w-full">
