@@ -10,6 +10,15 @@ export interface Idea {
   date: string;
 }
 
+export interface RSVP {
+  id: number;
+  event_slug: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  created_at: string;
+}
+
 export interface Project {
   id: number;
   name: string;
@@ -26,6 +35,7 @@ export interface Project {
 export function useAdminData() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load from Supabase on mount
@@ -57,6 +67,18 @@ export function useAdminData() {
         console.error("Error fetching projects:", projectsError);
       }
       
+      // Fetch RSVPs
+      const { data: rsvpsData, error: rsvpsError } = await supabase
+        .from('rsvps')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (!rsvpsError && rsvpsData) {
+        setRsvps(rsvpsData as RSVP[]);
+      } else {
+        console.error("Error fetching RSVPs:", rsvpsError);
+      }
+      
       setLoading(false);
     }
 
@@ -77,9 +99,16 @@ export function useAdminData() {
       })
       .subscribe();
 
+    const rsvpsSubscription = supabase.channel(`custom-all-rsvps-${channelId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvps' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(ideasSubscription);
       supabase.removeChannel(projectsSubscription);
+      supabase.removeChannel(rsvpsSubscription);
     };
   }, []);
 
@@ -186,6 +215,7 @@ export function useAdminData() {
     deleteProject,
     publishProject,
     upvoteProject,
+    rsvps,
     loading
   };
 }

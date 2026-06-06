@@ -219,48 +219,56 @@ function StatCard({ title, value, icon, color }: { title: string, value: string,
 }
 
 function EventsTab() {
-  const [events] = useState([
-    { id: 1, title: "Intro to Dev Tools", type: "Workshop", status: "Completed", date: "April 30, 2026" },
-    { id: 2, title: "AI in the Real World", type: "Seminar", status: "Upcoming", date: "June 15, 2026" }
-  ]);
+  const { rsvps } = useAdminData();
+  const [selectedEvent, setSelectedEvent] = useState<string>("promptwars");
+
+  const events = [
+    { slug: "promptwars", title: "PromptWars", type: "Hackathon" },
+    { slug: "ai-workshop", title: "AI Tools & Innovation Workshop", type: "Workshop" }
+  ];
+
+  const filteredRsvps = rsvps.filter(r => r.event_slug === selectedEvent);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Manage Events</h1>
-        <button className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl font-semibold shadow-sm transition-colors text-sm flex items-center gap-2">
-          <i className="fas fa-plus"></i> Add Event
-        </button>
+        <h1 className="text-3xl font-bold">Event RSVPs</h1>
       </div>
       
+      <div className="flex flex-wrap gap-4 mb-6">
+        {events.map(event => (
+          <button
+            key={event.slug}
+            onClick={() => setSelectedEvent(event.slug)}
+            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${selectedEvent === event.slug ? "bg-gray-900 text-white shadow-sm" : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"}`}
+          >
+            {event.title} <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">{rsvps.filter(r => r.event_slug === event.slug).length}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
-              <th className="p-4 font-semibold">Title</th>
-              <th className="p-4 font-semibold">Type</th>
-              <th className="p-4 font-semibold">Status</th>
-              <th className="p-4 font-semibold">Date</th>
-              <th className="p-4 font-semibold text-right">Actions</th>
+              <th className="p-4 font-semibold">Name</th>
+              <th className="p-4 font-semibold">Email</th>
+              <th className="p-4 font-semibold">RSVP Date</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {events.map((event) => (
-              <tr key={event.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="p-4 font-semibold text-gray-900">{event.title}</td>
-                <td className="p-4 text-gray-600">{event.type}</td>
-                <td className="p-4">
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${event.status === 'Completed' ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'}`}>
-                    {event.status}
-                  </span>
-                </td>
-                <td className="p-4 text-gray-600">{event.date}</td>
-                <td className="p-4 text-right space-x-2">
-                  <button className="text-gray-400 hover:text-blue-600 transition-colors"><i className="fas fa-edit"></i></button>
-                  <button className="text-gray-400 hover:text-red-600 transition-colors"><i className="fas fa-trash"></i></button>
-                </td>
+            {filteredRsvps.map((rsvp) => (
+              <tr key={rsvp.id} className="hover:bg-gray-50/50 transition-colors">
+                <td className="p-4 font-semibold text-gray-900">{rsvp.name}</td>
+                <td className="p-4 text-gray-600">{rsvp.email}</td>
+                <td className="p-4 text-gray-600">{new Date(rsvp.created_at).toLocaleDateString()}</td>
               </tr>
             ))}
+            {filteredRsvps.length === 0 && (
+              <tr>
+                <td colSpan={3} className="p-8 text-center text-gray-500">No RSVPs yet for this event.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
