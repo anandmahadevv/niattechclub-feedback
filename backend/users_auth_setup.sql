@@ -100,7 +100,8 @@ CREATE OR REPLACE FUNCTION public.update_user_profile(
     user_email TEXT,
     new_name TEXT,
     new_roll_number TEXT,
-    new_department TEXT
+    new_department TEXT,
+    new_github_username TEXT DEFAULT NULL
 )
 RETURNS BOOLEAN AS $$
 BEGIN
@@ -108,7 +109,8 @@ BEGIN
     SET 
         name = COALESCE(new_name, name),
         roll_number = COALESCE(new_roll_number, roll_number),
-        department = COALESCE(new_department, department)
+        department = COALESCE(new_department, department),
+        github_username = COALESCE(new_github_username, github_username)
     WHERE email = user_email;
     
     RETURN FOUND;

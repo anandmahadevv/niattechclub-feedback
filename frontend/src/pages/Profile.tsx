@@ -54,7 +54,7 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({ name: "", rollNumber: "", department: "" });
+  const [formData, setFormData] = useState({ name: "", rollNumber: "", department: "", githubUsername: "" });
   const [userRsvps, setUserRsvps] = useState<{ event_slug: string }[]>([]);
   const [rsvpsLoading, setRsvpsLoading] = useState(true);
   const [tab, setTab] = useState<"overview" | "events" | "edit">("overview");
@@ -63,7 +63,7 @@ export default function Profile() {
     if (!loading) {
       if (!user) navigate("/login?redirect=/profile");
       else {
-        setFormData({ name: user.name || "", rollNumber: user.roll_number || "", department: user.department || "" });
+        setFormData({ name: user.name || "", rollNumber: user.roll_number || "", department: user.department || "", githubUsername: user.github_username || "" });
         supabase.from("rsvps").select("event_slug").eq("email", user.email).then(({ data }) => {
           setUserRsvps(data || []);
           setRsvpsLoading(false);
@@ -83,9 +83,10 @@ export default function Profile() {
         new_name: formData.name,
         new_roll_number: formData.rollNumber,
         new_department: formData.department,
+        new_github_username: formData.githubUsername,
       });
       if (error) throw error;
-      updateLocalUser({ ...user, name: formData.name, roll_number: formData.rollNumber, department: formData.department });
+      updateLocalUser({ ...user, name: formData.name, roll_number: formData.rollNumber, department: formData.department, github_username: formData.githubUsername });
       toast.success("Profile updated.", { id });
     } catch (err: any) {
       toast.error(err.message || "Failed to update.", { id });
@@ -363,6 +364,20 @@ export default function Profile() {
                 <Field label="Email">
                   <input type="email" disabled value={user.email || ""}
                     className={`${inputCls} bg-gray-50 text-gray-400 cursor-not-allowed`} />
+                </Field>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label="GitHub Username">
+                  <input type="text" name="githubUsername" value={formData.githubUsername}
+                    onChange={e => {
+                      // Extract username if a full URL is pasted
+                      let val = e.target.value;
+                      if (val.includes('github.com/')) {
+                        val = val.split('github.com/')[1].split('/')[0];
+                      }
+                      setFormData(p => ({ ...p, githubUsername: val }));
+                    }}
+                    placeholder="e.g. torvalds" className={inputCls} />
                 </Field>
               </div>
               <div className="pt-2 flex justify-end">
