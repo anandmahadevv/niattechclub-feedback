@@ -75,6 +75,15 @@ export default function Profile() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+
+    if (formData.githubUsername) {
+      const ghRegex = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
+      if (!ghRegex.test(formData.githubUsername)) {
+        toast.error("Invalid GitHub username format.");
+        return;
+      }
+    }
+
     setSaving(true);
     const id = toast.loading("Saving...");
     try {
@@ -369,9 +378,10 @@ export default function Profile() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="GitHub Username">
                   <input type="text" name="githubUsername" value={formData.githubUsername}
+                    maxLength={39}
                     onChange={e => {
                       // Extract username if a full URL is pasted
-                      let val = e.target.value;
+                      let val = e.target.value.trim();
                       if (val.includes('github.com/')) {
                         val = val.split('github.com/')[1].split('/')[0];
                       }
