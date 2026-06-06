@@ -677,61 +677,68 @@ function ScannerTab() {
   const [scanResult, setScanResult] = useState<{status: 'success' | 'error' | null, message: string}>({status: null, message: ""});
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
+  const rsvpsRef = useRef(rsvps);
+  useEffect(() => {
+    rsvpsRef.current = rsvps;
+  }, [rsvps]);
+
   useEffect(() => {
     if (!scannerRef.current) {
       scannerRef.current = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+      
+      const onScanSuccess = async (decodedText: string) => {
+        if (scannerRef.current) {
+          scannerRef.current.pause(true); // Pause scanning after success to prevent multiple calls
+        }
+        const rsvpId = parseInt(decodedText);
+        if (isNaN(rsvpId)) {
+          setScanResult({status: 'error', message: "Invalid QR Code format. Please scan a valid Tech Club ticket."});
+          setTimeout(() => scannerRef.current?.resume(), 3000);
+          return;
+        }
+
+        // Check if valid RSVP using the ref
+        const ticket = rsvpsRef.current.find(r => r.id === rsvpId);
+        if (!ticket) {
+          setScanResult({status: 'error', message: `Ticket #${rsvpId} not found in the system.`});
+          setTimeout(() => scannerRef.current?.resume(), 3000);
+          return;
+        }
+
+        if (ticket.attended) {
+          setScanResult({status: 'error', message: `${ticket.name} (Ticket #${rsvpId}) has already checked in!`});
+          setTimeout(() => scannerRef.current?.resume(), 3000);
+          return;
+        }
+
+        try {
+          await markAttendance(rsvpId);
+          setScanResult({status: 'success', message: `Successfully checked in ${ticket.name}!`});
+        } catch (err) {
+          setScanResult({status: 'error', message: "Database error while updating attendance."});
+        }
+        
+        // Resume scanning after 3 seconds
+        setTimeout(() => {
+          setScanResult({status: null, message: ""});
+          scannerRef.current?.resume();
+        }, 3000);
+      };
+
+      const onScanFailure = (_error: any) => {
+        // ignore normal scanning failures
+      };
+
       scannerRef.current.render(onScanSuccess, onScanFailure);
     }
 
     return () => {
       if (scannerRef.current) {
         scannerRef.current.clear().catch(console.error);
+        scannerRef.current = null;
       }
     };
-  }, [rsvps]);
-
-  const onScanSuccess = async (decodedText: string) => {
-    if (scannerRef.current) {
-      scannerRef.current.pause(true); // Pause scanning after success to prevent multiple calls
-    }
-    const rsvpId = parseInt(decodedText);
-    if (isNaN(rsvpId)) {
-      setScanResult({status: 'error', message: "Invalid QR Code format. Please scan a valid Tech Club ticket."});
-      setTimeout(() => scannerRef.current?.resume(), 3000);
-      return;
-    }
-
-    // Check if valid RSVP
-    const ticket = rsvps.find(r => r.id === rsvpId);
-    if (!ticket) {
-      setScanResult({status: 'error', message: `Ticket #${rsvpId} not found in the system.`});
-      setTimeout(() => scannerRef.current?.resume(), 3000);
-      return;
-    }
-
-    if (ticket.attended) {
-      setScanResult({status: 'error', message: `${ticket.name} (Ticket #${rsvpId}) has already checked in!`});
-      setTimeout(() => scannerRef.current?.resume(), 3000);
-      return;
-    }
-
-    try {
-      await markAttendance(rsvpId);
-      setScanResult({status: 'success', message: `Successfully checked in ${ticket.name}!`});
-    } catch (err) {
-      setScanResult({status: 'error', message: "Database error while updating attendance."});
-    }
-    
-    // Resume scanning after 3 seconds
-    setTimeout(() => {
-      setScanResult({status: null, message: ""});
-      scannerRef.current?.resume();
-    }, 3000);
-  };
-
-  const onScanFailure = (_error: any) => {
-    // ignore normal scanning failures
-  };
+  }, []);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto">
