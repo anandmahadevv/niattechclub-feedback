@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAdminData } from "../hooks/useAdminData";
 import { useAuth } from "../components/AuthContext";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
 
 const exportCSV = (data: any[], filename: string) => {
   if (data.length === 0) return;
@@ -684,7 +684,11 @@ function ScannerTab() {
 
   useEffect(() => {
     if (!scannerRef.current) {
-      scannerRef.current = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+      scannerRef.current = new Html5QrcodeScanner("reader", { 
+        fps: 10, 
+        qrbox: {width: 250, height: 250},
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+      }, false);
       
       const onScanSuccess = async (decodedText: string) => {
         if (scannerRef.current) {
