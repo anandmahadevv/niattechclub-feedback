@@ -138,7 +138,6 @@ export default function Profile() {
   const [tab, setTab] = useState<"overview" | "events" | "edit">("overview");
   const [showLeaguesModal, setShowLeaguesModal] = useState(false);
   const [prCount, setPrCount] = useState(0);
-  const [prLoading, setPrLoading] = useState(true);
 
   useEffect(() => {
     if (!loading) {
@@ -154,7 +153,6 @@ export default function Profile() {
 
         // Fetch GitHub PR contributions from leaderboard
         if (user.github_username) {
-          setPrLoading(true);
           supabase
             .from("leaderboard")
             .select("merged_prs")
@@ -166,11 +164,9 @@ export default function Profile() {
               } else {
                 setPrCount(0);
               }
-              setPrLoading(false);
             });
         } else {
           setPrCount(0);
-          setPrLoading(false);
         }
       }
     }
