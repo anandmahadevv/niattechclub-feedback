@@ -368,7 +368,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-const inputCls = "w-full px-3.5 py-2.5 rounded-lg border border-slate-800 bg-slate-950 text-sm text-white font-medium outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all placeholder-slate-600";
+const inputCls = "w-full px-3.5 py-2.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 font-medium outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all placeholder-gray-400";
 
 export default function Profile() {
   const { user, loading, updateLocalUser } = useAuth();
@@ -428,7 +428,7 @@ export default function Profile() {
 
   if (loading || !user) {
     return (
-      <div className="flex-grow w-full flex items-center justify-center bg-white">
+      <div className="flex-grow w-full flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -452,16 +452,16 @@ export default function Profile() {
   ] as const;
 
   return (
-    <div className="flex-grow w-full bg-slate-950 text-slate-100 min-h-screen">
+    <div className="flex-grow w-full text-gray-900">
 
       {/* ── Top Identity Strip ─────────────────────────────────────────────── */}
-      <div className="bg-slate-900 border-b border-slate-800/80 shadow-md">
+      <div className="bg-white/60 backdrop-blur-md border-b border-gray-200/50">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
 
             {/* Avatar */}
             <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-black flex-shrink-0 border border-slate-700/80 shadow-lg"
+              className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-black flex-shrink-0 shadow-sm"
               style={{ background: badge.color }}
             >
               {firstLetter}
@@ -470,20 +470,20 @@ export default function Profile() {
             {/* Name / details */}
             <div className="flex-grow min-w-0">
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-xl font-bold text-slate-50 truncate">{formData.name || "Member"}</h1>
+                <h1 className="text-xl font-bold text-gray-900 truncate">{formData.name || "Member"}</h1>
               </div>
-              <p className="text-sm text-slate-400 mt-0.5">{user.email}</p>
+              <p className="text-sm text-gray-400 mt-0.5">{user.email}</p>
               <div className="flex flex-wrap gap-2 mt-2">
-                {formData.rollNumber && <span className="text-xs text-slate-400 font-medium">#{formData.rollNumber}</span>}
-                {formData.rollNumber && formData.department && <span className="text-slate-600 text-xs">·</span>}
-                {formData.department && <span className="text-xs text-slate-400 font-medium">{formData.department}</span>}
+                {formData.rollNumber && <span className="text-xs text-gray-500 font-medium">#{formData.rollNumber}</span>}
+                {formData.rollNumber && formData.department && <span className="text-gray-300 text-xs">·</span>}
+                {formData.department && <span className="text-xs text-gray-500 font-medium">{formData.department}</span>}
                 {user.github_username && (
                   <>
-                    <span className="text-slate-600 text-xs">·</span>
+                    <span className="text-gray-300 text-xs">·</span>
                     <a
                       href={`https://github.com/${user.github_username}`}
                       target="_blank" rel="noreferrer"
-                      className="text-xs text-slate-400 font-medium hover:text-white flex items-center gap-1 transition-colors"
+                      className="text-xs text-gray-500 font-medium hover:text-gray-900 flex items-center gap-1 transition-colors"
                     >
                       <svg viewBox="0 0 24 24" className="w-3 h-3" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
                       @{user.github_username}
@@ -504,8 +504,8 @@ export default function Profile() {
                 onClick={() => setTab(t.key)}
                 className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
                   tab === t.key
-                    ? "border-red-500 text-red-500"
-                    : "border-transparent text-slate-400 hover:text-slate-200"
+                    ? "border-red-600 text-red-600"
+                    : "border-transparent text-gray-400 hover:text-gray-700"
                 }`}
               >
                 {t.label}
@@ -525,7 +525,7 @@ export default function Profile() {
             <div className="flex justify-end mb-4 px-2">
               <button 
                 onClick={() => setShowLeaguesModal(true)} 
-                className="text-xs font-black uppercase tracking-wider text-amber-400 hover:text-amber-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="text-xs font-black uppercase tracking-wider text-amber-600 hover:text-amber-700 flex items-center gap-1.5 transition-colors cursor-pointer"
                 style={{ fontFamily: "'Outfit', sans-serif" }}
               >
                 <i className="fas fa-trophy text-[10px]" /> See all leagues
@@ -739,7 +739,7 @@ export default function Profile() {
                 emptyText: "No events attended yet.",
                 emptyHint: "Attend events to earn badges.",
                 accent: "bg-green-500",
-                tagClass: "bg-green-950/30 text-green-400 border-green-800/40",
+                tagClass: "bg-green-50 text-green-700 border-green-200",
                 tag: "Attended",
               },
               {
@@ -748,29 +748,29 @@ export default function Profile() {
                 emptyText: "Not registered for any events.",
                 emptyHint: "Check the Events page to RSVP.",
                 accent: "bg-red-500",
-                tagClass: "bg-red-950/30 text-red-400 border-red-800/40",
+                tagClass: "bg-red-50 text-red-700 border-red-200",
                 tag: "RSVP'd",
               },
             ].map(section => (
-              <div key={section.title} className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 shadow-xl">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{section.title}</p>
+              <div key={section.title} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">{section.title}</p>
                 {rsvpsLoading ? (
                   <div className="flex justify-center py-8">
                     <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : section.list.length === 0 ? (
                   <div className="py-8 text-center">
-                    <p className="text-sm text-slate-500 font-medium">{section.emptyText}</p>
-                    <p className="text-xs text-slate-600 mt-1">{section.emptyHint}</p>
+                    <p className="text-sm text-gray-500 font-medium">{section.emptyText}</p>
+                    <p className="text-xs text-gray-400 mt-1">{section.emptyHint}</p>
                   </div>
                 ) : (
                   <div className="space-y-2.5">
                     {section.list.map(event => (
-                      <div key={event.slug} className="flex items-center gap-3 p-3 rounded-xl border border-slate-800/60 bg-slate-950/50">
+                      <div key={event.slug} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50">
                         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${section.accent}`} />
                         <div className="flex-grow min-w-0">
-                          <p className="text-sm font-semibold text-slate-100 truncate">{event.name}</p>
-                          <p className="text-xs text-slate-400">{event.date} · {event.type}</p>
+                          <p className="text-sm font-semibold text-gray-800 truncate">{event.name}</p>
+                          <p className="text-xs text-gray-400">{event.date} · {event.type}</p>
                         </div>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 ${section.tagClass}`}>
                           {section.tag}
@@ -786,8 +786,8 @@ export default function Profile() {
 
         {/* EDIT */}
         {tab === "edit" && (
-          <div className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 max-w-2xl shadow-xl">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">Personal Information</p>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 max-w-2xl">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-6">Personal Information</p>
             <form onSubmit={handleSave} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="Full Name">
@@ -809,7 +809,7 @@ export default function Profile() {
                 </Field>
                 <Field label="Email">
                   <input type="email" disabled value={user.email || ""}
-                    className={`${inputCls} bg-slate-950 text-slate-500 border-slate-800/80 cursor-not-allowed`} />
+                    className={`${inputCls} bg-gray-50 text-gray-400 cursor-not-allowed`} />
                 </Field>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
