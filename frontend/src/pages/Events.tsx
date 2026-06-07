@@ -74,12 +74,6 @@ export default function Events() {
     if (!user) return;
     if (isFull) return;
     
-    if (!user.email.endsWith('@yenepoya.edu.in')) {
-      const { toast } = await import('sonner');
-      toast.error('Only @yenepoya.edu.in email addresses are allowed to RSVP.');
-      return;
-    }
-    
     setIsSubmittingRsvp(true);
     
     try {
@@ -95,7 +89,7 @@ export default function Events() {
       }
 
       const { data: newRsvpData, error } = await supabase.from('rsvps').insert([
-        { event_slug: 'promptwars', name: user.name, email: user.email }
+        { event_slug: 'promptwars', name: user.name, email: user.email, phone: user.roll_number }
       ]).select();
       
       if (error) throw error;
@@ -317,12 +311,6 @@ export default function Events() {
                     <button
                       onClick={() => {
                         if (isFull) return;
-                        if (!user?.email?.endsWith('@yenepoya.edu.in')) {
-                          import('sonner').then(({ toast }) => {
-                            toast.error('Only @yenepoya.edu.in email addresses are allowed to RSVP.');
-                          });
-                          return;
-                        }
                         setShowConfirmModal(true);
                       }}
                       disabled={isFull}

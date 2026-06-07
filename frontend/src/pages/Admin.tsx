@@ -386,7 +386,21 @@ function EventsTab() {
           ))}
         </div>
         {filteredRsvps.length > 0 && (
-          <button onClick={() => exportCSV(filteredRsvps, `rsvps_${selectedEvent}`)} className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-2">
+          <button
+            onClick={() => {
+              const mappedRsvps = filteredRsvps.map(({ id, event_slug, name, email, phone, attended, created_at }) => ({
+                id,
+                event_slug,
+                name,
+                email,
+                campus_id: phone,
+                attended,
+                created_at
+              }));
+              exportCSV(mappedRsvps, `rsvps_${selectedEvent}`);
+            }}
+            className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-2"
+          >
             <i className="fas fa-download"></i> Export CSV
           </button>
         )}
@@ -436,7 +450,7 @@ function EventsTab() {
                     {rsvp.attended && <span className="px-2 py-0.5 rounded bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider border border-green-200 shadow-sm"><i className="fas fa-check mr-1"></i>Checked In</span>}
                     {rsvp.name}
                   </div>
-                  <div className="text-xs text-gray-400 font-medium mt-1">Ticket #{rsvp.id}</div>
+                  <div className="text-xs text-gray-400 font-medium mt-1">Ticket #{rsvp.id} {rsvp.phone && `• Campus ID: ${rsvp.phone}`}</div>
                 </td>
                 <td className="p-4 text-gray-600">{rsvp.email}</td>
                 <td className="p-4">
