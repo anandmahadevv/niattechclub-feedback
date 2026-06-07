@@ -268,6 +268,25 @@ export default function Events() {
                     <p className="text-gray-600 font-medium relative z-10 mb-4">
                       Your slot for PromptWars is <span className="text-green-700 font-bold">100% Confirmed</span>.
                     </p>
+
+                    {/* Registration Confirmation Details */}
+                    {user && (
+                      <div className="bg-white/80 backdrop-blur-sm border border-green-100 rounded-2xl p-4 mb-5 text-left text-xs space-y-2 relative z-10 max-w-xs mx-auto shadow-sm">
+                        <div className="flex justify-between">
+                          <span className="font-semibold text-gray-400">Name:</span>
+                          <span className="font-extrabold text-gray-800">{user.name}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-gray-50 pt-2">
+                          <span className="font-semibold text-gray-400">Campus ID:</span>
+                          <span className="font-extrabold text-green-700">{user.roll_number || "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-gray-50 pt-2">
+                          <span className="font-semibold text-gray-400">Email:</span>
+                          <span className="font-bold text-gray-600 truncate max-w-[150px]">{user.email}</span>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-green-100 shadow-sm text-sm font-semibold text-green-700 relative z-10">
                       <i className="fas fa-check-circle"></i> RSVP Verified
                     </div>
