@@ -300,14 +300,7 @@ export default function Profile() {
                 style={{ backgroundColor: badge.color }}
               />
 
-              {/* Card Header */}
-              <div className="flex justify-between items-center border-b border-gray-100 pb-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                  <span className="text-[10px] font-black tracking-widest text-gray-400 uppercase">NIAT Tech Club Rank</span>
-                </div>
-                <span className="text-xs font-mono font-bold text-gray-400">ID: #{formData.rollNumber || "GUEST"}</span>
-              </div>
+
 
               {/* Card Body: Emblem and Rank Name */}
               <div className="flex flex-col items-center text-center gap-4 py-4">
@@ -366,15 +359,6 @@ export default function Profile() {
                   <p className="text-xs font-bold text-gray-400 tracking-widest mt-1 uppercase">
                     Events Attended: <span className="text-gray-900 font-mono text-sm font-black">{eventsCount}</span>
                   </p>
-                  <div className="mt-3 flex flex-col items-center select-none">
-                    <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest leading-none">Club Score</span>
-                    <div className="mt-1 flex items-center gap-1">
-                      <span className="text-2xl font-black text-amber-500 font-outfit" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                        Score <span className="text-yellow-600">+{eventsCount * 100}</span>
-                      </span>
-                      <i className="fas fa-circle-question text-[10px] text-gray-300 hover:text-gray-400 cursor-pointer" title="Score is calculated as 100 points per event attended." />
-                    </div>
-                  </div>
                 </div>
               </div>
 
