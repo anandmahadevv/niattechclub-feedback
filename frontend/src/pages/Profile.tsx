@@ -547,7 +547,7 @@ export default function Profile() {
               <div className="flex justify-between items-center border-b border-slate-800/80 pb-4 mb-6">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                  <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">NIAT Battlegrounds Rank</span>
+                  <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">NIAT Tech Club Rank</span>
                 </div>
                 <span className="text-xs font-mono font-bold text-slate-500">ID: #{formData.rollNumber || "GUEST"}</span>
               </div>
