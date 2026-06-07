@@ -5,21 +5,204 @@ import { supabase } from "../lib/supabase";
 import { toast } from "sonner";
 
 // ─── Badge System ─────────────────────────────────────────────────────────────
+// ─── Badge System ─────────────────────────────────────────────────────────────
 const BADGES = [
-  { name: "Beginner",  min: 0,  color: "#6b7280", light: "#f3f4f6", tag: "bg-gray-100 text-gray-600 border-gray-200" },
-  { name: "Bronze",    min: 1,  color: "#b45309", light: "#fffbeb", tag: "bg-amber-50 text-amber-700 border-amber-200" },
-  { name: "Silver",    min: 2,  color: "#4b5563", light: "#f9fafb", tag: "bg-gray-100 text-gray-700 border-gray-300" },
-  { name: "Gold",      min: 3,  color: "#d97706", light: "#fffbeb", tag: "bg-yellow-50 text-yellow-700 border-yellow-200" },
-  { name: "Platinum",  min: 5,  color: "#0891b2", light: "#ecfeff", tag: "bg-cyan-50 text-cyan-700 border-cyan-200" },
-  { name: "Diamond",   min: 8,  color: "#4f46e5", light: "#eef2ff", tag: "bg-indigo-50 text-indigo-700 border-indigo-200" },
-  { name: "Crown",     min: 12, color: "#7c3aed", light: "#f5f3ff", tag: "bg-violet-50 text-violet-700 border-violet-200" },
-  { name: "Ace",       min: 18, color: "#dc2626", light: "#fef2f2", tag: "bg-red-50 text-red-700 border-red-200" },
+  { name: "Beginner",       min: 0,  color: "#6b7280", light: "#f3f4f6", tag: "bg-gray-100 text-gray-600 border-gray-200" },
+  { name: "Bronze",         min: 1,  color: "#b45309", light: "#fffbeb", tag: "bg-amber-50 text-amber-700 border-amber-200" },
+  { name: "Silver",         min: 2,  color: "#4b5563", light: "#f9fafb", tag: "bg-gray-100 text-gray-700 border-gray-300" },
+  { name: "Gold",           min: 3,  color: "#d97706", light: "#fffbeb", tag: "bg-yellow-50 text-yellow-700 border-yellow-200" },
+  { name: "Platinum",       min: 5,  color: "#0891b2", light: "#ecfeff", tag: "bg-cyan-50 text-cyan-700 border-cyan-200" },
+  { name: "Diamond",        min: 8,  color: "#4f46e5", light: "#eef2ff", tag: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  { name: "Crown",          min: 12, color: "#7c3aed", light: "#f5f3ff", tag: "bg-violet-50 text-violet-700 border-violet-200" },
+  { name: "Ace",            min: 18, color: "#dc2626", light: "#fef2f2", tag: "bg-red-50 text-red-700 border-red-200" },
+  { name: "Ace Master",     min: 25, color: "#1e1b4b", light: "#f5f3ff", tag: "bg-indigo-950 text-purple-300 border-purple-800" },
+  { name: "Ace Dominator",  min: 35, color: "#701a75", light: "#fdf4ff", tag: "bg-fuchsia-950 text-fuchsia-300 border-fuchsia-800" },
+  { name: "Conqueror",      min: 50, color: "#ea580c", light: "#fff7ed", tag: "bg-orange-50 text-orange-700 border-orange-200" },
 ];
 
 const BADGE_ICONS: Record<string, string> = {
   Beginner: "🌱", Bronze: "🥉", Silver: "🥈", Gold: "🥇",
   Platinum: "💎", Diamond: "💠", Crown: "👑", Ace: "⚡",
+  "Ace Master": "💀", "Ace Dominator": "🏅", Conqueror: "🏆"
 };
+
+function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
+  const sizeClasses = {
+    sm: "w-14 h-16 text-[9px]",
+    md: "w-20 h-24 text-[11px]",
+    lg: "w-24 h-28 text-xs",
+  };
+
+  const config: Record<string, {
+    border: string[];
+    fill: string[];
+    innerFill: string[];
+    icon: string;
+    iconColor: string;
+    bannerBg: string;
+    bannerText: string;
+  }> = {
+    Beginner: {
+      border: ["#d1d5db", "#9ca3af"],
+      fill: ["#f3f4f6", "#e5e7eb"],
+      innerFill: ["#e5e7eb", "#9ca3af"],
+      icon: "fa-seedling text-emerald-500",
+      iconColor: "#10b981",
+      bannerBg: "bg-gray-500",
+      bannerText: "text-white"
+    },
+    Bronze: {
+      border: ["#f59e0b", "#78350f"],
+      fill: ["#fffbeb", "#fef3c7"],
+      innerFill: ["#fcd34d", "#b45309"],
+      icon: "fa-parachute-box",
+      iconColor: "#b45309",
+      bannerBg: "bg-amber-700",
+      bannerText: "text-amber-100"
+    },
+    Silver: {
+      border: ["#e5e7eb", "#4b5563"],
+      fill: ["#f9fafb", "#f3f4f6"],
+      innerFill: ["#d1d5db", "#6b7280"],
+      icon: "fa-crosshairs",
+      iconColor: "#4b5563",
+      bannerBg: "bg-slate-600",
+      bannerText: "text-slate-100"
+    },
+    Gold: {
+      border: ["#fbbf24", "#d97706"],
+      fill: ["#fffbeb", "#fef3c7"],
+      innerFill: ["#f59e0b", "#b45309"],
+      icon: "fa-trophy",
+      iconColor: "#d97706",
+      bannerBg: "bg-yellow-600",
+      bannerText: "text-yellow-100"
+    },
+    Platinum: {
+      border: ["#22d3ee", "#0891b2"],
+      fill: ["#ecfeff", "#cffafe"],
+      innerFill: ["#67e8f9", "#0e7490"],
+      icon: "fa-shield-halved",
+      iconColor: "#0891b2",
+      bannerBg: "bg-cyan-700",
+      bannerText: "text-cyan-100"
+    },
+    Diamond: {
+      border: ["#818cf8", "#4f46e5"],
+      fill: ["#eef2ff", "#e0e7ff"],
+      innerFill: ["#a5b4fc", "#3730a3"],
+      icon: "fa-gem",
+      iconColor: "#4f46e5",
+      bannerBg: "bg-indigo-600",
+      bannerText: "text-indigo-100"
+    },
+    Crown: {
+      border: ["#c084fc", "#7c3aed"],
+      fill: ["#f5f3ff", "#ede9fe"],
+      innerFill: ["#d8b4fe", "#5b21b6"],
+      icon: "fa-crown",
+      iconColor: "#7c3aed",
+      bannerBg: "bg-purple-700",
+      bannerText: "text-purple-100"
+    },
+    Ace: {
+      border: ["#f87171", "#dc2626"],
+      fill: ["#fef2f2", "#fee2e2"],
+      innerFill: ["#fca5a5", "#991b1b"],
+      icon: "fa-fire",
+      iconColor: "#dc2626",
+      bannerBg: "bg-red-700",
+      bannerText: "text-red-100"
+    },
+    "Ace Master": {
+      border: ["#d946ef", "#701a75"],
+      fill: ["#fae8ff", "#f5d0fe"],
+      innerFill: ["#e879f9", "#4a044e"],
+      icon: "fa-skull-crossbones animate-pulse",
+      iconColor: "#d946ef",
+      bannerBg: "bg-purple-900",
+      bannerText: "text-purple-100"
+    },
+    "Ace Dominator": {
+      border: ["#ec4899", "#9d174d"],
+      fill: ["#fdf2f8", "#fce7f3"],
+      innerFill: ["#f472b6", "#831843"],
+      icon: "fa-award animate-bounce",
+      iconColor: "#be185d",
+      bannerBg: "bg-pink-700",
+      bannerText: "text-pink-100"
+    },
+    Conqueror: {
+      border: ["#f97316", "#ea580c", "#fbbf24"],
+      fill: ["#fff7ed", "#ffedd5"],
+      innerFill: ["#fdba74", "#9a3412"],
+      icon: "fa-chess-king animate-bounce",
+      iconColor: "#ea580c",
+      bannerBg: "bg-gradient-to-r from-orange-600 to-amber-600",
+      bannerText: "text-orange-50 font-black animate-pulse"
+    }
+  };
+
+  const rankConfig = config[name] || config.Beginner;
+  const gradientIdBorder = `border-${name.replace(/\s+/g, "-")}`;
+  const gradientIdInner = `inner-${name.replace(/\s+/g, "-")}`;
+
+  return (
+    <div className={`relative flex flex-col items-center select-none ${sizeClasses[size]}`}>
+      {/* Glow effect for high ranks */}
+      {["Crown", "Ace", "Ace Master", "Ace Dominator", "Conqueror"].includes(name) && (
+        <div className="absolute inset-0 rounded-full bg-current opacity-20 blur-xl scale-125 animate-pulse" style={{ color: rankConfig.innerFill[0] }} />
+      )}
+      
+      {/* SVG Shield shape */}
+      <svg viewBox="0 0 100 120" className="w-full h-auto drop-shadow-md">
+        <defs>
+          <linearGradient id={gradientIdBorder} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={rankConfig.border[0]} />
+            <stop offset="100%" stopColor={rankConfig.border[1] || rankConfig.border[2] || rankConfig.border[0]} />
+          </linearGradient>
+          <linearGradient id={gradientIdInner} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={rankConfig.innerFill[0]} />
+            <stop offset="100%" stopColor={rankConfig.innerFill[1]} />
+          </linearGradient>
+        </defs>
+        
+        {/* Outer shield structure */}
+        <path
+          d="M50 5 L90 25 L90 75 L50 115 L10 75 L10 25 Z"
+          style={{ fill: `url(#${gradientIdBorder})` }}
+          className="transition-all duration-500"
+        />
+        
+        {/* Inner shield inset */}
+        <path
+          d="M50 12 L83 29 L83 71 L50 105 L17 71 L17 29 Z"
+          style={{ fill: `url(#${gradientIdInner})` }}
+          className="transition-all duration-500"
+        />
+
+        {/* Decorative Inner Shield Line */}
+        <path
+          d="M50 18 L77 32 L77 67 L50 95 L23 67 L23 32 Z"
+          fill="none"
+          stroke="white"
+          strokeOpacity="0.15"
+          strokeWidth="1.5"
+        />
+      </svg>
+      
+      {/* Icon placed inside shield */}
+      <div className="absolute top-[28%] flex items-center justify-center text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+        <i className={`fas ${rankConfig.icon} text-2xl`} style={{ color: rankConfig.iconColor === "#b45309" || rankConfig.iconColor === "#4b5563" || rankConfig.iconColor === "#d97706" ? "white" : undefined }} />
+      </div>
+      
+      {/* Title banner overlay */}
+      <div className={`absolute bottom-0 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-md text-center max-w-[90%] truncate ${rankConfig.bannerBg} ${rankConfig.bannerText} border border-white/20`}>
+        {name}
+      </div>
+    </div>
+  );
+}
 
 function getBadge(n: number) {
   let b = BADGES[0];
