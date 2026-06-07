@@ -22,6 +22,39 @@ const BADGES = [
 ];
 
 
+const IMAGE_BADGES: Record<string, { src: string; glow: string; shadow: string }> = {
+  Bronze: {
+    src: "/Badges/bronze.png",
+    glow: "bg-amber-600/15",
+    shadow: "drop-shadow-[0_6px_10px_rgba(180,83,9,0.35)]"
+  },
+  Crown: {
+    src: "/Badges/crown.png",
+    glow: "bg-yellow-600/20",
+    shadow: "drop-shadow-[0_6px_12px_rgba(217,119,6,0.4)]"
+  },
+  Ace: {
+    src: "/Badges/ace.png",
+    glow: "bg-red-600/20",
+    shadow: "drop-shadow-[0_6px_12px_rgba(220,38,38,0.4)]"
+  },
+  "Ace Master": {
+    src: "/Badges/acemaster.png",
+    glow: "bg-emerald-600/20",
+    shadow: "drop-shadow-[0_6px_12px_rgba(5,150,105,0.4)]"
+  },
+  "Ace Dominator": {
+    src: "/Badges/acedominator.png",
+    glow: "bg-blue-600/20",
+    shadow: "drop-shadow-[0_6px_12px_rgba(37,99,235,0.4)]"
+  },
+  Conqueror: {
+    src: "/Badges/conquerorbadge.png",
+    glow: "bg-orange-500/20",
+    shadow: "drop-shadow-[0_6px_12px_rgba(234,88,12,0.5)]"
+  }
+};
+
 function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
   const sizeClasses = {
     sm: "w-16 h-20 text-[8px]",
@@ -29,7 +62,8 @@ function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" |
     lg: "w-28 h-36 text-[12px]",
   };
 
-  if (name === "Conqueror") {
+  const imgConfig = IMAGE_BADGES[name];
+  if (imgConfig) {
     const sizeClassesImg = {
       sm: "w-16 h-18 object-contain",
       md: "w-24 h-26 object-contain",
@@ -38,11 +72,11 @@ function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" |
     return (
       <div className={`relative flex flex-col items-center select-none group ${sizeClasses[size]}`}>
         {/* Glow effect */}
-        <div className="absolute inset-0 rounded-full bg-orange-500/20 opacity-30 blur-xl scale-110 group-hover:scale-125 transition-transform duration-500 animate-pulse" />
+        <div className={`absolute inset-0 rounded-full ${imgConfig.glow} opacity-30 blur-xl scale-110 group-hover:scale-125 transition-transform duration-500 animate-pulse`} />
         <img
-          src="/Badges/conquerorbadge.png"
-          alt="Conqueror Badge"
-          className={`${sizeClassesImg[size]} drop-shadow-[0_6px_12px_rgba(234,88,12,0.5)] transition-transform duration-500 group-hover:scale-105 group-hover:rotate-1`}
+          src={imgConfig.src}
+          alt={`${name} Badge`}
+          className={`${sizeClassesImg[size]} ${imgConfig.shadow} transition-transform duration-500 group-hover:scale-105 group-hover:rotate-1`}
         />
       </div>
     );
@@ -532,111 +566,111 @@ export default function Profile() {
               </button>
             </div>
 
-            <div className="relative bg-slate-900 border border-slate-800 text-white rounded-3xl p-8 shadow-2xl overflow-hidden group transition-all duration-500 hover:border-slate-700/80">
+            <div className="relative bg-white border border-gray-200 text-gray-900 rounded-3xl p-8 shadow-md overflow-hidden group transition-all duration-500 hover:border-gray-300 hover:shadow-lg">
               {/* Active rank glow background */}
               <div 
-                className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-25 blur-[100px] pointer-events-none animate-pulse" 
+                className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-10 blur-[100px] pointer-events-none animate-pulse" 
                 style={{ backgroundColor: badge.color }}
               />
               <div 
-                className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full opacity-20 blur-[100px] pointer-events-none animate-pulse" 
+                className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full opacity-10 blur-[100px] pointer-events-none animate-pulse" 
                 style={{ backgroundColor: badge.color }}
               />
 
               {/* Card Header */}
-              <div className="flex justify-between items-center border-b border-slate-800/80 pb-4 mb-6">
+              <div className="flex justify-between items-center border-b border-gray-100 pb-4 mb-6">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                  <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">NIAT Tech Club Rank</span>
+                  <span className="text-[10px] font-black tracking-widest text-gray-400 uppercase">NIAT Tech Club Rank</span>
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-500">ID: #{formData.rollNumber || "GUEST"}</span>
+                <span className="text-xs font-mono font-bold text-gray-400">ID: #{formData.rollNumber || "GUEST"}</span>
               </div>
 
               {/* Card Body: Emblem and Rank Name */}
               <div className="flex flex-col items-center text-center gap-4 py-4">
-                <div className="relative flex items-center justify-center p-3 filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)]">
+                <div className="relative flex items-center justify-center p-3 filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.15)]">
                   <BadgeEmblem name={badge.name} size="lg" />
                 </div>
                 
                 <div className="mt-2">
                   <h2 
-                    className="text-3xl font-black uppercase tracking-wider bg-gradient-to-b from-white via-gray-200 to-gray-400 bg-clip-text text-transparent filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+                    className="text-3xl font-black uppercase tracking-wider bg-gradient-to-b bg-clip-text text-transparent filter drop-shadow-sm"
                     style={{
                       fontFamily: "'Outfit', sans-serif",
                       backgroundImage: badge.name === "Conqueror" 
-                        ? "linear-gradient(to bottom, #fef08a, #f59e0b, #b45309)"
+                        ? "linear-gradient(to bottom, #ea580c, #9a3412)"
                         : badge.name === "Ace" || badge.name === "Ace Master" || badge.name === "Ace Dominator"
-                        ? "linear-gradient(to bottom, #fca5a5, #ef4444, #7f1d1d)"
+                        ? "linear-gradient(to bottom, #dc2626, #7f1d1d)"
                         : badge.name === "Crown"
-                        ? "linear-gradient(to bottom, #e9d5ff, #8b5cf6, #4c1d95)"
+                        ? "linear-gradient(to bottom, #7c3aed, #4c1d95)"
                         : badge.name === "Gold"
-                        ? "linear-gradient(to bottom, #fef08a, #eab308, #854d0e)"
-                        : undefined
+                        ? "linear-gradient(to bottom, #d97706, #78350f)"
+                        : "linear-gradient(to bottom, #374151, #111827)"
                     }}
                   >
                     {badge.name}
                   </h2>
-                  <p className="text-xs font-bold text-slate-400 tracking-widest mt-1 uppercase">
-                    Events Attended: <span className="text-white font-mono text-sm font-black">{eventsCount}</span>
+                  <p className="text-xs font-bold text-gray-400 tracking-widest mt-1 uppercase">
+                    Events Attended: <span className="text-gray-900 font-mono text-sm font-black">{eventsCount}</span>
                   </p>
                 </div>
               </div>
 
               {/* Progress bar container */}
-              <div className="mt-8 pt-6 border-t border-slate-800/60">
+              <div className="mt-8 pt-6 border-t border-gray-100">
                 {nextBadge ? (
                   <div>
                     {/* Labels and point counts */}
                     <div className="flex justify-between items-end mb-2 px-1">
                       <div className="flex flex-col">
-                        <span className="text-[9px] font-black uppercase text-slate-500 tracking-wider">Current Tier</span>
-                        <span className="text-xs font-bold text-slate-300">{badge.name}</span>
+                        <span className="text-[9px] font-black uppercase text-gray-400 tracking-wider">Current Tier</span>
+                        <span className="text-xs font-bold text-gray-700">{badge.name}</span>
                       </div>
-                      <div className="text-center bg-slate-950 border border-slate-800/80 px-3 py-1 rounded-full shadow-inner">
-                        <span className="text-xs font-mono font-black text-amber-400">
-                          {eventsCount} <span className="text-slate-500 text-[10px]">/</span> {nextBadge.min}
+                      <div className="text-center bg-gray-50 border border-gray-200/60 px-3 py-1 rounded-full shadow-sm">
+                        <span className="text-xs font-mono font-black text-red-600">
+                          {eventsCount} <span className="text-gray-400 text-[10px]">/</span> {nextBadge.min}
                         </span>
-                        <span className="text-[9px] font-bold text-slate-400 ml-1.5 uppercase tracking-wide">Attended</span>
+                        <span className="text-[9px] font-bold text-gray-500 ml-1.5 uppercase tracking-wide">Attended</span>
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className="text-[9px] font-black uppercase text-slate-500 tracking-wider">Next Tier</span>
-                        <span className="text-xs font-bold text-amber-500 flex items-center gap-1">
+                        <span className="text-[9px] font-black uppercase text-gray-400 tracking-wider">Next Tier</span>
+                        <span className="text-xs font-bold text-red-600 flex items-center gap-1">
                           <i className="fas fa-lock text-[9px]" /> {nextBadge.name}
                         </span>
                       </div>
                     </div>
 
                     {/* Gaming-style Progress bar */}
-                    <div className="h-3 bg-slate-950/80 rounded-full border border-slate-800 relative overflow-hidden p-0.5 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]">
+                    <div className="h-3 bg-gray-100 rounded-full border border-gray-200/80 relative overflow-hidden p-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
                       <div
-                        className="h-full rounded-full transition-all duration-700 bg-gradient-to-r relative overflow-hidden shadow-[0_0_8px_rgba(239,68,68,0.2)]"
+                        className="h-full rounded-full transition-all duration-700 bg-gradient-to-r relative overflow-hidden"
                         style={{ 
                           width: `${progressPct}%`, 
                           backgroundImage: `linear-gradient(to right, ${badge.color}, ${nextBadge.color || badge.color})` 
                         }}
                       >
                         {/* Inner shimmer animation */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" />
                       </div>
                     </div>
 
                     {/* Progression status message */}
-                    <div className="mt-3 flex flex-wrap items-center justify-between text-xs gap-2 px-1 text-slate-400">
+                    <div className="mt-3 flex flex-wrap items-center justify-between text-xs gap-2 px-1 text-gray-500">
                       <span className="flex items-center gap-1">
-                        <i className="fas fa-circle-info text-[10px] text-slate-500" />
+                        <i className="fas fa-circle-info text-[10px] text-gray-400" />
                         <span>Complete events to climb the leaderboard rank.</span>
                       </span>
-                      <span className="font-semibold text-amber-400/95 animate-pulse">
+                      <span className="font-semibold text-red-600 animate-pulse">
                         {nextBadge.min - eventsCount} more event{nextBadge.min - eventsCount !== 1 ? "s" : ""} to unlock
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-2 px-4 bg-slate-950/40 rounded-xl border border-slate-800/40">
-                    <p className="text-sm font-black uppercase text-amber-400 tracking-wider animate-pulse">
+                  <div className="text-center py-3 px-4 bg-amber-50 rounded-xl border border-amber-200/50">
+                    <p className="text-sm font-black uppercase text-amber-700 tracking-wider animate-pulse">
                       🏆 Max Rank Achieved!
                     </p>
-                    <p className="text-[10px] text-slate-500 mt-1 uppercase font-semibold">
+                    <p className="text-[10px] text-amber-600/90 mt-1 uppercase font-semibold">
                       You have attained the ultimate Conqueror status in the NIAT Tech Club.
                     </p>
                   </div>
@@ -654,7 +688,7 @@ export default function Profile() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     onClick={() => setShowLeaguesModal(false)}
-                    className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+                    className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
                   />
                   
                   {/* Modal Container */}
@@ -663,18 +697,18 @@ export default function Profile() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 15 }}
                     transition={{ type: "spring", duration: 0.4 }}
-                    className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[85vh] z-[210]"
+                    className="relative w-full max-w-2xl bg-white border border-gray-200 text-gray-900 rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[85vh] z-[210]"
                   >
-                    <div className="flex justify-between items-center border-b border-slate-800/80 pb-4 mb-6">
+                    <div className="flex justify-between items-center border-b border-gray-100 pb-4 mb-6">
                       <div className="flex items-center gap-2">
                         <i className="fas fa-trophy text-amber-500 text-lg" />
-                        <h3 className="text-lg font-black uppercase tracking-wider font-outfit" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                        <h3 className="text-lg font-black uppercase tracking-wider font-outfit text-gray-900" style={{ fontFamily: "'Outfit', sans-serif" }}>
                           Leagues Progression
                         </h3>
                       </div>
                       <button 
                         onClick={() => setShowLeaguesModal(false)}
-                        className="text-slate-400 hover:text-white transition-colors p-1"
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
                       >
                         <i className="fas fa-times text-lg" />
                       </button>
@@ -690,32 +724,32 @@ export default function Profile() {
                             key={b.name}
                             className={`flex flex-col items-center justify-between gap-3 p-3 rounded-2xl border text-center transition-all ${
                               isCurrent
-                                ? "border-amber-500 bg-slate-800/80 shadow-md shadow-amber-500/5"
+                                ? "border-amber-400 bg-amber-50/50 shadow-sm shadow-amber-500/5"
                                 : unlocked
-                                ? "border-slate-800 bg-slate-800/20"
-                                : "border-slate-800/40 bg-slate-950/40 opacity-40"
+                                ? "border-gray-200 bg-gray-50/50"
+                                : "border-gray-100 bg-gray-50/20 opacity-50"
                             }`}
                           >
                             <div className="relative flex items-center justify-center">
                               <BadgeEmblem name={b.name} size="sm" />
                               {!unlocked && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40 rounded-lg">
-                                  <i className="fas fa-lock text-[10px] text-slate-400 bg-slate-900 border border-slate-800 p-1.5 rounded-full shadow-md" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-white/20 rounded-lg">
+                                  <i className="fas fa-lock text-[10px] text-gray-400 bg-white border border-gray-200 p-1.5 rounded-full shadow-sm" />
                                 </div>
                               )}
                             </div>
                             <div className="flex flex-col items-center gap-0.5">
-                              <span className="text-[10px] font-bold text-slate-200 leading-tight">{b.name}</span>
+                              <span className="text-[10px] font-bold text-gray-800 leading-tight">{b.name}</span>
                               {isCurrent ? (
-                                <span className="text-[8px] font-black text-amber-400 uppercase tracking-widest leading-none mt-1">
+                                <span className="text-[8px] font-black text-amber-600 uppercase tracking-widest leading-none mt-1">
                                   CURRENT
                                 </span>
                               ) : unlocked ? (
-                                <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest leading-none mt-1">
+                                <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest leading-none mt-1">
                                   UNLOCKED
                                 </span>
                               ) : (
-                                <span className="text-[9px] text-slate-500 font-semibold mt-1">{b.min}+ events</span>
+                                <span className="text-[9px] text-gray-400 font-semibold mt-1">{b.min}+ events</span>
                               )}
                             </div>
                           </div>
