@@ -8,8 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 // ─── Badge System ─────────────────────────────────────────────────────────────
 // ─── Badge System ─────────────────────────────────────────────────────────────
 const BADGES = [
-  { name: "Beginner",       min: 0,  color: "#6b7280", light: "#f3f4f6", tag: "bg-gray-100 text-gray-600 border-gray-200" },
-  { name: "Bronze",         min: 1,  color: "#b45309", light: "#fffbeb", tag: "bg-amber-50 text-amber-700 border-amber-200" },
+  { name: "Bronze",         min: 0,  color: "#b45309", light: "#fffbeb", tag: "bg-amber-50 text-amber-700 border-amber-200" },
   { name: "Silver",         min: 2,  color: "#4b5563", light: "#f9fafb", tag: "bg-gray-100 text-gray-700 border-gray-300" },
   { name: "Gold",           min: 3,  color: "#d97706", light: "#fffbeb", tag: "bg-yellow-50 text-yellow-700 border-yellow-200" },
   { name: "Platinum",       min: 5,  color: "#0891b2", light: "#ecfeff", tag: "bg-cyan-50 text-cyan-700 border-cyan-200" },
@@ -64,19 +63,14 @@ function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" |
 
   const imgConfig = IMAGE_BADGES[name];
   if (imgConfig) {
-    const sizeClassesImg = {
-      sm: "w-16 h-18 object-contain",
-      md: "w-24 h-26 object-contain",
-      lg: "w-28 h-32 object-contain",
-    };
     return (
-      <div className={`relative flex flex-col items-center select-none group ${sizeClasses[size]}`}>
+      <div className={`relative flex items-center justify-center select-none group ${sizeClasses[size]}`}>
         {/* Glow effect */}
         <div className={`absolute inset-0 rounded-full ${imgConfig.glow} opacity-30 blur-xl scale-110 group-hover:scale-125 transition-transform duration-500 animate-pulse`} />
         <img
           src={imgConfig.src}
           alt={`${name} Badge`}
-          className={`${sizeClassesImg[size]} ${imgConfig.shadow} transition-transform duration-500 group-hover:scale-105 group-hover:rotate-1`}
+          className={`w-full h-full object-contain ${imgConfig.shadow} transition-transform duration-500 group-hover:scale-105 group-hover:rotate-1`}
         />
       </div>
     );
@@ -94,16 +88,6 @@ function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" |
     hasWings?: boolean;
     hasEliteWings?: boolean;
   }> = {
-    Beginner: {
-      border: ["#9ca3af", "#d1d5db", "#4b5563"],
-      fill: ["#f3f4f6", "#d1d5db"],
-      innerFill: ["#e5e7eb", "#9ca3af"],
-      icon: "fa-seedling",
-      iconColor: "text-emerald-500",
-      bannerBg: "from-gray-500 to-gray-600",
-      bannerText: "text-white",
-      numeral: "I"
-    },
     Bronze: {
       border: ["#a16207", "#ca8a04", "#78350f"],
       fill: ["#fffbeb", "#fcd34d"],
@@ -202,7 +186,7 @@ function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" |
     }
   };
 
-  const rank = rankConfig[name] || rankConfig.Beginner;
+  const rank = rankConfig[name] || rankConfig.Bronze;
   const gradBorderId = `border-${name.replace(/\s+/g, "-")}`;
   const gradFillId = `fill-${name.replace(/\s+/g, "-")}`;
   const gradInnerId = `inner-${name.replace(/\s+/g, "-")}`;
