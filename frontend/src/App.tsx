@@ -9,15 +9,32 @@ import { AuthProvider } from "./components/AuthContext";
 import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 import PageLoader from "./components/PageLoader";
 
-const Home = lazy(() => import("./pages/Home"));
-const Events = lazy(() => import("./pages/Events"));
-const Showcase = lazy(() => import("./pages/Showcase"));
-const Ideas = lazy(() => import("./pages/Ideas"));
-const Admin = lazy(() => import("./pages/Admin"));
-const OpenSource = lazy(() => import("./pages/OpenSource"));
-const Login = lazy(() => import("./pages/Login"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Learn = lazy(() => import("./pages/Learn"));
+// Helper to retry dynamic imports when they fail (e.g. due to new deployments)
+function safeLazy<T>(importFn: () => Promise<{ default: React.ComponentType<T> }>) {
+  return lazy(() =>
+    importFn().catch((err) => {
+      // Check if we already reloaded in the last 10 seconds to prevent loops
+      const lastReload = sessionStorage.getItem("last-chunk-reload");
+      const now = Date.now();
+      if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+        sessionStorage.setItem("last-chunk-reload", now.toString());
+        window.location.reload();
+        return new Promise<{ default: React.ComponentType<T> }>(() => {}); // Never resolve to stop rendering while reloading
+      }
+      throw err;
+    })
+  );
+}
+
+const Home = safeLazy(() => import("./pages/Home"));
+const Events = safeLazy(() => import("./pages/Events"));
+const Showcase = safeLazy(() => import("./pages/Showcase"));
+const Ideas = safeLazy(() => import("./pages/Ideas"));
+const Admin = safeLazy(() => import("./pages/Admin"));
+const OpenSource = safeLazy(() => import("./pages/OpenSource"));
+const Login = safeLazy(() => import("./pages/Login"));
+const Profile = safeLazy(() => import("./pages/Profile"));
+const Learn = safeLazy(() => import("./pages/Learn"));
 
 function AppContent() {
   const location = useLocation();
