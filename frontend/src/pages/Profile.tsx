@@ -27,6 +27,26 @@ const IMAGE_BADGES: Record<string, { src: string; glow: string; shadow: string }
     glow: "bg-amber-600/15",
     shadow: "drop-shadow-[0_6px_10px_rgba(180,83,9,0.35)]"
   },
+  Silver: {
+    src: "/Badges/silver.png",
+    glow: "bg-slate-400/15",
+    shadow: "drop-shadow-[0_6px_10px_rgba(75,85,99,0.3)]"
+  },
+  Gold: {
+    src: "/Badges/gold.png",
+    glow: "bg-yellow-500/15",
+    shadow: "drop-shadow-[0_6px_10px_rgba(217,119,6,0.35)]"
+  },
+  Platinum: {
+    src: "/Badges/platinum.png",
+    glow: "bg-cyan-500/15",
+    shadow: "drop-shadow-[0_6px_10px_rgba(8,145,178,0.35)]"
+  },
+  Diamond: {
+    src: "/Badges/diamond.png",
+    glow: "bg-indigo-500/15",
+    shadow: "drop-shadow-[0_6px_10px_rgba(79,70,229,0.35)]"
+  },
   Crown: {
     src: "/Badges/crown.png",
     glow: "bg-yellow-600/20",
@@ -76,288 +96,7 @@ function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" |
     );
   }
 
-  const rankConfig: Record<string, {
-    border: string[];
-    fill: string[];
-    innerFill: string[];
-    icon: string;
-    iconColor: string;
-    bannerBg: string;
-    bannerText: string;
-    numeral: string;
-    hasWings?: boolean;
-    hasEliteWings?: boolean;
-  }> = {
-    Bronze: {
-      border: ["#a16207", "#ca8a04", "#78350f"],
-      fill: ["#fffbeb", "#fcd34d"],
-      innerFill: ["#ca8a04", "#78350f"],
-      icon: "fa-parachute-box",
-      iconColor: "text-amber-500",
-      bannerBg: "from-amber-700 to-amber-800",
-      bannerText: "text-amber-100",
-      numeral: "I"
-    },
-    Silver: {
-      border: ["#9ca3af", "#f3f4f6", "#6b7280"],
-      fill: ["#f9fafb", "#d1d5db"],
-      innerFill: ["#d1d5db", "#4b5563"],
-      icon: "fa-crosshairs",
-      iconColor: "text-slate-400",
-      bannerBg: "from-slate-600 to-slate-700",
-      bannerText: "text-slate-100",
-      numeral: "I"
-    },
-    Gold: {
-      border: ["#eab308", "#fef08a", "#a16207"],
-      fill: ["#fffbeb", "#fbbf24"],
-      innerFill: ["#f59e0b", "#9a3412"],
-      icon: "fa-trophy",
-      iconColor: "text-yellow-400",
-      bannerBg: "from-yellow-600 to-yellow-700",
-      bannerText: "text-yellow-100",
-      numeral: "I"
-    },
-    Platinum: {
-      border: ["#06b6d4", "#cffafe", "#0891b2"],
-      fill: ["#ecfeff", "#67e8f9"],
-      innerFill: ["#22d3ee", "#0f766e"],
-      icon: "fa-shield-halved",
-      iconColor: "text-cyan-400",
-      bannerBg: "from-cyan-700 to-cyan-800",
-      bannerText: "text-cyan-100",
-      numeral: "I",
-      hasWings: true
-    },
-    Diamond: {
-      border: ["#3b82f6", "#bfdbfe", "#1d4ed8"],
-      fill: ["#eef2ff", "#a5b4fc"],
-      innerFill: ["#4f46e5", "#1e1b4b"],
-      icon: "fa-gem",
-      iconColor: "text-indigo-400",
-      bannerBg: "from-indigo-600 to-indigo-700",
-      bannerText: "text-indigo-100",
-      numeral: "I",
-      hasWings: true
-    },
-    Crown: {
-      border: ["#fbbf24", "#fef08a", "#7c3aed"],
-      fill: ["#f5f3ff", "#d8b4fe"],
-      innerFill: ["#7c3aed", "#2e1065"],
-      icon: "fa-crown",
-      iconColor: "text-yellow-300",
-      bannerBg: "from-purple-700 to-purple-800",
-      bannerText: "text-purple-100",
-      numeral: "I",
-      hasEliteWings: true
-    },
-    Ace: {
-      border: ["#ef4444", "#fca5a5", "#b91c1c"],
-      fill: ["#fef2f2", "#fca5a5"],
-      innerFill: ["#dc2626", "#7f1d1d"],
-      icon: "fa-fire",
-      iconColor: "text-orange-400 animate-pulse",
-      bannerBg: "from-red-700 to-red-800",
-      bannerText: "text-red-100",
-      numeral: "I",
-      hasEliteWings: true
-    },
-    "Ace Master": {
-      border: ["#c084fc", "#fae8ff", "#701a75"],
-      fill: ["#fae8ff", "#e879f9"],
-      innerFill: ["#a21caf", "#4a044e"],
-      icon: "fa-skull-crossbones",
-      iconColor: "text-fuchsia-400 animate-pulse",
-      bannerBg: "from-fuchsia-800 to-fuchsia-950",
-      bannerText: "text-fuchsia-100",
-      numeral: "I",
-      hasEliteWings: true
-    },
-    "Ace Dominator": {
-      border: ["#ec4899", "#fbcfe8", "#9d174d"],
-      fill: ["#fdf2f8", "#f472b6"],
-      innerFill: ["#be185d", "#500724"],
-      icon: "fa-award",
-      iconColor: "text-pink-300",
-      bannerBg: "from-pink-700 to-pink-900",
-      bannerText: "text-pink-100",
-      numeral: "I",
-      hasEliteWings: true
-    }
-  };
-
-  const rank = rankConfig[name] || rankConfig.Bronze;
-  const gradBorderId = `border-${name.replace(/\s+/g, "-")}`;
-  const gradFillId = `fill-${name.replace(/\s+/g, "-")}`;
-  const gradInnerId = `inner-${name.replace(/\s+/g, "-")}`;
-
-  return (
-    <div className={`relative flex flex-col items-center select-none group transition-all duration-300 hover:scale-105 ${sizeClasses[size]}`}>
-      {/* Dynamic Pulsating Glow for high ranks */}
-      {["Crown", "Ace", "Ace Master", "Ace Dominator"].includes(name) && (
-        <div 
-          className="absolute inset-0 rounded-full opacity-25 blur-xl scale-125 animate-pulse transition-transform duration-500 group-hover:scale-150" 
-          style={{ backgroundColor: rank.innerFill[0] }} 
-        />
-      )}
-
-      {/* SVG Layout */}
-      <svg viewBox="0 0 100 125" className="w-full h-auto drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]">
-        <defs>
-          <linearGradient id={gradBorderId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={rank.border[0]} />
-            <stop offset="50%" stopColor={rank.border[1] || rank.border[0]} />
-            <stop offset="100%" stopColor={rank.border[2] || rank.border[0]} />
-          </linearGradient>
-          <linearGradient id={gradFillId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={rank.fill[0]} />
-            <stop offset="100%" stopColor={rank.fill[1] || rank.fill[0]} />
-          </linearGradient>
-          <linearGradient id={gradInnerId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={rank.innerFill[0]} />
-            <stop offset="100%" stopColor={rank.innerFill[1] || rank.innerFill[0]} />
-          </linearGradient>
-        </defs>
-
-        {/* 1. WINGS BACKGROUND (Elite tiers) */}
-        {rank.hasEliteWings && (
-          <g className="transition-all duration-500 group-hover:translate-y-[-2px]">
-            {/* Left Wing */}
-            <path
-              d="M 28 25 C 10 8 0 25 10 50 C 16 62 25 55 28 45"
-              style={{ fill: `url(#${gradBorderId})` }}
-              className="drop-shadow-sm"
-            />
-            <path
-              d="M 26 30 C 14 18 6 30 14 48 C 18 55 24 50 26 42"
-              style={{ fill: `url(#${gradInnerId})` }}
-              opacity="0.9"
-            />
-            {/* Right Wing */}
-            <path
-              d="M 72 25 C 90 8 100 25 90 50 C 84 62 75 55 72 45"
-              style={{ fill: `url(#${gradBorderId})` }}
-              className="drop-shadow-sm"
-            />
-            <path
-              d="M 74 30 C 86 18 94 30 86 48 C 82 55 76 50 74 42"
-              style={{ fill: `url(#${gradInnerId})` }}
-              opacity="0.9"
-            />
-            {/* Top Crowns / Swords Accent */}
-            <polygon points="50,2 45,12 55,12" style={{ fill: `url(#${gradBorderId})` }} />
-            <circle cx="50" cy="1" r="1.5" fill="#fef08a" />
-          </g>
-        )}
-
-        {/* 2. REGULAR WINGS (Mid tiers: Platinum, Diamond) */}
-        {rank.hasWings && (
-          <g className="transition-all duration-500">
-            {/* Left Wing Tip */}
-            <path
-              d="M 25 35 C 12 30 8 40 18 48 C 22 51 25 45 25 40"
-              style={{ fill: `url(#${gradBorderId})` }}
-            />
-            {/* Right Wing Tip */}
-            <path
-              d="M 75 35 C 88 30 92 40 82 48 C 78 51 75 45 75 40"
-              style={{ fill: `url(#${gradBorderId})` }}
-            />
-          </g>
-        )}
-
-        {/* 3. HANGING RIBBON/BANNER */}
-        <g className="transition-all duration-300 group-hover:translate-y-[1px]">
-          {/* Ribbon Outer border */}
-          <path
-            d="M 30,42 L 70,42 L 70,95 L 50,114 L 30,95 Z"
-            style={{ fill: `url(#${gradBorderId})` }}
-          />
-          {/* Ribbon Inner fill */}
-          <path
-            d="M 33,42 L 67,42 L 67,92 L 50,107 L 33,92 Z"
-            style={{ fill: `url(#${gradInnerId})` }}
-          />
-          {/* Vertical Texture Stripe */}
-          <path
-            d="M 46,42 L 54,42 L 54,103 L 50,107 L 46,103 Z"
-            fill="white"
-            opacity="0.08"
-          />
-        </g>
-
-        {/* 4. METALLIC CIRCLE MEDAL */}
-        <g className="transition-all duration-500 group-hover:scale-105 origin-[50px_42px]">
-          {/* Outer circle border (Metal ring) */}
-          <circle
-            cx="50"
-            cy="42"
-            r="23"
-            style={{ fill: `url(#${gradBorderId})` }}
-          />
-          {/* Inner circle background */}
-          <circle
-            cx="50"
-            cy="42"
-            r="19"
-            style={{ fill: `url(#${gradFillId})` }}
-          />
-          {/* Decorative circular dashed line */}
-          <circle
-            cx="50"
-            cy="42"
-            r="16.5"
-            fill="none"
-            stroke="white"
-            strokeOpacity="0.25"
-            strokeWidth="0.75"
-            strokeDasharray="3,2"
-          />
-        </g>
-
-        {/* 5. RANK LEVEL SHIELD (Mini Shield at bottom of medal) */}
-        <g className="transition-all duration-300 origin-[50px_68px]">
-          {/* Mini shield border */}
-          <path
-            d="M 43,62 L 57,62 L 57,72 L 50,78 L 43,72 Z"
-            style={{ fill: `url(#${gradBorderId})` }}
-          />
-          {/* Mini shield inner */}
-          <path
-            d="M 45,63 L 55,63 L 55,71 L 50,75 L 45,71 Z"
-            fill="#111827"
-          />
-          {/* Numeral text inside shield */}
-          <text
-            x="50"
-            y="71"
-            fill="white"
-            fontSize="7"
-            fontWeight="900"
-            fontFamily="'Outfit', sans-serif"
-            textAnchor="middle"
-            className="select-none"
-            opacity="0.9"
-          >
-            {rank.numeral}
-          </text>
-        </g>
-      </svg>
-
-      {/* FontAwesome Icon Overlaid absolutely */}
-      <div className="absolute top-[32.5%] left-1/2 -translate-x-1/2 flex items-center justify-center text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] group-hover:scale-110 transition-transform duration-500">
-        <i className={`fas ${rank.icon} text-lg md:text-xl lg:text-2xl ${rank.iconColor}`} />
-      </div>
-
-      {/* Rank Name Text at bottom of banner */}
-      <div 
-        className={`absolute bottom-[16%] left-0 right-0 text-center font-black uppercase tracking-wider text-white select-none drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.85)] group-hover:scale-105 transition-transform duration-300`}
-        style={{ fontFamily: "'Outfit', sans-serif" }}
-      >
-        {name}
-      </div>
-    </div>
-  );
+  return <div className={sizeClasses[size]} />;
 }
 
 function getBadge(n: number) {
@@ -572,11 +311,41 @@ export default function Profile() {
 
               {/* Card Body: Emblem and Rank Name */}
               <div className="flex flex-col items-center text-center gap-4 py-4">
-                <div className="relative flex items-center justify-center p-3 filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.15)]">
-                  <BadgeEmblem name={badge.name} size="lg" />
+                {/* BGMI-style gold shimmering ring layout around BadgeEmblem */}
+                <div className="relative flex items-center justify-center w-52 h-52">
+                  {/* Glowing halo pulsing circle */}
+                  <div 
+                    className="absolute inset-4 rounded-full opacity-35 blur-[10px] animate-pulse transition-transform duration-500 scale-105" 
+                    style={{ backgroundColor: badge.color }}
+                  />
+
+                  {/* Golden energy ring backdrop */}
+                  <div className="absolute inset-0 rounded-full border-4 border-yellow-400/10 shadow-[0_0_20px_rgba(251,191,36,0.15)]" />
+
+                  {/* Outer spinning gold ring with dashes */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
+                    className="absolute inset-1 rounded-full border-2 border-dashed border-amber-400/60"
+                  />
+
+                  {/* Middle rotating energy arcs */}
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+                    className="absolute inset-2.5 rounded-full border-[3px] border-transparent border-t-yellow-400 border-b-amber-500 opacity-95"
+                  />
+
+                  {/* Inner gold frame border */}
+                  <div className="absolute inset-5 rounded-full border-[3px] border-yellow-500 shadow-[0_0_15px_rgba(245,158,11,0.5),inset_0_0_15px_rgba(245,158,11,0.3)] bg-gradient-to-b from-white/10 to-gray-50/10 backdrop-blur-[2px]" />
+
+                  {/* Badge emblem in the center */}
+                  <div className="relative z-10 scale-105 filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.12)]">
+                    <BadgeEmblem name={badge.name} size="lg" />
+                  </div>
                 </div>
                 
-                <div className="mt-2">
+                <div className="mt-2 flex flex-col items-center">
                   <h2 
                     className="text-3xl font-black uppercase tracking-wider bg-gradient-to-b bg-clip-text text-transparent filter drop-shadow-sm"
                     style={{
@@ -597,6 +366,15 @@ export default function Profile() {
                   <p className="text-xs font-bold text-gray-400 tracking-widest mt-1 uppercase">
                     Events Attended: <span className="text-gray-900 font-mono text-sm font-black">{eventsCount}</span>
                   </p>
+                  <div className="mt-3 flex flex-col items-center select-none">
+                    <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest leading-none">Club Score</span>
+                    <div className="mt-1 flex items-center gap-1">
+                      <span className="text-2xl font-black text-amber-500 font-outfit" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                        Score <span className="text-yellow-600">+{eventsCount * 100}</span>
+                      </span>
+                      <i className="fas fa-circle-question text-[10px] text-gray-300 hover:text-gray-400 cursor-pointer" title="Score is calculated as 100 points per event attended." />
+                    </div>
+                  </div>
                 </div>
               </div>
 
