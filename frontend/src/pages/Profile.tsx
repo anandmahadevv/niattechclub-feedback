@@ -137,16 +137,41 @@ export default function Profile() {
   const [rsvpsLoading, setRsvpsLoading] = useState(true);
   const [tab, setTab] = useState<"overview" | "events" | "edit">("overview");
   const [showLeaguesModal, setShowLeaguesModal] = useState(false);
+  const [prCount, setPrCount] = useState(0);
+  const [prLoading, setPrLoading] = useState(true);
 
   useEffect(() => {
     if (!loading) {
       if (!user) navigate("/login?redirect=/profile");
       else {
         setFormData({ name: user.name || "", rollNumber: user.roll_number || "", department: user.department || "", githubUsername: user.github_username || "" });
+        
+        // Fetch RSVPs
         supabase.from("rsvps").select("event_slug").eq("email", user.email).then(({ data }) => {
           setUserRsvps(data || []);
           setRsvpsLoading(false);
         });
+
+        // Fetch GitHub PR contributions from leaderboard
+        if (user.github_username) {
+          setPrLoading(true);
+          supabase
+            .from("leaderboard")
+            .select("merged_prs")
+            .eq("github_username", user.github_username.toLowerCase())
+            .maybeSingle()
+            .then(({ data }) => {
+              if (data) {
+                setPrCount(data.merged_prs || 0);
+              } else {
+                setPrCount(0);
+              }
+              setPrLoading(false);
+            });
+        } else {
+          setPrCount(0);
+          setPrLoading(false);
+        }
       }
     }
   }, [user, loading, navigate]);
@@ -196,10 +221,11 @@ export default function Profile() {
   const attendedEvents = ALL_EVENTS.filter(e => attendedSlugs.has(e.slug));
   const registeredEvents = ALL_EVENTS.filter(e => registeredSlugs.has(e.slug));
   const eventsCount = attendedEvents.length;
+  const contributionScore = eventsCount + prCount;
 
-  const badge = getBadge(eventsCount);
-  const nextBadge = getNextBadge(eventsCount);
-  const progressPct = nextBadge ? Math.min(100, (eventsCount / nextBadge.min) * 100) : 100;
+  const badge = getBadge(contributionScore);
+  const nextBadge = getNextBadge(contributionScore);
+  const progressPct = nextBadge ? Math.min(100, (contributionScore / nextBadge.min) * 100) : 100;
   const firstLetter = (formData.name || user.email || "U").charAt(0).toUpperCase();
 
   const TABS = [
@@ -356,9 +382,24 @@ export default function Profile() {
                   >
                     {badge.name}
                   </h2>
-                  <p className="text-xs font-bold text-gray-400 tracking-widest mt-1 uppercase">
-                    Events Attended: <span className="text-gray-900 font-mono text-sm font-black">{eventsCount}</span>
-                  </p>
+                  
+                  {/* Contribution Stats Breakdown */}
+                  <div className="mt-4 flex gap-4 text-center items-center justify-center select-none bg-gray-50 border border-gray-100 rounded-2xl px-4 py-2.5 shadow-sm">
+                    <div>
+                      <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest leading-none">Events</p>
+                      <p className="font-mono text-xs font-black text-gray-800 mt-1">{eventsCount}</p>
+                    </div>
+                    <div className="h-6 w-px bg-gray-200" />
+                    <div>
+                      <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest leading-none">PRs Merged</p>
+                      <p className="font-mono text-xs font-black text-gray-800 mt-1">{prCount}</p>
+                    </div>
+                    <div className="h-6 w-px bg-gray-200" />
+                    <div>
+                      <p className="text-[9px] text-red-600 font-black uppercase tracking-widest leading-none">Total Pts</p>
+                      <p className="font-mono text-xs font-black text-red-600 mt-1">{contributionScore}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -374,9 +415,9 @@ export default function Profile() {
                       </div>
                       <div className="text-center bg-gray-50 border border-gray-200/60 px-3 py-1 rounded-full shadow-sm">
                         <span className="text-xs font-mono font-black text-red-600">
-                          {eventsCount} <span className="text-gray-400 text-[10px]">/</span> {nextBadge.min}
+                          {contributionScore} <span className="text-gray-400 text-[10px]">/</span> {nextBadge.min}
                         </span>
-                        <span className="text-[9px] font-bold text-gray-500 ml-1.5 uppercase tracking-wide">Attended</span>
+                        <span className="text-[9px] font-bold text-gray-500 ml-1.5 uppercase tracking-wide">Pts</span>
                       </div>
                       <div className="flex flex-col items-end">
                         <span className="text-[9px] font-black uppercase text-gray-400 tracking-wider">Next Tier</span>
@@ -404,10 +445,10 @@ export default function Profile() {
                     <div className="mt-3 flex flex-wrap items-center justify-between text-xs gap-2 px-1 text-gray-500">
                       <span className="flex items-center gap-1">
                         <i className="fas fa-circle-info text-[10px] text-gray-400" />
-                        <span>Complete events to climb the leaderboard rank.</span>
+                        <span>Contribute code & attend events to rank up.</span>
                       </span>
                       <span className="font-semibold text-red-600 animate-pulse">
-                        {nextBadge.min - eventsCount} more event{nextBadge.min - eventsCount !== 1 ? "s" : ""} to unlock
+                        {nextBadge.min - contributionScore} more point{nextBadge.min - contributionScore !== 1 ? "s" : ""} to unlock
                       </span>
                     </div>
                   </div>
@@ -463,7 +504,7 @@ export default function Profile() {
                     {/* Leagues Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {BADGES.map(b => {
-                        const unlocked = eventsCount >= b.min;
+                        const unlocked = contributionScore >= b.min;
                         const isCurrent = badge.name === b.name;
                         return (
                           <div
@@ -495,7 +536,7 @@ export default function Profile() {
                                   UNLOCKED
                                 </span>
                               ) : (
-                                <span className="text-[9px] text-gray-400 font-semibold mt-1">{b.min}+ events</span>
+                                <span className="text-[9px] text-gray-400 font-semibold mt-1">{b.min}+ pts</span>
                               )}
                             </div>
                           </div>
