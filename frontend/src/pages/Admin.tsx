@@ -442,6 +442,7 @@ function EventsTab() {
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
               <th className="p-4 font-semibold">Name</th>
+              <th className="p-4 font-semibold">Campus ID</th>
               <th className="p-4 font-semibold">Email</th>
               <th className="p-4 font-semibold">Attendance</th>
               <th className="p-4 font-semibold">RSVP Date</th>
@@ -455,8 +456,9 @@ function EventsTab() {
                     {rsvp.attended && <span className="px-2 py-0.5 rounded bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider border border-green-200 shadow-sm"><i className="fas fa-check mr-1"></i>Checked In</span>}
                     {rsvp.name}
                   </div>
-                  <div className="text-xs text-gray-400 font-medium mt-1">Ticket #{rsvp.id} {rsvp.phone && `• Campus ID: ${rsvp.phone}`}</div>
+                  <div className="text-xs text-gray-400 font-medium mt-1">Ticket #{rsvp.id}</div>
                 </td>
+                <td className="p-4 text-gray-700 dark:text-slate-300 font-bold">{rsvp.phone || "N/A"}</td>
                 <td className="p-4 text-gray-600">{rsvp.email}</td>
                 <td className="p-4">
                   {rsvp.attended ? (
@@ -470,7 +472,7 @@ function EventsTab() {
             ))}
             {filteredRsvps.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-gray-500">No RSVPs yet for this event.</td>
+                <td colSpan={5} className="p-8 text-center text-gray-500">No RSVPs yet for this event.</td>
               </tr>
             )}
           </tbody>
