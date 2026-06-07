@@ -20,11 +20,6 @@ const BADGES = [
   { name: "Conqueror",      min: 50, color: "#ea580c", light: "#fff7ed", tag: "bg-orange-50 text-orange-700 border-orange-200" },
 ];
 
-const BADGE_ICONS: Record<string, string> = {
-  Beginner: "🌱", Bronze: "🥉", Silver: "🥈", Gold: "🥇",
-  Platinum: "💎", Diamond: "💠", Crown: "👑", Ace: "⚡",
-  "Ace Master": "💀", "Ace Dominator": "🏅", Conqueror: "🏆"
-};
 
 function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
   const sizeClasses = {
@@ -474,9 +469,6 @@ export default function Profile() {
             <div className="flex-grow min-w-0">
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-xl font-bold text-gray-900 truncate">{formData.name || "Member"}</h1>
-                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badge.tag}`}>
-                  {BADGE_ICONS[badge.name]} {badge.name}
-                </span>
               </div>
               <p className="text-sm text-gray-400 mt-0.5">{user.email}</p>
               <div className="flex flex-wrap gap-2 mt-2">
@@ -497,19 +489,6 @@ export default function Profile() {
                   </>
                 )}
               </div>
-            </div>
-
-            {/* Quick stats */}
-            <div className="flex gap-6 flex-shrink-0">
-              {[
-                { n: attendedEvents.length, label: "Attended" },
-                { n: registeredEvents.length, label: "Registered" },
-              ].map(s => (
-                <div key={s.label} className="text-center">
-                  <p className="text-2xl font-black text-gray-900">{s.n}</p>
-                  <p className="text-xs text-gray-400 font-medium">{s.label}</p>
-                </div>
-              ))}
             </div>
           </div>
         </div>
@@ -539,85 +518,116 @@ export default function Profile() {
 
         {/* OVERVIEW */}
         {tab === "overview" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="max-w-xl mx-auto">
+            <div className="relative bg-slate-900 border border-slate-800 text-white rounded-3xl p-8 shadow-2xl overflow-hidden group transition-all duration-500 hover:border-slate-700/80">
+              {/* Active rank glow background */}
+              <div 
+                className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-25 blur-[100px] pointer-events-none animate-pulse" 
+                style={{ backgroundColor: badge.color }}
+              />
+              <div 
+                className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full opacity-20 blur-[100px] pointer-events-none animate-pulse" 
+                style={{ backgroundColor: badge.color }}
+              />
 
-            {/* Current rank card */}
-            <div className="md:col-span-1">
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Current Rank</p>
-                <div className="flex flex-col items-center text-center gap-3 py-2">
-                  <div className="flex items-center justify-center p-2 mb-2">
-                    <BadgeEmblem name={badge.name} size="lg" />
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-gray-900">{badge.name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{eventsCount} event{eventsCount !== 1 ? "s" : ""} attended</p>
-                  </div>
+              {/* Card Header */}
+              <div className="flex justify-between items-center border-b border-slate-800/80 pb-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                  <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">NIAT Battlegrounds Rank</span>
                 </div>
+                <span className="text-xs font-mono font-bold text-slate-500">ID: #{formData.rollNumber || "GUEST"}</span>
+              </div>
 
-                {nextBadge && (
-                  <div className="mt-5 pt-5 border-t border-gray-100">
-                    <div className="flex justify-between items-center mb-1.5">
-                      <span className="text-xs text-gray-400">Next: <strong className="text-gray-700">{nextBadge.name}</strong></span>
-                      <span className="text-xs text-gray-400 tabular-nums">{eventsCount}/{nextBadge.min}</span>
+              {/* Card Body: Emblem and Rank Name */}
+              <div className="flex flex-col items-center text-center gap-4 py-4">
+                <div className="relative flex items-center justify-center p-3 filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)]">
+                  <BadgeEmblem name={badge.name} size="lg" />
+                </div>
+                
+                <div className="mt-2">
+                  <h2 
+                    className="text-3xl font-black uppercase tracking-wider bg-gradient-to-b from-white via-gray-200 to-gray-400 bg-clip-text text-transparent filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+                    style={{
+                      fontFamily: "'Outfit', sans-serif",
+                      backgroundImage: badge.name === "Conqueror" 
+                        ? "linear-gradient(to bottom, #fef08a, #f59e0b, #b45309)"
+                        : badge.name === "Ace" || badge.name === "Ace Master" || badge.name === "Ace Dominator"
+                        ? "linear-gradient(to bottom, #fca5a5, #ef4444, #7f1d1d)"
+                        : badge.name === "Crown"
+                        ? "linear-gradient(to bottom, #e9d5ff, #8b5cf6, #4c1d95)"
+                        : badge.name === "Gold"
+                        ? "linear-gradient(to bottom, #fef08a, #eab308, #854d0e)"
+                        : undefined
+                    }}
+                  >
+                    {badge.name}
+                  </h2>
+                  <p className="text-xs font-bold text-slate-400 tracking-widest mt-1 uppercase">
+                    Events Attended: <span className="text-white font-mono text-sm font-black">{eventsCount}</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress bar container */}
+              <div className="mt-8 pt-6 border-t border-slate-800/60">
+                {nextBadge ? (
+                  <div>
+                    {/* Labels and point counts */}
+                    <div className="flex justify-between items-end mb-2 px-1">
+                      <div className="flex flex-col">
+                        <span className="text-[9px] font-black uppercase text-slate-500 tracking-wider">Current Tier</span>
+                        <span className="text-xs font-bold text-slate-300">{badge.name}</span>
+                      </div>
+                      <div className="text-center bg-slate-950 border border-slate-800/80 px-3 py-1 rounded-full shadow-inner">
+                        <span className="text-xs font-mono font-black text-amber-400">
+                          {eventsCount} <span className="text-slate-500 text-[10px]">/</span> {nextBadge.min}
+                        </span>
+                        <span className="text-[9px] font-bold text-slate-400 ml-1.5 uppercase tracking-wide">Attended</span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-[9px] font-black uppercase text-slate-500 tracking-wider">Next Tier</span>
+                        <span className="text-xs font-bold text-amber-500 flex items-center gap-1">
+                          <i className="fas fa-lock text-[9px]" /> {nextBadge.name}
+                        </span>
+                      </div>
                     </div>
-                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+
+                    {/* Gaming-style Progress bar */}
+                    <div className="h-3 bg-slate-950/80 rounded-full border border-slate-800 relative overflow-hidden p-0.5 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]">
                       <div
-                        className="h-full rounded-full transition-all duration-700"
-                        style={{ width: `${progressPct}%`, background: badge.color }}
-                      />
+                        className="h-full rounded-full transition-all duration-700 bg-gradient-to-r relative overflow-hidden shadow-[0_0_8px_rgba(239,68,68,0.2)]"
+                        style={{ 
+                          width: `${progressPct}%`, 
+                          backgroundImage: `linear-gradient(to right, ${badge.color}, ${nextBadge.color || badge.color})` 
+                        }}
+                      >
+                        {/* Inner shimmer animation */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-400 mt-2">
-                      {nextBadge.min - eventsCount} more event{nextBadge.min - eventsCount !== 1 ? "s" : ""} to unlock
+
+                    {/* Progression status message */}
+                    <div className="mt-3 flex flex-wrap items-center justify-between text-xs gap-2 px-1 text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <i className="fas fa-circle-info text-[10px] text-slate-500" />
+                        <span>Complete events to climb the leaderboard rank.</span>
+                      </span>
+                      <span className="font-semibold text-amber-400/95 animate-pulse">
+                        {nextBadge.min - eventsCount} more event{nextBadge.min - eventsCount !== 1 ? "s" : ""} to unlock
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-2 px-4 bg-slate-950/40 rounded-xl border border-slate-800/40">
+                    <p className="text-sm font-black uppercase text-amber-400 tracking-wider animate-pulse">
+                      🏆 Max Rank Achieved!
+                    </p>
+                    <p className="text-[10px] text-slate-500 mt-1 uppercase font-semibold">
+                      You have attained the ultimate Conqueror status in the NIAT Tech Club.
                     </p>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* All ranks */}
-            <div className="md:col-span-2">
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">All Ranks</p>
-                <div className="grid grid-cols-4 gap-3">
-                  {BADGES.map(b => {
-                    const unlocked = eventsCount >= b.min;
-                    const isCurrent = badge.name === b.name;
-                    return (
-                      <div
-                        key={b.name}
-                        className={`flex flex-col items-center justify-between gap-2 p-3 rounded-xl border text-center transition-all ${
-                          isCurrent
-                            ? "border-gray-900 bg-gray-50 shadow-sm"
-                            : unlocked
-                            ? "border-gray-100 bg-white"
-                            : "border-gray-100 bg-gray-50 opacity-50"
-                        }`}
-                        title={`${b.name}: ${b.min}+ events`}
-                      >
-                        <div className="relative flex items-center justify-center">
-                          <BadgeEmblem name={b.name} size="sm" />
-                          {!unlocked && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/10 rounded-lg backdrop-blur-[0.5px]">
-                              <i className="fas fa-lock text-[10px] text-gray-400 bg-white/95 p-1 rounded-full shadow-sm" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-col items-center gap-1 mt-1">
-                          <span className="text-[10px] font-semibold text-gray-700 leading-tight">{b.name}</span>
-                          {isCurrent && (
-                            <span className="text-[8px] font-black text-white px-1.5 py-0.5 rounded-full leading-none" style={{ background: badge.color }}>
-                              YOU
-                            </span>
-                          )}
-                          {!unlocked && (
-                            <span className="text-[9px] text-gray-400 font-medium">{b.min}+ events</span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
               </div>
             </div>
           </div>
