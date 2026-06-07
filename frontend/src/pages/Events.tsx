@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../components/AuthContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Events() {
   const { user } = useAuth();
@@ -9,6 +10,8 @@ export default function Events() {
   const [rsvpCount, setRsvpCount] = useState<number>(0);
   const [isRsvped, setIsRsvped] = useState(false);
   const [attendees, setAttendees] = useState<{ id: number; name: string; created_at: string }[]>([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false);
 
   const fetchRsvps = useCallback(async () => {
     const { data, error, count } = await supabase
@@ -66,6 +69,61 @@ export default function Events() {
 
   const remainingSlots = Math.max(0, TOTAL_SLOTS - rsvpCount);
   const isFull = remainingSlots === 0;
+
+  const submitRsvp = async () => {
+    if (!user) return;
+    if (isFull) return;
+    
+    if (!user.email.endsWith('@yenepoya.edu.in')) {
+      const { toast } = await import('sonner');
+      toast.error('Only @yenepoya.edu.in email addresses are allowed to RSVP.');
+      return;
+    }
+    
+    setIsSubmittingRsvp(true);
+    
+    try {
+      const { data: existingRsvp } = await supabase
+        .from('rsvps')
+        .select('id')
+        .eq('event_slug', 'promptwars')
+        .eq('email', user.email)
+        .maybeSingle();
+        
+      if (existingRsvp) {
+        throw new Error("You have already RSVP'd for this event with this email.");
+      }
+
+      const { data: newRsvpData, error } = await supabase.from('rsvps').insert([
+        { event_slug: 'promptwars', name: user.name, email: user.email }
+      ]).select();
+      
+      if (error) throw error;
+      
+      const rsvpId = newRsvpData && newRsvpData[0] ? newRsvpData[0].id : null;
+      
+      try {
+        await fetch('/api/send-rsvp-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: user.name, email: user.email, rsvpId })
+        });
+      } catch (emailError) {
+        console.error("Failed to send confirmation email:", emailError);
+      }
+      
+      const { toast } = await import('sonner');
+      toast.success("RSVP successful! Confirmation email sent.");
+      fetchRsvps();
+      setIsRsvped(true);
+      setShowConfirmModal(false);
+    } catch (error: any) {
+      const { toast } = await import('sonner');
+      toast.error(error.message || "Failed to submit RSVP.");
+    } finally {
+      setIsSubmittingRsvp(false);
+    }
+  };
 
   return (
     <div className="flex-grow w-full flex flex-col">
@@ -245,108 +303,33 @@ export default function Events() {
                       </span>
                     </div>
                     
-                    <form className="space-y-4" onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (isFull) return;
-                      const form = e.target as HTMLFormElement;
-                      const name = (form.elements.namedItem('name') as HTMLInputElement).value;
-                      const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-                      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-                      
-                      if (!email.endsWith('@yenepoya.edu.in')) {
-                        const { toast } = await import('sonner');
-                        toast.error('Only @yenepoya.edu.in email addresses are allowed to RSVP.');
-                        return;
-                      }
-                      
-                      submitBtn.disabled = true;
-                      
-                      try {
-                        const { supabase } = await import('../lib/supabase');
-                        const { toast } = await import('sonner');
-                        
-                        // Check if email already RSVP'd
-                        const { data: existingRsvp } = await supabase
-                          .from('rsvps')
-                          .select('id')
-                          .eq('event_slug', 'promptwars')
-                          .eq('email', email)
-                          .single();
-                          
-                        if (existingRsvp) {
-                          throw new Error("You have already RSVP'd for this event with this email.");
-                        }
+                    <div className="bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 rounded-2xl p-5 shadow-sm mb-6 flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg flex-shrink-0">
+                        <i className="fas fa-user-circle"></i>
+                      </div>
+                      <div className="min-w-0 flex-grow">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Registering as</p>
+                        <p className="text-sm font-extrabold text-gray-900 dark:text-slate-100 truncate">{user?.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+                      </div>
+                    </div>
 
-                        const { data: newRsvpData, error } = await supabase.from('rsvps').insert([
-                          { event_slug: 'promptwars', name, email }
-                        ]).select();
-                        
-                        if (error) throw error;
-                        
-                        const rsvpId = newRsvpData && newRsvpData[0] ? newRsvpData[0].id : null;
-                        
-                        // Send confirmation email via Vercel Serverless Function
-                        try {
-                          await fetch('/api/send-rsvp-email', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name, email, rsvpId })
+                    <button
+                      onClick={() => {
+                        if (isFull) return;
+                        if (!user?.email?.endsWith('@yenepoya.edu.in')) {
+                          import('sonner').then(({ toast }) => {
+                            toast.error('Only @yenepoya.edu.in email addresses are allowed to RSVP.');
                           });
-                        } catch (emailError) {
-                          console.error("Failed to send confirmation email:", emailError);
+                          return;
                         }
-                        
-                        toast.success("RSVP successful! Confirmation email sent.");
-                        fetchRsvps(); // Instantly fetch new list
-                        setIsRsvped(true);
-                      } catch (error: any) {
-                        const { toast } = await import('sonner');
-                        toast.error(error.message || "Failed to submit RSVP.");
-                        submitBtn.disabled = false;
-                      }
-                    }}>
-                  <div>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                        <i className="fas fa-user text-sm"></i>
-                      </div>
-                      <input
-                        type="text"
-                        name="name"
-                        required
-                        defaultValue={user?.name || ""}
-                        className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all text-sm"
-                        placeholder="Full Name"
-                        maxLength={50} pattern="^[a-zA-Z\s]+$" title="Only letters and spaces are allowed"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                        <i className="fas fa-envelope text-sm"></i>
-                      </div>
-                      <input
-                        type="email"
-                        name="email"
-                        required
-                        defaultValue={user?.email || ""}
-                        pattern=".*@yenepoya\.edu\.in$"
-                        title="Please enter your @yenepoya.edu.in email address"
-                        className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all text-sm"
-                        placeholder="Email Address (@yenepoya.edu.in)"
-                        maxLength={100}
-                      />
-                    </div>
-                  </div>
-                      <button
-                        type="submit"
-                        disabled={isFull}
-                        className="w-full py-3 px-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isFull ? 'Registration Closed' : 'Confirm RSVP'} <i className={`fas ${isFull ? 'fa-ban' : 'fa-check-circle'}`}></i>
-                      </button>
-                    </form>
+                        setShowConfirmModal(true);
+                      }}
+                      disabled={isFull}
+                      className="w-full py-3.5 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      {isFull ? 'Registration Closed' : 'Register RSVP'} <i className={`fas ${isFull ? 'fa-ban' : 'fa-arrow-right'}`}></i>
+                    </button>
                   </>
                 )}
 
@@ -403,6 +386,89 @@ export default function Events() {
           </div>
         </div>
       </main>
+
+      <AnimatePresence>
+        {user && showConfirmModal && (
+          <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => { if (!isSubmittingRsvp) setShowConfirmModal(false); }}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+            />
+            
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
+              className="relative bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl overflow-hidden z-10"
+            >
+              {/* Premium Glow Top bar */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600" />
+              
+              {/* Content */}
+              <div className="flex flex-col items-center text-center mt-4">
+                <div className="w-14 h-14 bg-purple-50 dark:bg-purple-950/50 rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-400 mb-4 shadow-inner">
+                  <i className="fas fa-ticket-alt text-2xl"></i>
+                </div>
+                
+                <h3 className="text-xl font-extrabold text-gray-900 dark:text-white mb-2 font-sans">
+                  Confirm RSVP
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6 font-sans">
+                  Are you sure you want to register for <strong className="text-purple-600 dark:text-purple-400">PromptWars</strong>? This will reserve your slot.
+                </p>
+                
+                {/* Details Card */}
+                <div className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800/80 rounded-2xl p-4 mb-6 text-left space-y-3">
+                  <div>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block font-sans">Attendee Name</span>
+                    <span className="text-sm font-extrabold text-gray-900 dark:text-slate-100 font-sans">{user.name}</span>
+                  </div>
+                  <div className="border-t border-gray-100 dark:border-slate-800/50 pt-3">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block font-sans">Yenepoya Email</span>
+                    <span className="text-sm font-bold text-gray-900 dark:text-slate-100 break-all font-sans">{user.email}</span>
+                  </div>
+                </div>
+                
+                {/* Buttons */}
+                <div className="flex w-full gap-3">
+                  <button
+                    disabled={isSubmittingRsvp}
+                    onClick={() => setShowConfirmModal(false)}
+                    className="flex-1 py-3 px-4 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-500 dark:text-gray-400 font-bold rounded-xl transition-colors text-sm disabled:opacity-50 cursor-pointer font-sans"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    disabled={isSubmittingRsvp}
+                    onClick={submitRsvp}
+                    className="flex-1 py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm disabled:opacity-50 cursor-pointer font-sans"
+                  >
+                    {isSubmittingRsvp ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Confirming...
+                      </>
+                    ) : (
+                      <>
+                        Yes, Confirm <i className="fas fa-check-circle text-xs"></i>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
