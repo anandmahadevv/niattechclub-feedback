@@ -33,7 +33,12 @@ export default function Admin() {
     );
   }
 
-  const isAdmin = user && user.email === "anandgowda82961@gmail.com";
+  const ADMIN_EMAILS = [
+    "anandgowda82961@gmail.com",
+    "dineshyr2904@gmail.com",
+    "dshenoyh@gmail.com"
+  ];
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
   const handleLogout = async () => {
     await signOut();
