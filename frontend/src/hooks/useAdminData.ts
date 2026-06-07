@@ -10,6 +10,36 @@ export interface Idea {
   date: string;
 }
 
+export interface Member {
+  id: number;
+  name: string;
+  role: string;
+  created_at: string;
+}
+
+export interface Event {
+  id: number;
+  slug: string;
+  title: string;
+  type: string;
+  status: string;
+  date: string;
+  location: string | null;
+  description: string | null;
+  image_url: string | null;
+  created_at: string;
+}
+
+export interface RSVP {
+  id: number;
+  event_slug: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  attended: boolean;
+  created_at: string;
+}
+
 export interface Project {
   id: number;
   name: string;
@@ -26,6 +56,9 @@ export interface Project {
 export function useAdminData() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [rsvps, setRsvps] = useState<RSVP[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load from Supabase on mount
@@ -57,6 +90,42 @@ export function useAdminData() {
         console.error("Error fetching projects:", projectsError);
       }
       
+      // Fetch RSVPs
+      const { data: rsvpsData, error: rsvpsError } = await supabase
+        .from('rsvps')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (!rsvpsError && rsvpsData) {
+        setRsvps(rsvpsData as RSVP[]);
+      } else {
+        console.error("Error fetching RSVPs:", rsvpsError);
+      }
+
+      // Fetch Members
+      const { data: membersData, error: membersError } = await supabase
+        .from('members')
+        .select('*')
+        .order('id', { ascending: true });
+        
+      if (!membersError && membersData) {
+        setMembers(membersData as Member[]);
+      } else {
+        console.error("Error fetching Members:", membersError);
+      }
+
+      // Fetch Events
+      const { data: eventsData, error: eventsError } = await supabase
+        .from('events')
+        .select('*')
+        .order('id', { ascending: false });
+        
+      if (!eventsError && eventsData) {
+        setEvents(eventsData as Event[]);
+      } else {
+        console.error("Error fetching Events:", eventsError);
+      }
+      
       setLoading(false);
     }
 
@@ -77,9 +146,30 @@ export function useAdminData() {
       })
       .subscribe();
 
+    const rsvpsSubscription = supabase.channel(`custom-all-rsvps-${channelId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvps' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
+    const membersSubscription = supabase.channel(`custom-all-members-${channelId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
+    const eventsSubscription = supabase.channel(`custom-all-events-${channelId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(ideasSubscription);
       supabase.removeChannel(projectsSubscription);
+      supabase.removeChannel(rsvpsSubscription);
+      supabase.removeChannel(membersSubscription);
+      supabase.removeChannel(eventsSubscription);
     };
   }, []);
 
@@ -177,6 +267,47 @@ export function useAdminData() {
     }
   };
 
+  const addMember = async (member: Omit<Member, "id" | "created_at">) => {
+    const { error } = await supabase.from('members').insert(member);
+    if (error) throw error;
+  };
+
+  const deleteMember = async (id: number) => {
+    const { error } = await supabase.from('members').delete().eq('id', id);
+    if (error) throw error;
+  };
+
+  const addEvent = async (event: Omit<Event, "id" | "created_at">) => {
+    const { error } = await supabase.from('events').insert(event);
+    if (error) throw error;
+  };
+
+  const deleteEvent = async (id: number) => {
+    const { error } = await supabase.from('events').delete().eq('id', id);
+    if (error) throw error;
+  };
+
+  const markAttendance = async (id: number) => {
+    // Optimistic UI update
+    setRsvps((prev) => 
+      prev.map((r) => r.id === id ? { ...r, attended: true } : r)
+    );
+    
+    const { error } = await supabase
+      .from('rsvps')
+      .update({ attended: true })
+      .eq('id', id);
+      
+    if (error) {
+      console.error("Failed to mark attendance:", error);
+      // Revert if error
+      setRsvps((prev) => 
+        prev.map((r) => r.id === id ? { ...r, attended: false } : r)
+      );
+      throw error;
+    }
+  };
+
   return {
     ideas,
     addIdea,
@@ -186,6 +317,14 @@ export function useAdminData() {
     deleteProject,
     publishProject,
     upvoteProject,
+    rsvps,
+    members,
+    addMember,
+    deleteMember,
+    events,
+    addEvent,
+    deleteEvent,
+    markAttendance,
     loading
   };
 }
