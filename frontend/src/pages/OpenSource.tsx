@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
 import Tilt from "react-parallax-tilt";
 import Leaderboard from "../components/Leaderboard";
 
-const repos = [
+const DEFAULT_REPOS = [
   {
     id: 1,
     name: "first-contributions / first-contributions",
@@ -58,7 +60,62 @@ const repos = [
   }
 ];
 
+function parseArrayField(val: any): string[] {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+      try {
+        return JSON.parse(val);
+      } catch (e) {
+        // Fallback to comma separation on parse error
+      }
+    }
+    return val.split(',').map(v => v.trim()).filter(v => v !== '');
+  }
+  return [];
+}
+
 export default function OpenSource() {
+  const [dbRepos, setDbRepos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadRepos() {
+      try {
+        const { data, error } = await supabase
+          .from("tracked_repos")
+          .select("*")
+          .order("id", { ascending: true });
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          const formatted = data.map(r => ({
+            id: r.id,
+            name: `${r.owner} / ${r.repo}`,
+            description: r.description || "Tracked repository for community contributions.",
+            motive: r.motive || "Contribute to open source",
+            languages: parseArrayField(r.languages),
+            link: r.link || `https://github.com/${r.owner}/${r.repo}`,
+            tags: parseArrayField(r.tags),
+          }));
+          setDbRepos(formatted);
+        } else {
+          setDbRepos([]);
+        }
+      } catch (err) {
+        console.error("Error loading repos from database:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadRepos();
+  }, []);
+
+  const displayRepos = dbRepos.length > 0 ? dbRepos : DEFAULT_REPOS;
+
   return (
     <div className="flex-grow w-full flex flex-col pb-20">
       <header className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center w-full">
@@ -83,14 +140,19 @@ export default function OpenSource() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-          {repos.map((repo) => (
-            <Tilt key={repo.id} tiltMaxAngleX={4} tiltMaxAngleY={4} scale={1.02} transitionSpeed={2000} className="w-full flex">
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {displayRepos.map((repo) => (
+              <Tilt key={repo.id} tiltMaxAngleX={4} tiltMaxAngleY={4} scale={1.02} transitionSpeed={2000} className="w-full flex">
               <article className="flex flex-col w-full bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all p-6">
                 <div className="mb-4">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{repo.name}</h3>
                   <div className="flex flex-wrap gap-1 mb-3">
-                    {repo.languages.map((lang, idx) => (
+                    {repo.languages.map((lang: string, idx: number) => (
                       <span key={idx} className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded-md text-[10px] font-bold uppercase tracking-wider">{lang}</span>
                     ))}
                   </div>
@@ -105,7 +167,7 @@ export default function OpenSource() {
                 
                 <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
                   <div className="flex flex-wrap gap-1">
-                    {repo.tags.map((tag, idx) => (
+                    {repo.tags.map((tag: string, idx: number) => (
                       <span key={idx} className="px-2.5 py-0.5 bg-gray-100 text-gray-600 rounded-md text-[10px] font-bold uppercase tracking-wider">{tag}</span>
                     ))}
                   </div>
@@ -116,8 +178,9 @@ export default function OpenSource() {
                 </div>
               </article>
             </Tilt>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAdminData } from "../hooks/useAdminData";
 import { useAuth } from "../components/AuthContext";
+import { supabase } from "../lib/supabase";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { Scanner } from '@yudiel/react-qr-scanner';
 
@@ -156,6 +157,12 @@ export default function Admin() {
             icon="fa-envelope"
             label="Communications"
           />
+          <SidebarButton 
+            active={activeTab === "resources"} 
+            onClick={() => { setActiveTab("resources"); setIsSidebarOpen(false); }}
+            icon="fa-folder-open"
+            label="Resources"
+          />
         </nav>
 
         <div className="p-4 border-t border-gray-100 bg-white">
@@ -197,6 +204,7 @@ export default function Admin() {
           {activeTab === "projects" && <ProjectsTab />}
           {activeTab === "members" && <MembersTab />}
           {activeTab === "communications" && <CommunicationsTab />}
+          {activeTab === "resources" && <ResourcesTab />}
         </div>
       </main>
     </div>
@@ -807,6 +815,220 @@ function ScannerTab() {
         )}
       </div>
       <p className="text-center text-gray-500 mt-6 text-sm">Please allow camera permissions if prompted.</p>
+    </div>
+  );
+}
+
+function ResourcesTab() {
+  const [repos, setRepos] = useState<any[]>([]);
+  const [learning, setLearning] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Forms states
+  const [newRepo, setNewRepo] = useState({ owner: "", repo: "", description: "", motive: "", languages: "", tags: "", link: "" });
+  const [newResource, setNewResource] = useState({ title: "", description: "", url: "", type: "video", duration: "", author: "", level: "Beginner", free: true, category: "web" });
+
+  const fetchResources = async () => {
+    setLoading(true);
+    try {
+      const { data: repoData, error: repoErr } = await supabase.from("tracked_repos").select("*").order("id", { ascending: false });
+      if (!repoErr && repoData) setRepos(repoData);
+
+      const { data: learnData, error: learnErr } = await supabase.from("learning_resources").select("*").order("id", { ascending: false });
+      if (!learnErr && learnData) setLearning(learnData);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchResources();
+  }, []);
+
+  const handleAddRepo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRepo.owner || !newRepo.repo) return;
+    try {
+      const { error } = await supabase.from("tracked_repos").insert([{
+        owner: newRepo.owner.trim(),
+        repo: newRepo.repo.trim(),
+        description: newRepo.description.trim() || null,
+        motive: newRepo.motive.trim() || null,
+        languages: newRepo.languages.trim() || null,
+        tags: newRepo.tags.trim() || null,
+        link: newRepo.link.trim() || null
+      }]);
+      if (error) throw error;
+      setNewRepo({ owner: "", repo: "", description: "", motive: "", languages: "", tags: "", link: "" });
+      fetchResources();
+    } catch (err: any) {
+      alert("Failed to add repo: " + err.message);
+    }
+  };
+
+  const handleDeleteRepo = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this repository?")) return;
+    try {
+      const { error } = await supabase.from("tracked_repos").delete().eq("id", id);
+      if (error) throw error;
+      fetchResources();
+    } catch (err: any) {
+      alert("Failed to delete repo: " + err.message);
+    }
+  };
+
+  const handleAddResource = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newResource.title || !newResource.url) return;
+    try {
+      const { error } = await supabase.from("learning_resources").insert([{
+        title: newResource.title.trim(),
+        description: newResource.description.trim() || null,
+        url: newResource.url.trim(),
+        type: newResource.type,
+        duration: newResource.duration.trim() || null,
+        author: newResource.author.trim() || null,
+        level: newResource.level,
+        free: newResource.free,
+        category: newResource.category.trim().toLowerCase()
+      }]);
+      if (error) throw error;
+      setNewResource({ title: "", description: "", url: "", type: "video", duration: "", author: "", level: "Beginner", free: true, category: "web" });
+      fetchResources();
+    } catch (err: any) {
+      alert("Failed to add resource: " + err.message);
+    }
+  };
+
+  const handleDeleteResource = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this learning material?")) return;
+    try {
+      const { error } = await supabase.from("learning_resources").delete().eq("id", id);
+      if (error) throw error;
+      fetchResources();
+    } catch (err: any) {
+      alert("Failed to delete resource: " + err.message);
+    }
+  };
+
+  if (loading) return <div className="p-8 text-center text-gray-500">Loading resources...</div>;
+
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-12">
+      {/* SECTION 1: OPEN SOURCE REPOS */}
+      <div>
+        <h1 className="text-3xl font-bold mb-6 font-outfit" style={{ fontFamily: "'Outfit', sans-serif" }}>Open Source Repositories</h1>
+        <form onSubmit={handleAddRepo} className="bg-white border border-gray-200 rounded-3xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <input required placeholder="Repo Owner (e.g. facebook)" className="border border-gray-200 p-3 rounded-xl w-full" value={newRepo.owner} onChange={e => setNewRepo({...newRepo, owner: e.target.value})} />
+          <input required placeholder="Repo Name (e.g. react)" className="border border-gray-200 p-3 rounded-xl w-full" value={newRepo.repo} onChange={e => setNewRepo({...newRepo, repo: e.target.value})} />
+          <input placeholder="Description (Optional)" className="border border-gray-200 p-3 rounded-xl w-full" value={newRepo.description} onChange={e => setNewRepo({...newRepo, description: e.target.value})} />
+          <input placeholder="Motive (Optional, e.g. Make web dev accessible)" className="border border-gray-200 p-3 rounded-xl w-full" value={newRepo.motive} onChange={e => setNewRepo({...newRepo, motive: e.target.value})} />
+          <input placeholder="Languages (Optional, e.g. TypeScript, HTML)" className="border border-gray-200 p-3 rounded-xl w-full" value={newRepo.languages} onChange={e => setNewRepo({...newRepo, languages: e.target.value})} />
+          <input placeholder="Tags (Optional, e.g. Beginner Friendly)" className="border border-gray-200 p-3 rounded-xl w-full" value={newRepo.tags} onChange={e => setNewRepo({...newRepo, tags: e.target.value})} />
+          <input placeholder="Link (Optional, defaults to GitHub URL)" className="border border-gray-200 p-3 rounded-xl w-full" value={newRepo.link} onChange={e => setNewRepo({...newRepo, link: e.target.value})} />
+          <div className="md:col-span-2 lg:col-span-3 flex justify-end">
+            <button type="submit" className="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-sm cursor-pointer">Add Repository</button>
+          </div>
+        </form>
+
+        <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
+                <th className="p-4 font-semibold">Repository</th>
+                <th className="p-4 font-semibold">Description</th>
+                <th className="p-4 font-semibold">Tags / Languages</th>
+                <th className="p-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {repos.map((r) => (
+                <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="p-4">
+                    <div className="font-bold text-gray-900">{r.owner} / {r.repo}</div>
+                    {r.motive && <div className="text-xs text-gray-400 italic">Motive: {r.motive}</div>}
+                  </td>
+                  <td className="p-4 text-sm text-gray-600 max-w-xs truncate">{r.description || "N/A"}</td>
+                  <td className="p-4 text-xs text-gray-500">
+                    <div>Langs: {r.languages || "N/A"}</div>
+                    <div>Tags: {r.tags || "N/A"}</div>
+                  </td>
+                  <td className="p-4 text-right">
+                    <button onClick={() => handleDeleteRepo(r.id)} className="text-gray-400 hover:text-red-600 transition-colors cursor-pointer"><i className="fas fa-trash"></i></button>
+                  </td>
+                </tr>
+              ))}
+              {repos.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-gray-500">No tracked repositories found in database.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* SECTION 2: LEARNING MATERIALS */}
+      <div>
+        <h1 className="text-3xl font-bold mb-6 font-outfit" style={{ fontFamily: "'Outfit', sans-serif" }}>Learning Materials (Videos / Reading)</h1>
+        <form onSubmit={handleAddResource} className="bg-white border border-gray-200 rounded-3xl p-6 mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <input required placeholder="Title (e.g. Git Full Course)" className="border border-gray-200 p-3 rounded-xl w-full" value={newResource.title} onChange={e => setNewResource({...newResource, title: e.target.value})} />
+          <input placeholder="Description (Optional)" className="border border-gray-200 p-3 rounded-xl w-full" value={newResource.description} onChange={e => setNewResource({...newResource, description: e.target.value})} />
+          <input required placeholder="URL (e.g. https://...)" className="border border-gray-200 p-3 rounded-xl w-full" value={newResource.url} onChange={e => setNewResource({...newResource, url: e.target.value})} />
+          <select className="border border-gray-200 p-3 rounded-xl w-full" value={newResource.type} onChange={e => setNewResource({...newResource, type: e.target.value})}>
+            <option value="video">Video</option>
+            <option value="playlist">Playlist</option>
+            <option value="docs">Docs</option>
+            <option value="course">Course</option>
+            <option value="article">Article</option>
+          </select>
+          <input placeholder="Duration (Optional, e.g. 1.5h)" className="border border-gray-200 p-3 rounded-xl w-full" value={newResource.duration} onChange={e => setNewResource({...newResource, duration: e.target.value})} />
+          <input placeholder="Author (Optional, e.g. freeCodeCamp)" className="border border-gray-200 p-3 rounded-xl w-full" value={newResource.author} onChange={e => setNewResource({...newResource, author: e.target.value})} />
+          <select className="border border-gray-200 p-3 rounded-xl w-full" value={newResource.level} onChange={e => setNewResource({...newResource, level: e.target.value as any})}>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+          <input required placeholder="Category (e.g. web, programming, ai, git)" className="border border-gray-200 p-3 rounded-xl w-full" value={newResource.category} onChange={e => setNewResource({...newResource, category: e.target.value})} />
+          <div className="flex items-center gap-2 p-3">
+            <input type="checkbox" id="free-chk" checked={newResource.free} onChange={e => setNewResource({...newResource, free: e.target.checked})} className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+            <label htmlFor="free-chk" className="text-sm font-semibold text-gray-700 select-none cursor-pointer">Free Resource</label>
+          </div>
+          <div className="md:col-span-2 lg:col-span-3 flex justify-end">
+            <button type="submit" className="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-sm cursor-pointer">Add Material</button>
+          </div>
+        </form>
+
+        <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
+                <th className="p-4 font-semibold">Title / Author</th>
+                <th className="p-4 font-semibold">Type / Level</th>
+                <th className="p-4 font-semibold">Category</th>
+                <th className="p-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {learning.map((l) => (
+                <tr key={l.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="p-4">
+                    <div className="font-bold text-gray-900">{l.title}</div>
+                    <div className="text-xs text-gray-400">By {l.author || "N/A"} · {l.duration ? `Duration: ${l.duration}` : "No duration"} · {l.free ? "Free" : "Paid"}</div>
+                  </td>
+                  <td className="p-4">
+                    <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-bold mr-2 uppercase">{l.type}</span>
+                    <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-700 text-xs font-semibold">{l.level}</span>
+                  </td>
+                  <td className="p-4 text-sm text-gray-600 font-semibold">{l.category}</td>
+                  <td className="p-4 text-right">
+                    <button onClick={() => handleDeleteResource(l.id)} className="text-gray-400 hover:text-red-600 transition-colors cursor-pointer"><i className="fas fa-trash"></i></button>
+                  </td>
+                </tr>
+              ))}
+              {learning.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-gray-500">No learning materials found in database.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

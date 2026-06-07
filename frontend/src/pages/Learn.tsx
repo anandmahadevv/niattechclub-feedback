@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../components/AuthContext";
+import { supabase } from "../lib/supabase";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Resource {
@@ -304,6 +305,82 @@ export default function Learn() {
   const { user, loading } = useAuth();
 
   const [activeCategory, setActiveCategory] = useState<string>("web");
+  const [dbResources, setDbResources] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!loading && user) {
+      async function loadResources() {
+        try {
+          const { data, error } = await supabase
+            .from("learning_resources")
+            .select("*")
+            .order("id", { ascending: true });
+          
+          if (error) throw error;
+          if (data) {
+            setDbResources(data);
+          }
+        } catch (err) {
+          console.error("Error loading learning resources:", err);
+        }
+      }
+      loadResources();
+    }
+  }, [user, loading]);
+
+  // Merge database resources into categories
+  const categoriesList = CATEGORIES.map(cat => {
+    const catDbResources = dbResources
+      .filter(r => r.category === cat.id)
+      .map(r => ({
+        title: r.title,
+        description: r.description || "",
+        url: r.url,
+        type: r.type as Resource["type"],
+        duration: r.duration || undefined,
+        author: r.author || undefined,
+        level: r.level as Resource["level"],
+        free: r.free ?? true
+      }));
+
+    return {
+      ...cat,
+      resources: [...cat.resources, ...catDbResources]
+    };
+  });
+
+  // Group custom categories
+  const standardCategoryIds = new Set(CATEGORIES.map(c => c.id));
+  const customResources = dbResources.filter(r => !standardCategoryIds.has(r.category));
+  
+  const customCategoriesMap: Record<string, any[]> = {};
+  customResources.forEach(r => {
+    if (!customCategoriesMap[r.category]) {
+      customCategoriesMap[r.category] = [];
+    }
+    customCategoriesMap[r.category].push({
+      title: r.title,
+      description: r.description || "",
+      url: r.url,
+      type: r.type,
+      duration: r.duration || undefined,
+      author: r.author || undefined,
+      level: r.level,
+      free: r.free ?? true
+    });
+  });
+
+  const finalCategories = [...categoriesList];
+  Object.keys(customCategoriesMap).forEach(catId => {
+    const label = catId.charAt(0).toUpperCase() + catId.slice(1);
+    finalCategories.push({
+      id: catId,
+      label: label,
+      icon: "fa-book-open",
+      description: `Custom resources for ${label}.`,
+      resources: customCategoriesMap[catId]
+    });
+  });
 
   if (loading) {
     return (
@@ -349,7 +426,7 @@ export default function Learn() {
   }
   const [levelFilter, setLevelFilter] = useState<string>("All");
 
-  const category = CATEGORIES.find(c => c.id === activeCategory)!;
+  const category = finalCategories.find(c => c.id === activeCategory) || finalCategories[0];
   const filtered = category.resources.filter(
     r => levelFilter === "All" || r.level === levelFilter
   );
@@ -381,7 +458,7 @@ export default function Learn() {
           <aside className="md:w-52 flex-shrink-0">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Topics</p>
             <nav className="flex flex-col gap-1">
-              {CATEGORIES.map(cat => (
+              {finalCategories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => { setActiveCategory(cat.id); setLevelFilter("All"); }}
