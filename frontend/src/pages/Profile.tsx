@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../components/AuthContext";
 import { supabase } from "../lib/supabase";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Badge System ─────────────────────────────────────────────────────────────
 // ─── Badge System ─────────────────────────────────────────────────────────────
@@ -326,7 +327,7 @@ function BadgeEmblem({ name, size = "md" }: { name: string; size?: "sm" | "md" |
       </svg>
 
       {/* FontAwesome Icon Overlaid absolutely */}
-      <div className="absolute top-[32%] flex items-center justify-center text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] group-hover:scale-110 transition-transform duration-500">
+      <div className="absolute top-[32.5%] left-1/2 -translate-x-1/2 flex items-center justify-center text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] group-hover:scale-110 transition-transform duration-500">
         <i className={`fas ${rank.icon} text-lg md:text-xl lg:text-2xl ${rank.iconColor}`} />
       </div>
 
@@ -367,7 +368,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-const inputCls = "w-full px-3.5 py-2.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 font-medium outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all placeholder-gray-400";
+const inputCls = "w-full px-3.5 py-2.5 rounded-lg border border-slate-800 bg-slate-950 text-sm text-white font-medium outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all placeholder-slate-600";
 
 export default function Profile() {
   const { user, loading, updateLocalUser } = useAuth();
@@ -378,6 +379,7 @@ export default function Profile() {
   const [userRsvps, setUserRsvps] = useState<{ event_slug: string }[]>([]);
   const [rsvpsLoading, setRsvpsLoading] = useState(true);
   const [tab, setTab] = useState<"overview" | "events" | "edit">("overview");
+  const [showLeaguesModal, setShowLeaguesModal] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -450,16 +452,16 @@ export default function Profile() {
   ] as const;
 
   return (
-    <div className="flex-grow w-full bg-gray-50 min-h-screen">
+    <div className="flex-grow w-full bg-slate-950 text-slate-100 min-h-screen">
 
       {/* ── Top Identity Strip ─────────────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-100">
+      <div className="bg-slate-900 border-b border-slate-800/80 shadow-md">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
 
             {/* Avatar */}
             <div
-              className="w-16 h-16 rounded-xl flex items-center justify-center text-white text-2xl font-black flex-shrink-0"
+              className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-black flex-shrink-0 border border-slate-700/80 shadow-lg"
               style={{ background: badge.color }}
             >
               {firstLetter}
@@ -468,20 +470,20 @@ export default function Profile() {
             {/* Name / details */}
             <div className="flex-grow min-w-0">
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-xl font-bold text-gray-900 truncate">{formData.name || "Member"}</h1>
+                <h1 className="text-xl font-bold text-slate-50 truncate">{formData.name || "Member"}</h1>
               </div>
-              <p className="text-sm text-gray-400 mt-0.5">{user.email}</p>
+              <p className="text-sm text-slate-400 mt-0.5">{user.email}</p>
               <div className="flex flex-wrap gap-2 mt-2">
-                {formData.rollNumber && <span className="text-xs text-gray-500 font-medium">#{formData.rollNumber}</span>}
-                {formData.rollNumber && formData.department && <span className="text-gray-300 text-xs">·</span>}
-                {formData.department && <span className="text-xs text-gray-500 font-medium">{formData.department}</span>}
+                {formData.rollNumber && <span className="text-xs text-slate-400 font-medium">#{formData.rollNumber}</span>}
+                {formData.rollNumber && formData.department && <span className="text-slate-600 text-xs">·</span>}
+                {formData.department && <span className="text-xs text-slate-400 font-medium">{formData.department}</span>}
                 {user.github_username && (
                   <>
-                    <span className="text-gray-300 text-xs">·</span>
+                    <span className="text-slate-600 text-xs">·</span>
                     <a
                       href={`https://github.com/${user.github_username}`}
                       target="_blank" rel="noreferrer"
-                      className="text-xs text-gray-500 font-medium hover:text-gray-900 flex items-center gap-1 transition-colors"
+                      className="text-xs text-slate-400 font-medium hover:text-white flex items-center gap-1 transition-colors"
                     >
                       <svg viewBox="0 0 24 24" className="w-3 h-3" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
                       @{user.github_username}
@@ -502,8 +504,8 @@ export default function Profile() {
                 onClick={() => setTab(t.key)}
                 className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
                   tab === t.key
-                    ? "border-red-600 text-red-600"
-                    : "border-transparent text-gray-400 hover:text-gray-700"
+                    ? "border-red-500 text-red-500"
+                    : "border-transparent text-slate-400 hover:text-slate-200"
                 }`}
               >
                 {t.label}
@@ -519,6 +521,17 @@ export default function Profile() {
         {/* OVERVIEW */}
         {tab === "overview" && (
           <div className="max-w-xl mx-auto">
+            {/* See all leagues trigger */}
+            <div className="flex justify-end mb-4 px-2">
+              <button 
+                onClick={() => setShowLeaguesModal(true)} 
+                className="text-xs font-black uppercase tracking-wider text-amber-400 hover:text-amber-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                <i className="fas fa-trophy text-[10px]" /> See all leagues
+              </button>
+            </div>
+
             <div className="relative bg-slate-900 border border-slate-800 text-white rounded-3xl p-8 shadow-2xl overflow-hidden group transition-all duration-500 hover:border-slate-700/80">
               {/* Active rank glow background */}
               <div 
@@ -630,6 +643,89 @@ export default function Profile() {
                 )}
               </div>
             </div>
+
+            {/* Leagues Progression Modal */}
+            <AnimatePresence>
+              {showLeaguesModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                  {/* Backdrop */}
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setShowLeaguesModal(false)}
+                    className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+                  />
+                  
+                  {/* Modal Container */}
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                    transition={{ type: "spring", duration: 0.4 }}
+                    className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[85vh] z-[210]"
+                  >
+                    <div className="flex justify-between items-center border-b border-slate-800/80 pb-4 mb-6">
+                      <div className="flex items-center gap-2">
+                        <i className="fas fa-trophy text-amber-500 text-lg" />
+                        <h3 className="text-lg font-black uppercase tracking-wider font-outfit" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                          Leagues Progression
+                        </h3>
+                      </div>
+                      <button 
+                        onClick={() => setShowLeaguesModal(false)}
+                        className="text-slate-400 hover:text-white transition-colors p-1"
+                      >
+                        <i className="fas fa-times text-lg" />
+                      </button>
+                    </div>
+
+                    {/* Leagues Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {BADGES.map(b => {
+                        const unlocked = eventsCount >= b.min;
+                        const isCurrent = badge.name === b.name;
+                        return (
+                          <div
+                            key={b.name}
+                            className={`flex flex-col items-center justify-between gap-3 p-3 rounded-2xl border text-center transition-all ${
+                              isCurrent
+                                ? "border-amber-500 bg-slate-800/80 shadow-md shadow-amber-500/5"
+                                : unlocked
+                                ? "border-slate-800 bg-slate-800/20"
+                                : "border-slate-800/40 bg-slate-950/40 opacity-40"
+                            }`}
+                          >
+                            <div className="relative flex items-center justify-center">
+                              <BadgeEmblem name={b.name} size="sm" />
+                              {!unlocked && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40 rounded-lg">
+                                  <i className="fas fa-lock text-[10px] text-slate-400 bg-slate-900 border border-slate-800 p-1.5 rounded-full shadow-md" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className="text-[10px] font-bold text-slate-200 leading-tight">{b.name}</span>
+                              {isCurrent ? (
+                                <span className="text-[8px] font-black text-amber-400 uppercase tracking-widest leading-none mt-1">
+                                  CURRENT
+                                </span>
+                              ) : unlocked ? (
+                                <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest leading-none mt-1">
+                                  UNLOCKED
+                                </span>
+                              ) : (
+                                <span className="text-[9px] text-slate-500 font-semibold mt-1">{b.min}+ events</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
@@ -643,7 +739,7 @@ export default function Profile() {
                 emptyText: "No events attended yet.",
                 emptyHint: "Attend events to earn badges.",
                 accent: "bg-green-500",
-                tagClass: "bg-green-50 text-green-700 border-green-200",
+                tagClass: "bg-green-950/30 text-green-400 border-green-800/40",
                 tag: "Attended",
               },
               {
@@ -652,29 +748,29 @@ export default function Profile() {
                 emptyText: "Not registered for any events.",
                 emptyHint: "Check the Events page to RSVP.",
                 accent: "bg-red-500",
-                tagClass: "bg-red-50 text-red-700 border-red-200",
+                tagClass: "bg-red-950/30 text-red-400 border-red-800/40",
                 tag: "RSVP'd",
               },
             ].map(section => (
-              <div key={section.title} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">{section.title}</p>
+              <div key={section.title} className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 shadow-xl">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{section.title}</p>
                 {rsvpsLoading ? (
                   <div className="flex justify-center py-8">
                     <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : section.list.length === 0 ? (
                   <div className="py-8 text-center">
-                    <p className="text-sm text-gray-500 font-medium">{section.emptyText}</p>
-                    <p className="text-xs text-gray-400 mt-1">{section.emptyHint}</p>
+                    <p className="text-sm text-slate-500 font-medium">{section.emptyText}</p>
+                    <p className="text-xs text-slate-600 mt-1">{section.emptyHint}</p>
                   </div>
                 ) : (
                   <div className="space-y-2.5">
                     {section.list.map(event => (
-                      <div key={event.slug} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50">
+                      <div key={event.slug} className="flex items-center gap-3 p-3 rounded-xl border border-slate-800/60 bg-slate-950/50">
                         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${section.accent}`} />
                         <div className="flex-grow min-w-0">
-                          <p className="text-sm font-semibold text-gray-800 truncate">{event.name}</p>
-                          <p className="text-xs text-gray-400">{event.date} · {event.type}</p>
+                          <p className="text-sm font-semibold text-slate-100 truncate">{event.name}</p>
+                          <p className="text-xs text-slate-400">{event.date} · {event.type}</p>
                         </div>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 ${section.tagClass}`}>
                           {section.tag}
@@ -690,8 +786,8 @@ export default function Profile() {
 
         {/* EDIT */}
         {tab === "edit" && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 max-w-2xl">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-6">Personal Information</p>
+          <div className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 max-w-2xl shadow-xl">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">Personal Information</p>
             <form onSubmit={handleSave} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="Full Name">
@@ -713,7 +809,7 @@ export default function Profile() {
                 </Field>
                 <Field label="Email">
                   <input type="email" disabled value={user.email || ""}
-                    className={`${inputCls} bg-gray-50 text-gray-400 cursor-not-allowed`} />
+                    className={`${inputCls} bg-slate-950 text-slate-500 border-slate-800/80 cursor-not-allowed`} />
                 </Field>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -734,7 +830,7 @@ export default function Profile() {
               <div className="pt-2 flex justify-end">
                 <button
                   type="submit" disabled={saving}
-                  className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm shadow-red-700/20"
+                  className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-md shadow-red-700/20"
                 >
                   {saving ? (
                     <><div className="w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin" />Saving...</>
