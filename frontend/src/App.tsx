@@ -55,19 +55,21 @@ function AppContent() {
       {/* Dynamic Route Content with Transitions */}
       <Suspense fallback={<PageLoader />}>
         <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-            <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
-            <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
-            <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
-            <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
-            <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-            <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
-            <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
-            <Route path="/nigga" element={<PageWrapper><Admin /></PageWrapper>} />
-            {/* Catch-all route to redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <div className={!isAuthOrAdminRoute ? "pt-20 md:pt-24 flex-grow flex flex-col w-full animate-in fade-in duration-300" : "flex-grow flex flex-col w-full"}>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+              <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
+              <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
+              <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
+              <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
+              <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+              <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+              <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
+              <Route path="/nigga" element={<PageWrapper><Admin /></PageWrapper>} />
+              {/* Catch-all route to redirect to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
         </AnimatePresence>
       </Suspense>
 
