@@ -212,7 +212,7 @@ export default function Navbar() {
 
         {/* Mobile Navigation Menu */}
         <div 
-          className={`md:hidden absolute top-[72px] left-0 right-0 bg-white/95 backdrop-blur-xl transition-all duration-300 overflow-hidden rounded-2xl border border-gray-200/50 shadow-2xl flex flex-col gap-1.5 ${
+          className={`md:hidden absolute top-[72px] left-0 right-0 bg-white/95 backdrop-blur-xl transition-all duration-700 overflow-hidden rounded-2xl border border-gray-200/50 shadow-2xl flex flex-col gap-1.5 ${
             isMobileMenuOpen 
               ? 'max-h-[500px] p-4 opacity-100' 
               : 'max-h-0 p-0 opacity-0 pointer-events-none'
@@ -335,7 +335,7 @@ export default function Navbar() {
               </NavLink>
               <button
                 onClick={() => { signOut(); closeMenu(); }}
-                className="hover:text-red-600 hover:bg-red-50/50 px-4 py-2.5 rounded-xl transition-all duration-200 cursor-pointer text-gray-600 font-semibold text-left w-full flex items-center gap-2"
+                className="hover:text-red-600 hover:bg-red-50/50 px-4 py-2.5 rounded-xl transition-all duration-                                                                                                                                                    700 cursor-pointer text-gray-600 font-semibold text-left w-full flex items-center gap-2"
               >
                 <i className="fas fa-sign-out-alt"></i> Logout
               </button>
@@ -345,7 +345,7 @@ export default function Navbar() {
               to="/login"
               onClick={closeMenu}
               className={({ isActive }) =>
-                `relative px-4 py-2.5 rounded-xl font-bold flex items-center justify-center transition-all duration-300 z-10 ${
+                `relative px-4 py-2.5 rounded-xl font-bold flex items-center justify-center transition-all duration-700 z-10 ${
                   isActive
                     ? "text-red-750"
                     : "bg-gradient-to-r from-red-600 to-red-800 text-white hover:from-red-700 hover:to-orange-700 shadow-sm hover:scale-[1.02]"
