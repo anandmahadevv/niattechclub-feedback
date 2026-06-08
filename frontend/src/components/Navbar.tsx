@@ -10,18 +10,18 @@ export default function Navbar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
-      ? "text-red-600 bg-red-50/80 px-3.5 py-1.5 rounded-full font-semibold shadow-sm border border-red-100/50 flex items-center gap-1.5"
+      ? "text-red-700 bg-gradient-to-r from-red-50/90 to-orange-50/90 px-3.5 py-1.5 rounded-full font-bold shadow-sm border border-red-100/50 flex items-center gap-1.5 transform scale-[1.02] transition-all duration-300"
       : "hover:text-red-600 hover:bg-gray-50/60 text-gray-600 px-3.5 py-1.5 rounded-full transition-all duration-200 font-medium flex items-center gap-1.5";
 
   const mobileLinkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
-      ? "text-red-600 bg-red-50/80 px-4 py-2.5 rounded-xl font-bold shadow-sm border border-red-100/50 flex items-center gap-2"
+      ? "text-red-700 bg-gradient-to-r from-red-50/90 to-orange-50/90 px-4 py-2.5 rounded-xl font-bold shadow-sm border border-red-100/50 flex items-center gap-2 transform translate-x-1 transition-all duration-200"
       : "hover:text-red-600 hover:bg-gray-50/60 text-gray-700 px-4 py-2.5 rounded-xl transition-all duration-200 font-semibold flex items-center gap-2";
   
   return (
     <div className="fixed top-4 left-0 right-0 z-[150] px-4 md:px-8">
       <div className="max-w-7xl mx-auto relative">
-        <nav className="border border-gray-200/50 bg-white/70 backdrop-blur-lg shadow-lg shadow-gray-100/30 rounded-2xl md:rounded-full transition-all duration-300">
+        <nav className="border border-gray-200/50 bg-white/70 backdrop-blur-lg shadow-lg shadow-gray-100/30 hover:shadow-[0_10px_30px_-5px_rgba(239,68,68,0.08)] rounded-2xl md:rounded-full transition-all duration-300">
           <div className="px-5 md:px-6 h-16 flex items-center justify-between">
             <Link to="/" onClick={closeMenu} className="flex items-center gap-2.5 hover:opacity-90 transition-opacity z-10">
               <img src="/logo.png" alt="NIAT Tech Club" className="h-9 w-9 object-contain mix-blend-multiply" loading="lazy" decoding="async" />
@@ -46,7 +46,13 @@ export default function Navbar() {
                 Learn
               </NavLink>
               <NavLink to="/ideas" className={linkClass}>
-                <i className="fas fa-lightbulb"></i> Ideas
+                <div className="relative flex items-center gap-1.5">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                  </span>
+                  <i className="fas fa-lightbulb"></i> Ideas
+                </div>
               </NavLink>
 
               <span className="h-5 w-px bg-gray-200/80 mx-2 shrink-0" />
@@ -69,8 +75,8 @@ export default function Navbar() {
                   to="/login"
                   className={({ isActive }) =>
                     isActive
-                      ? "text-red-600 bg-red-50/80 px-4 py-1.5 rounded-full font-semibold border border-red-100/50 shadow-sm"
-                      : "bg-gray-900 text-white hover:bg-gray-800 px-4 py-1.5 rounded-full transition-all duration-200 font-semibold shadow-sm"
+                      ? "text-red-750 bg-gradient-to-r from-red-50/90 to-orange-50/90 px-4 py-1.5 rounded-full font-bold border border-red-100/50 shadow-sm"
+                      : "bg-gradient-to-r from-red-600 to-red-800 text-white hover:from-red-700 hover:to-orange-700 px-4 py-1.5 rounded-full transition-all duration-300 font-semibold shadow-md shadow-red-600/10 hover:shadow-red-600/25 hover:scale-[1.03]"
                   }
                 >
                   Login
@@ -115,7 +121,13 @@ export default function Navbar() {
             Learn
           </NavLink>
           <NavLink to="/ideas" onClick={closeMenu} className={mobileLinkClass}>
-            <i className="fas fa-lightbulb"></i> Ideas
+            <div className="relative flex items-center gap-2">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+              </span>
+              <i className="fas fa-lightbulb"></i> Ideas
+            </div>
           </NavLink>
 
           <hr className="border-gray-100 my-2" />
@@ -139,8 +151,8 @@ export default function Navbar() {
               onClick={closeMenu}
               className={({ isActive }) =>
                 isActive
-                  ? "text-red-600 bg-red-50/80 px-4 py-2.5 rounded-xl font-bold shadow-sm border border-red-100/50 flex items-center gap-2"
-                  : "bg-gray-900 text-white hover:bg-gray-800 px-4 py-2.5 rounded-xl transition-all duration-200 font-bold shadow-sm flex items-center justify-center"
+                  ? "text-red-700 bg-gradient-to-r from-red-50/90 to-orange-50/90 px-4 py-2.5 rounded-xl font-bold shadow-sm border border-red-100/50 flex items-center gap-2"
+                  : "bg-gradient-to-r from-red-600 to-red-800 text-white hover:from-red-700 hover:to-orange-700 px-4 py-2.5 rounded-xl transition-all duration-200 font-bold shadow-sm flex items-center justify-center hover:scale-[1.02]"
               }
             >
               Login
