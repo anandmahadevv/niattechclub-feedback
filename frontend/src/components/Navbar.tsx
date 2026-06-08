@@ -35,10 +35,10 @@ export default function Navbar() {
   return (
     <div className="fixed top-4 left-0 right-0 z-[150] px-4 md:px-8">
       <div className="max-w-7xl mx-auto relative">
-        <nav className={`border transition-all duration-500 rounded-2xl md:rounded-full ${
+        <nav className={`border backdrop-blur-md transition-all duration-500 rounded-2xl md:rounded-full ${
           isScrolled 
-            ? "border-gray-200/50 bg-white/70 backdrop-blur-lg shadow-lg shadow-gray-100/30 hover:shadow-[0_10px_30px_-5px_rgba(239,68,68,0.08)]"
-            : "border-transparent bg-transparent shadow-none"
+            ? "border-red-200/40 bg-gradient-to-r from-white/90 via-white/95 to-red-50/80 shadow-xl shadow-red-100/10 hover:shadow-[0_12px_40px_-5px_rgba(220,38,38,0.12)]"
+            : "border-gray-100/40 bg-gradient-to-r from-white/80 via-white/85 to-red-50/50 shadow-md shadow-gray-100/5"
         }`}>
           <div className="px-5 md:px-6 h-16 flex items-center justify-between">
             <Link to="/" onClick={closeMenu} className="flex items-center gap-2.5 hover:opacity-90 transition-opacity z-10">
