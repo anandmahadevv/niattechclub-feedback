@@ -23,13 +23,13 @@ export default function Navbar() {
   const closeMenu = () => setIsMobileMenuOpen(false);
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `relative px-4 py-2 flex items-center gap-1.5 text-sm font-semibold transition-colors duration-300 z-10 ${
-      isActive ? "text-red-700" : "text-gray-600 hover:text-red-600"
+    `relative px-4 py-2 flex items-center gap-1.5 text-sm font-semibold transition-all duration-300 z-10 hover:scale-[1.03] rounded-full ${
+      isActive ? "text-red-700" : "text-gray-600 hover:text-red-600 hover:bg-red-500/[0.04]"
     }`;
 
   const mobileLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `relative px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all duration-300 z-10 ${
-      isActive ? "text-red-700" : "text-gray-700 hover:text-red-600 hover:bg-gray-50/60"
+    `relative px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all duration-300 z-10 hover:scale-[1.01] ${
+      isActive ? "text-red-700" : "text-gray-700 hover:text-red-650 hover:bg-red-500/[0.03]"
     }`;
 
   return (
@@ -43,7 +43,7 @@ export default function Navbar() {
           <div className="px-5 md:px-6 h-16 flex items-center justify-between">
             <Link to="/" onClick={closeMenu} className="flex items-center gap-2.5 hover:opacity-90 transition-opacity z-10">
               <img src="/logo.png" alt="NIAT Tech Club" className="h-9 w-9 object-contain mix-blend-multiply" loading="lazy" decoding="async" />
-              <span className="font-extrabold tracking-tight text-gray-900 hidden sm:block text-base">NIAT Tech Club</span>
+              <span className="font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-800 to-red-800 hidden sm:block text-base" style={{ fontFamily: "'Outfit', sans-serif" }}>NIAT Tech Club</span>
             </Link>
             
             {/* Desktop Navigation */}
