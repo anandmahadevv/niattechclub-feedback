@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { ArrowRight, Home, Calendar, Users } from "lucide-react";
+import { Home, Calendar, Users } from "lucide-react";
 
 const NotFound = () => {
   return (
