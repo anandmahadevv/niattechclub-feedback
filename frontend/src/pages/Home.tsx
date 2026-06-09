@@ -9,7 +9,7 @@ export default function Home() {
         {/* Soft gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white pointer-events-none"></div>
 
-        <div className="mx-auto px-6 md:px-20 py-24 md:py-32 relative z-10 w-full">
+        <div className="mx-auto px-6 md:px-20 pt-16 pb-24 md:pt-20 md:pb-32 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
             <div className="text-center lg:text-left">
