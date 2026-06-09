@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://techclub.niat.me/sitemap.xml

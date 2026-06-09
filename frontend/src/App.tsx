@@ -35,6 +35,7 @@ const OpenSource = safeLazy(() => import("./pages/OpenSource"));
 const Login = safeLazy(() => import("./pages/Login"));
 const Profile = safeLazy(() => import("./pages/Profile"));
 const Learn = safeLazy(() => import("./pages/Learn"));
+const NotFound = safeLazy(() => import("./pages/NotFound"));
 
 function AppContent() {
   const location = useLocation();
@@ -65,8 +66,8 @@ function AppContent() {
             <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
             <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
             <Route path="/nigga" element={<PageWrapper><Admin /></PageWrapper>} />
-            {/* Catch-all route to redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Catch-all route to show 404 page */}
+            <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
           </Routes>
         </AnimatePresence>
       </Suspense>
