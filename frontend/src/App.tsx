@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { AnimatePresence } from "motion/react";
 import { Toaster } from "sonner";
@@ -35,6 +35,7 @@ const OpenSource = safeLazy(() => import("./pages/OpenSource"));
 const Login = safeLazy(() => import("./pages/Login"));
 const Profile = safeLazy(() => import("./pages/Profile"));
 const Learn = safeLazy(() => import("./pages/Learn"));
+const NotFound = safeLazy(() => import("./pages/NotFound"));
 
 function AppContent() {
   const location = useLocation();
@@ -55,21 +56,19 @@ function AppContent() {
       {/* Dynamic Route Content with Transitions */}
       <Suspense fallback={<PageLoader />}>
         <AnimatePresence mode="wait">
-          <div className={!isAuthOrAdminRoute ? "pt-20 md:pt-24 flex-grow flex flex-col w-full animate-in fade-in duration-300" : "flex-grow flex flex-col w-full"}>
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-              <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
-              <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
-              <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
-              <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
-              <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-              <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
-              <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
-              <Route path="/nigga" element={<PageWrapper><Admin /></PageWrapper>} />
-              {/* Catch-all route to redirect to home */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </div>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+            <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
+            <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
+            <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
+            <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
+            <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+            <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+            <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
+            <Route path="/nigga" element={<PageWrapper><Admin /></PageWrapper>} />
+            {/* Catch-all route to redirect to home */}
+            <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
+          </Routes>
         </AnimatePresence>
       </Suspense>
 
