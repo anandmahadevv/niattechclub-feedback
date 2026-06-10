@@ -28,7 +28,7 @@ export default function Navbar() {
     }`;
 
   const mobileLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `relative px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all duration-300 z-10 hover:scale-[1.01] ${
+    `relative w-full px-4 py-3 rounded-2xl font-bold flex items-center gap-3 transition-all duration-300 z-10 hover:scale-[1.01] ${
       isActive ? "text-red-700" : "text-gray-700 hover:text-red-650 hover:bg-red-500/[0.03]"
     }`;
 
@@ -40,10 +40,10 @@ export default function Navbar() {
             ? "border-red-200/40 bg-gradient-to-r from-white/90 via-white/95 to-red-50/80 shadow-xl shadow-red-100/10 hover:shadow-[0_12px_40px_-5px_rgba(220,38,38,0.12)]"
             : "border-gray-100/40 bg-gradient-to-r from-white/80 via-white/85 to-red-50/50 shadow-md shadow-gray-100/5"
         }`}>
-          <div className="px-5 md:px-6 h-16 flex items-center justify-between">
-            <Link to="/" onClick={closeMenu} className="flex items-center gap-2.5 hover:opacity-90 transition-opacity z-10">
+          <div className="px-4 sm:px-5 md:px-6 h-16 md:h-16 flex items-center justify-between gap-3">
+            <Link to="/" onClick={closeMenu} className="flex items-center gap-2.5 hover:opacity-90 transition-opacity z-10 min-w-0">
               <img src="/logo.png" alt="NIAT Tech Club" className="h-9 w-9 object-contain mix-blend-multiply" loading="lazy" decoding="async" />
-              <span className="font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-800 to-red-800 hidden sm:block text-base" style={{ fontFamily: "'Outfit', sans-serif" }}>NIAT Tech Club</span>
+              <span className="font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-800 to-red-800 hidden sm:block text-base truncate" style={{ fontFamily: "'Outfit', sans-serif" }}>NIAT Tech Club</span>
             </Link>
             
             {/* Desktop Navigation */}
@@ -212,160 +212,171 @@ export default function Navbar() {
 
         {/* Mobile Navigation Menu */}
         <div 
-          className={`md:hidden absolute top-[72px] left-0 right-0 bg-white/95 backdrop-blur-xl transition-all duration-700 overflow-hidden rounded-2xl border border-gray-200/50 shadow-2xl flex flex-col gap-1.5 ${
+          className={`md:hidden absolute top-[calc(100%+0.75rem)] left-0 right-0 bg-white/97 backdrop-blur-xl transition-all duration-500 overflow-hidden rounded-[1.5rem] border border-gray-200/60 shadow-2xl flex flex-col ${
             isMobileMenuOpen 
-              ? 'max-h-[500px] p-4 opacity-100' 
+              ? 'max-h-[70vh] p-3 opacity-100' 
               : 'max-h-0 p-0 opacity-0 pointer-events-none'
           }`}
         >
-          <NavLink to="/" onClick={closeMenu} className={mobileLinkClass}>
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <motion.span
-                    layoutId="activeNavBackgroundMobile"
-                    className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-xl -z-10 shadow-sm"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-                Home
-              </>
-            )}
-          </NavLink>
-
-          <NavLink to="/events" onClick={closeMenu} className={mobileLinkClass}>
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <motion.span
-                    layoutId="activeNavBackgroundMobile"
-                    className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-xl -z-10 shadow-sm"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-                Events
-              </>
-            )}
-          </NavLink>
-
-          <NavLink to="/showcase" onClick={closeMenu} className={mobileLinkClass}>
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <motion.span
-                    layoutId="activeNavBackgroundMobile"
-                    className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-xl -z-10 shadow-sm"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-                Showcase
-              </>
-            )}
-          </NavLink>
-
-          <NavLink to="/open-source" onClick={closeMenu} className={mobileLinkClass}>
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <motion.span
-                    layoutId="activeNavBackgroundMobile"
-                    className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-xl -z-10 shadow-sm"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-                Open Source
-              </>
-            )}
-          </NavLink>
-
-          <NavLink to="/learn" onClick={closeMenu} className={mobileLinkClass}>
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <motion.span
-                    layoutId="activeNavBackgroundMobile"
-                    className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-xl -z-10 shadow-sm"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-                Learn
-              </>
-            )}
-          </NavLink>
-
-          <NavLink to="/ideas" onClick={closeMenu} className={mobileLinkClass}>
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <motion.span
-                    layoutId="activeNavBackgroundMobile"
-                    className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-xl -z-10 shadow-sm"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-                <div className="relative flex items-center gap-2">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
-                  </span>
-                  <i className="fas fa-lightbulb"></i> Ideas
-                </div>
-              </>
-            )}
-          </NavLink>
-
-          <hr className="border-gray-100 my-2" />
-
-          {user ? (
-            <>
-              <NavLink to="/profile" onClick={closeMenu} className={mobileLinkClass}>
+          <div className="px-1 pb-2 pt-1">
+            <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+              Navigate
+            </div>
+            <div className="grid gap-1.5">
+              <NavLink to="/" onClick={closeMenu} className={mobileLinkClass}>
                 {({ isActive }) => (
                   <>
                     {isActive && (
                       <motion.span
                         layoutId="activeNavBackgroundMobile"
-                        className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-xl -z-10 shadow-sm"
+                        className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-2xl -z-10 shadow-sm"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
-                    <i className="fas fa-user-circle text-lg"></i>
-                    <span>{user.name || "Profile"}</span>
+                    Home
                   </>
                 )}
               </NavLink>
-              <button
-                onClick={() => { signOut(); closeMenu(); }}
-                className="hover:text-red-600 hover:bg-red-50/50 px-4 py-2.5 rounded-xl transition-all duration-                                                                                                                                                    700 cursor-pointer text-gray-600 font-semibold text-left w-full flex items-center gap-2"
-              >
-                <i className="fas fa-sign-out-alt"></i> Logout
-              </button>
-            </>
-          ) : (
-            <NavLink
-              to="/login"
-              onClick={closeMenu}
-              className={({ isActive }) =>
-                `relative px-4 py-2.5 rounded-xl font-bold flex items-center justify-center transition-all duration-700 z-10 ${
-                  isActive
-                    ? "text-red-750"
-                    : "bg-gradient-to-r from-red-600 to-red-800 text-white hover:from-red-700 hover:to-orange-700 shadow-sm hover:scale-[1.02]"
-                }`
-              }
-            >
-              {({ isActive }) => (
+
+              <NavLink to="/events" onClick={closeMenu} className={mobileLinkClass}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeNavBackgroundMobile"
+                        className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-2xl -z-10 shadow-sm"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    Events
+                  </>
+                )}
+              </NavLink>
+
+              <NavLink to="/showcase" onClick={closeMenu} className={mobileLinkClass}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeNavBackgroundMobile"
+                        className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-2xl -z-10 shadow-sm"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    Showcase
+                  </>
+                )}
+              </NavLink>
+
+              <NavLink to="/open-source" onClick={closeMenu} className={mobileLinkClass}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeNavBackgroundMobile"
+                        className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-2xl -z-10 shadow-sm"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    Open Source
+                  </>
+                )}
+              </NavLink>
+
+              <NavLink to="/learn" onClick={closeMenu} className={mobileLinkClass}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeNavBackgroundMobile"
+                        className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-2xl -z-10 shadow-sm"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    Learn
+                  </>
+                )}
+              </NavLink>
+
+              <NavLink to="/ideas" onClick={closeMenu} className={mobileLinkClass}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeNavBackgroundMobile"
+                        className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-2xl -z-10 shadow-sm"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <div className="relative flex items-center gap-2.5">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                      </span>
+                      <i className="fas fa-lightbulb"></i> Ideas
+                    </div>
+                  </>
+                )}
+              </NavLink>
+            </div>
+
+            <div className="mt-3 border-t border-gray-100 pt-3 grid gap-1.5">
+              <div className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+                Account
+              </div>
+
+              {user ? (
                 <>
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeNavBackgroundMobile"
-                      className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-xl -z-10 shadow-sm"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                  Login
+                  <NavLink to="/profile" onClick={closeMenu} className={mobileLinkClass}>
+                    {({ isActive }) => (
+                      <>
+                        {isActive && (
+                          <motion.span
+                            layoutId="activeNavBackgroundMobile"
+                            className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-2xl -z-10 shadow-sm"
+                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                          />
+                        )}
+                        <i className="fas fa-user-circle text-lg"></i>
+                        <span className="truncate">{user.name || "Profile"}</span>
+                      </>
+                    )}
+                  </NavLink>
+                  <button
+                    onClick={() => { signOut(); closeMenu(); }}
+                    className="w-full hover:text-red-600 hover:bg-red-50/50 px-4 py-3 rounded-2xl transition-all duration-300 cursor-pointer text-gray-600 font-semibold text-left flex items-center gap-3"
+                  >
+                    <i className="fas fa-sign-out-alt"></i> Logout
+                  </button>
                 </>
+              ) : (
+                <NavLink
+                  to="/login"
+                  onClick={closeMenu}
+                  className={({ isActive }) =>
+                    `relative w-full px-4 py-3 rounded-2xl font-bold flex items-center justify-center transition-all duration-700 z-10 ${
+                      isActive
+                        ? "text-red-750"
+                        : "bg-gradient-to-r from-red-600 to-red-800 text-white hover:from-red-700 hover:to-orange-700 shadow-sm hover:scale-[1.01]"
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeNavBackgroundMobile"
+                          className="absolute inset-0 bg-gradient-to-r from-red-50/90 to-orange-50/90 border border-red-100/50 rounded-2xl -z-10 shadow-sm"
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                        />
+                      )}
+                      Login
+                    </>
+                  )}
+                </NavLink>
               )}
-            </NavLink>
-          )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
