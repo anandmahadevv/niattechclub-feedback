@@ -40,6 +40,7 @@ const NotFound = safeLazy(() => import("./pages/NotFound"));
 function AppContent() {
   const location = useLocation();
   const isAuthOrAdminRoute = location.pathname.startsWith('/nigga') || location.pathname === '/login';
+  const publicContentOffset = isAuthOrAdminRoute ? '' : 'pt-28 md:pt-32';
   
   return (
     <div className={`flex flex-col min-h-screen font-sans antialiased ${isAuthOrAdminRoute ? 'bg-gray-100 dark:bg-slate-950' : 'bg-gradient-to-b from-white via-gray-50 to-gray-100 text-gray-900'}`}>
@@ -56,19 +57,21 @@ function AppContent() {
       {/* Dynamic Route Content with Transitions */}
       <Suspense fallback={<PageLoader />}>
         <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-            <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
-            <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
-            <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
-            <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
-            <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-            <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
-            <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
-            <Route path="/nigga" element={<PageWrapper><Admin /></PageWrapper>} />
-            {/* Catch-all route to redirect to home */}
-            <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
-          </Routes>
+          <div className={`flex-1 w-full ${publicContentOffset}`}>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+              <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
+              <Route path="/showcase" element={<PageWrapper><Showcase /></PageWrapper>} />
+              <Route path="/ideas" element={<PageWrapper><Ideas /></PageWrapper>} />
+              <Route path="/open-source" element={<PageWrapper><OpenSource /></PageWrapper>} />
+              <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+              <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+              <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
+              <Route path="/nigga" element={<PageWrapper><Admin /></PageWrapper>} />
+              {/* Catch-all route to redirect to home */}
+              <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
+            </Routes>
+          </div>
         </AnimatePresence>
       </Suspense>
 
