@@ -325,7 +325,14 @@ export default function Login() {
             body: JSON.stringify({ email: formData.email, password: formData.password }),
           });
           const result = await response.json();
-          if (!response.ok) throw new Error(result.error || "Failed to verify credentials.");
+          if (!response.ok) {
+            // Show both email and password as wrong for security
+            setErrors({ email: "Invalid credentials", password: "Invalid credentials" });
+            toast.dismiss(toastId);
+            toast.error("Invalid email or password.", { id: toastId });
+            setLoading(false);
+            return;
+          }
           setLoginStep('otp');
           toast.success("Verification code sent! Check your email inbox.", { id: toastId });
         } else {
