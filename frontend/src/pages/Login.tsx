@@ -324,7 +324,7 @@ export default function Login() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: formData.email, password: formData.password }),
           });
-          const result = await response.json();
+          await response.json();
           if (!response.ok) {
             // Show both email and password as wrong for security
             setErrors({ email: "Invalid credentials", password: "Invalid credentials" });
