@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import { AuthProvider } from "./components/AuthContext";
 import { UpgradeBannerDemo } from "@/components/UpgradeBannerDemo";
 import PageLoader from "./components/PageLoader";
+import { APP_VERSION } from "./version";
 
 // Helper to retry dynamic imports when they fail (e.g. due to new deployments)
 function safeLazy<T>(importFn: () => Promise<{ default: React.ComponentType<T> }>) {
@@ -77,6 +78,11 @@ function AppContent() {
 
       {/* Footer */}
       {!isAuthOrAdminRoute && <Footer />}
+
+      {/* Version Display in a rare place */}
+      <div className="fixed bottom-1 right-2 text-[10px] text-gray-400 opacity-30 z-50 pointer-events-none font-mono">
+        {APP_VERSION}
+      </div>
     </div>
   );
 }
