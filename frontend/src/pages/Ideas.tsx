@@ -15,6 +15,7 @@ export default function Ideas() {
     tech_support: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -79,6 +80,7 @@ export default function Ideas() {
         toast.success("Idea submitted successfully! We will review it shortly.", {
           id: toastId,
         });
+        setIsSubmitted(true);
         resetForm();
       } else {
         toast.error("Failed to submit idea. Please try again.", {
@@ -93,6 +95,50 @@ export default function Ideas() {
       setIsSubmitting(false);
     }
   };
+
+  if (isSubmitted) {
+    return (
+      <div className="flex-grow w-full flex flex-col pb-12 bg-white dark:bg-zinc-950">
+        {/* Header Section */}
+        <header className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center w-full">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-4">Event Ideas</h1>
+          <p className="text-lg text-gray-500 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+            Thank you for sharing your vision and ideas for upcoming events!
+          </p>
+        </header>
+
+        {/* Success Card Container */}
+        <div className="flex-grow flex items-start justify-center px-4 w-full">
+          <div className="w-full max-w-3xl p-8 md:p-12 text-center bg-white/75 dark:bg-zinc-900/60 backdrop-blur-xl border border-gray-200/55 dark:border-zinc-800/60 shadow-2xl rounded-3xl animate-in fade-in zoom-in-95 duration-300">
+            <div className="w-20 h-20 bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-sm border border-green-150 dark:border-green-900/50">
+              <i className="fas fa-check-circle animate-bounce"></i>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-4">Idea Uploaded Successfully!</h2>
+            <p className="text-base text-gray-600 dark:text-zinc-400 max-w-md mx-auto mb-8 leading-relaxed font-medium">
+              Your idea has been securely uploaded to our database. We appreciate your feedback and will review it shortly.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => {
+                  setIsSubmitted(false);
+                  resetForm();
+                }}
+                className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <i className="fas fa-plus"></i> Submit Another Idea
+              </button>
+              <button
+                onClick={() => navigate("/")}
+                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-800 dark:text-zinc-200 font-semibold rounded-xl transition-all border border-gray-200 dark:border-zinc-700 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <i className="fas fa-home"></i> Go to Homepage
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-grow w-full flex flex-col pb-12 bg-white">

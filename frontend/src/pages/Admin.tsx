@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import { Link } from "react-router-dom";
 import { useAdminData } from "../hooks/useAdminData";
 import { useAuth } from "../components/AuthContext";
@@ -492,6 +492,11 @@ function EventsTab() {
 
 function IdeasTab() {
   const { ideas, deleteIdea } = useAdminData();
+  const [expandedIdeas, setExpandedIdeas] = useState<Record<number, boolean>>({});
+
+  const toggleExpand = (id: number) => {
+    setExpandedIdeas((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -503,34 +508,69 @@ function IdeasTab() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm">
+              <th className="p-4 font-semibold w-10"></th>
               <th className="p-4 font-semibold">Submitted By</th>
               <th className="p-4 font-semibold">Category</th>
-              <th className="p-4 font-semibold">Idea</th>
+              <th className="p-4 font-semibold">Idea Preview</th>
               <th className="p-4 font-semibold">Needs Tech</th>
               <th className="p-4 font-semibold text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {ideas.map((idea) => (
-              <tr key={idea.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="p-4 font-semibold text-gray-900">
-                  {idea.name}
-                  <div className="text-xs text-gray-400 font-normal">{idea.date}</div>
-                </td>
-                <td className="p-4 text-gray-600">
-                  <span className="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 text-xs font-semibold">{idea.category}</span>
-                </td>
-                <td className="p-4 text-gray-700 max-w-xs truncate">{idea.idea}</td>
-                <td className="p-4 text-gray-600">{idea.tech}</td>
-                <td className="p-4 text-right space-x-2">
-                  <button className="text-gray-400 hover:text-green-600 transition-colors" title="Approve"><i className="fas fa-check"></i></button>
-                  <button onClick={() => deleteIdea(idea.id)} className="text-gray-400 hover:text-red-600 transition-colors" title="Delete"><i className="fas fa-times"></i></button>
-                </td>
-              </tr>
-            ))}
+            {ideas.map((idea) => {
+              const isExpanded = !!expandedIdeas[idea.id];
+              return (
+                <Fragment key={idea.id}>
+                  <tr 
+                    onClick={() => toggleExpand(idea.id)} 
+                    className="hover:bg-gray-50/50 transition-colors cursor-pointer"
+                  >
+                    <td className="p-4 text-center text-gray-400">
+                      <i className={`fas ${isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'} transition-transform duration-200`}></i>
+                    </td>
+                    <td className="p-4 font-semibold text-gray-900">
+                      {idea.name}
+                      <div className="text-xs text-gray-400 font-normal">{idea.date}</div>
+                    </td>
+                    <td className="p-4 text-gray-600">
+                      <span className="px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 text-xs font-semibold">{idea.category}</span>
+                    </td>
+                    <td className="p-4 text-gray-700 max-w-xs truncate">
+                      {idea.idea}
+                    </td>
+                    <td className="p-4 text-gray-600">{idea.tech}</td>
+                    <td className="p-4 text-right space-x-2" onClick={(e) => e.stopPropagation()}>
+                      <button className="text-gray-400 hover:text-green-600 transition-colors" title="Approve"><i className="fas fa-check"></i></button>
+                      <button onClick={() => deleteIdea(idea.id)} className="text-gray-400 hover:text-red-600 transition-colors" title="Delete"><i className="fas fa-times"></i></button>
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr className="bg-gray-50/30">
+                      <td colSpan={6} className="p-4 text-gray-700 border-t border-gray-100">
+                        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-150 shadow-inner">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <h4 className="font-bold text-gray-800 text-sm mb-0.5">Detailed Idea Description</h4>
+                              <p className="text-xs text-gray-400">Submitted by {idea.name} on {idea.date}</p>
+                            </div>
+                            <span className="px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 text-xs font-semibold uppercase tracking-wider">{idea.category}</span>
+                          </div>
+                          <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">{idea.idea}</p>
+                          <div className="mt-4 flex gap-4 text-xs text-gray-500">
+                            <div>
+                              <span className="font-semibold text-gray-700">Needs Tech Support:</span> {idea.tech === "yes" ? "Yes" : "No"}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
             {ideas.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-8 text-center text-gray-500">No ideas submitted yet.</td>
+                <td colSpan={6} className="p-8 text-center text-gray-500">No ideas submitted yet.</td>
               </tr>
             )}
           </tbody>
