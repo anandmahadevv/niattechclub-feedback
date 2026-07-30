@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAdminData } from "../hooks/useAdminData";
@@ -16,6 +16,12 @@ export default function Ideas() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (isSubmitted) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [isSubmitted]);
   
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -280,6 +286,12 @@ export default function Ideas() {
                 placeholder="Describe your idea in detail (supports up to 4,000 words)..."
                 maxLength={25000}
               ></textarea>
+              <div className="w-full bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-red-500 to-indigo-600 h-full transition-all duration-300 rounded-full"
+                  style={{ width: `${Math.min((formData.idea.length / 25000) * 100, 100)}%` }}
+                ></div>
+              </div>
             </div>
 
             {/* Technical Support */}

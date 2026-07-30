@@ -8,6 +8,7 @@ const MESSAGES: Record<string, string> = {
   "/events": "Syncing",
   "/showcase": "Creating",
   "/ideas": "Planning",
+  "/admin": "Securing",
   "/nigga": "Securing",
 };
 

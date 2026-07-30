@@ -493,17 +493,78 @@ function EventsTab() {
 function IdeasTab() {
   const { ideas, deleteIdea } = useAdminData();
   const [expandedIdeas, setExpandedIdeas] = useState<Record<number, boolean>>({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [copiedId, setCopiedId] = useState<number | null>(null);
 
   const toggleExpand = (id: number) => {
     setExpandedIdeas((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const handleCopy = (id: number, text: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const filteredIdeas = ideas.filter((idea) => {
+    const matchesSearch =
+      idea.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      idea.idea.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      idea.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || idea.category.toLowerCase() === selectedCategory.toLowerCase();
+    return matchesSearch && matchesCategory;
+  });
+
+  const categories = Array.from(new Set(ideas.map((i) => i.category))).filter(Boolean);
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Submitted Ideas</h1>
-        <button onClick={() => exportCSV(ideas, "ideas")} className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-2"><i className="fas fa-download"></i> Export CSV</button>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Submitted Ideas</h1>
+          <p className="text-sm text-gray-500 mt-1">Review, expand, and manage user event suggestions ({filteredIdeas.length} total)</p>
+        </div>
+        <button onClick={() => exportCSV(ideas, "ideas")} className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-2 self-start md:self-auto bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl transition-colors">
+          <i className="fas fa-download"></i> Export CSV
+        </button>
       </div>
+
+      {/* Filter and Search Bar */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="sm:col-span-2 relative">
+          <input
+            type="text"
+            placeholder="Search by name, category, or idea text..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm"
+          />
+          <i className="fas fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
+          {searchTerm && (
+            <button onClick={() => setSearchTerm("")} className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 text-xs">
+              <i className="fas fa-times"></i>
+            </button>
+          )}
+        </div>
+        <div className="relative">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm appearance-none cursor-pointer"
+          >
+            <option value="all">All Categories</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+          <i className="fas fa-chevron-down absolute right-3.5 top-3.5 text-gray-400 text-xs pointer-events-none"></i>
+        </div>
+      </div>
+
       <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -517,16 +578,16 @@ function IdeasTab() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {ideas.map((idea) => {
+            {filteredIdeas.map((idea) => {
               const isExpanded = !!expandedIdeas[idea.id];
               return (
                 <Fragment key={idea.id}>
                   <tr 
                     onClick={() => toggleExpand(idea.id)} 
-                    className="hover:bg-gray-50/50 transition-colors cursor-pointer"
+                    className={`transition-colors cursor-pointer ${isExpanded ? 'bg-blue-50/30' : 'hover:bg-gray-50/60'}`}
                   >
                     <td className="p-4 text-center text-gray-400">
-                      <i className={`fas ${isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'} transition-transform duration-200`}></i>
+                      <i className={`fas ${isExpanded ? 'fa-chevron-down text-blue-600' : 'fa-chevron-right'} transition-transform duration-200`}></i>
                     </td>
                     <td className="p-4 font-semibold text-gray-900">
                       {idea.name}
@@ -538,27 +599,44 @@ function IdeasTab() {
                     <td className="p-4 text-gray-700 max-w-xs truncate">
                       {idea.idea}
                     </td>
-                    <td className="p-4 text-gray-600">{idea.tech}</td>
+                    <td className="p-4 text-gray-600">
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${idea.tech === "yes" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-gray-100 text-gray-600"}`}>
+                        {idea.tech === "yes" ? "Yes" : "No"}
+                      </span>
+                    </td>
                     <td className="p-4 text-right space-x-2" onClick={(e) => e.stopPropagation()}>
-                      <button className="text-gray-400 hover:text-green-600 transition-colors" title="Approve"><i className="fas fa-check"></i></button>
-                      <button onClick={() => deleteIdea(idea.id)} className="text-gray-400 hover:text-red-600 transition-colors" title="Delete"><i className="fas fa-times"></i></button>
+                      <button className="text-gray-400 hover:text-green-600 transition-colors p-1" title="Approve"><i className="fas fa-check"></i></button>
+                      <button onClick={() => deleteIdea(idea.id)} className="text-gray-400 hover:text-red-600 transition-colors p-1" title="Delete"><i className="fas fa-times"></i></button>
                     </td>
                   </tr>
                   {isExpanded && (
-                    <tr className="bg-gray-50/30">
+                    <tr className="bg-slate-50/50">
                       <td colSpan={6} className="p-4 text-gray-700 border-t border-gray-100">
-                        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-150 shadow-inner">
-                          <div className="flex justify-between items-start mb-3">
+                        <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-sm">
+                          <div className="flex justify-between items-start mb-3 gap-2">
                             <div>
                               <h4 className="font-bold text-gray-800 text-sm mb-0.5">Detailed Idea Description</h4>
                               <p className="text-xs text-gray-400">Submitted by {idea.name} on {idea.date}</p>
                             </div>
-                            <span className="px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 text-xs font-semibold uppercase tracking-wider">{idea.category}</span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => handleCopy(idea.id, idea.idea, e)}
+                                className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+                                title="Copy idea text to clipboard"
+                              >
+                                <i className={`fas ${copiedId === idea.id ? 'fa-check text-green-600' : 'fa-copy'}`}></i>
+                                {copiedId === idea.id ? "Copied!" : "Copy Text"}
+                              </button>
+                              <span className="px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 text-xs font-semibold uppercase tracking-wider">{idea.category}</span>
+                            </div>
                           </div>
-                          <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">{idea.idea}</p>
-                          <div className="mt-4 flex gap-4 text-xs text-gray-500">
+                          <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700 bg-gray-50/60 p-4 rounded-xl border border-gray-100 shadow-inner max-h-96 overflow-y-auto">{idea.idea}</p>
+                          <div className="mt-4 flex gap-4 text-xs text-gray-500 items-center justify-between">
                             <div>
                               <span className="font-semibold text-gray-700">Needs Tech Support:</span> {idea.tech === "yes" ? "Yes" : "No"}
+                            </div>
+                            <div className="text-gray-400">
+                              Length: {idea.idea.length} characters ({idea.idea.trim().split(/\s+/).length} words)
                             </div>
                           </div>
                         </div>
@@ -568,9 +646,11 @@ function IdeasTab() {
                 </Fragment>
               );
             })}
-            {ideas.length === 0 && (
+            {filteredIdeas.length === 0 && (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-gray-500">No ideas submitted yet.</td>
+                <td colSpan={6} className="p-8 text-center text-gray-500">
+                  {ideas.length === 0 ? "No ideas submitted yet." : "No ideas match your search criteria."}
+                </td>
               </tr>
             )}
           </tbody>

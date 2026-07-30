@@ -40,7 +40,7 @@ const NotFound = safeLazy(() => import("./pages/NotFound"));
 
 function AppContent() {
   const location = useLocation();
-  const isAuthOrAdminRoute = location.pathname.startsWith('/nigga') || location.pathname === '/login';
+  const isAuthOrAdminRoute = location.pathname.startsWith('/nigga') || location.pathname.startsWith('/admin') || location.pathname === '/login';
   const publicContentOffset = isAuthOrAdminRoute ? '' : 'pt-28 md:pt-32';
   
   return (
@@ -68,6 +68,7 @@ function AppContent() {
               <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
               <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
               <Route path="/learn" element={<PageWrapper><Learn /></PageWrapper>} />
+              <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
               <Route path="/nigga" element={<PageWrapper><Admin /></PageWrapper>} />
               {/* Catch-all route to redirect to home */}
               <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
