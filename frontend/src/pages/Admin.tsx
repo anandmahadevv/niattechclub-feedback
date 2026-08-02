@@ -785,6 +785,10 @@ function CommunicationsTab() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ audience, subject, html, customEmails })
       });
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error(`Server returned invalid response format (${res.status}).`);
+      }
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to send email");
       setStatus({ loading: false, error: "", success: data.message });
