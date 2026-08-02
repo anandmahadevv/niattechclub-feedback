@@ -1,19 +1,31 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { name, email } = req.body;
-
-  if (!email || !name) {
-    return res.status(400).json({ error: 'Name and email are required' });
-  }
-
   try {
+    const { name, email } = req.body || {};
+
+    if (!email || !name) {
+      return res.status(400).json({ error: 'Name and email are required' });
+    }
+
+    const resendKey = process.env.RESEND_API_KEY || process.env.RESEND_API_KEY_EVENTS || process.env.RESEND_API_KEY_MAIN;
+    if (!resendKey) {
+      return res.status(500).json({ error: 'Email service configuration missing' });
+    }
+
+    const resend = new Resend(resendKey);
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=promptwars:${encodeURIComponent(email)}`;
     
     const html = `
@@ -39,9 +51,9 @@ export default async function handler(req, res) {
       html: html
     });
 
-    res.status(200).json({ message: 'Email sent successfully', data });
+    return res.status(200).json({ message: 'Email sent successfully', data });
   } catch (error) {
     console.error('Error sending email:', error);
-    res.status(500).json({ error: 'Failed to send email' });
+    return res.status(500).json({ error: error.message || 'Failed to send email' });
   }
 }
