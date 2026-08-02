@@ -151,6 +151,50 @@ app.post(['/api/verify-otp', '/verify-otp'], async (req, res) => {
   }
 });
 
+app.post(['/api/verify-reset-otp', '/verify-reset-otp'], async (req, res) => {
+  const { email, otp, newPassword } = req.body || {};
+
+  if (!email || !otp || !newPassword) {
+    return res.status(400).json({ error: 'Email, OTP, and new password are required' });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+
+  try {
+    const cleanEmail = email.toLowerCase().trim();
+    const { data: isValid, error: verifyError } = await supabase.rpc('verify_otp', {
+      email_input: cleanEmail,
+      otp_input: otp.trim()
+    });
+
+    if (verifyError) {
+      console.error('Error verifying OTP:', verifyError);
+      return res.status(500).json({ error: 'Failed to verify OTP' });
+    }
+
+    if (!isValid) {
+      return res.status(400).json({ error: 'Invalid or expired reset code. Please request a new one.' });
+    }
+
+    const { error: resetError } = await supabase.rpc('reset_user_password', {
+      user_email: cleanEmail,
+      new_password: newPassword
+    });
+
+    if (resetError) {
+      console.error('Password reset error:', resetError);
+      return res.status(500).json({ error: 'Failed to reset password' });
+    }
+
+    return res.status(200).json({ message: 'Password reset successfully' });
+  } catch (err) {
+    console.error('Unexpected error during password reset:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.post(['/api/login-step1', '/login-step1'], async (req, res) => {
   const { email, password } = req.body;
 
