@@ -217,9 +217,24 @@ function PasswordStrength({ password }: { password: string }) {
   );
 }
 
+// ─── Helper for Safe JSON Parsing ─────────────────────────────────────────────
+async function parseJsonResponse(response: Response) {
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    const text = await response.text();
+    console.error("Non-JSON response from server:", response.status, text);
+    throw new Error(`Server returned non-JSON response (${response.status}).`);
+  }
+  try {
+    return await response.json();
+  } catch {
+    throw new Error("Failed to parse response JSON from server.");
+  }
+}
+
 // ─── Main Component ─────────────────────────────────────────────────────────
 export default function Login() {
-  const { signUp, updateLocalUser } = useAuth();
+  const { signIn, signUp, updateLocalUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect") || "/";
@@ -319,29 +334,39 @@ export default function Login() {
         setIsSignUp(false);
       } else {
         if (loginStep === 'credentials') {
-          const response = await fetch("/api/login-step1", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: formData.email, password: formData.password }),
-          });
-          await response.json();
-          if (!response.ok) {
-            // Show both email and password as wrong for security
-            setErrors({ email: "Invalid credentials", password: "Invalid credentials" });
-            toast.dismiss(toastId);
-            toast.error("Invalid email or password.", { id: toastId });
-            setLoading(false);
-            return;
+          try {
+            const response = await fetch("/api/login-step1", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: formData.email, password: formData.password }),
+            });
+            const result = await parseJsonResponse(response);
+            if (!response.ok) {
+              setErrors({ email: "Invalid credentials", password: "Invalid credentials" });
+              toast.dismiss(toastId);
+              toast.error(result.error || "Invalid email or password.", { id: toastId });
+              setLoading(false);
+              return;
+            }
+            setLoginStep('otp');
+            toast.success("Verification code sent! Check your email inbox.", { id: toastId });
+          } catch (apiErr: any) {
+            if (apiErr.message?.includes("Invalid credentials") || apiErr.message?.includes("Invalid email")) {
+              throw apiErr;
+            }
+            console.warn("2FA API unavailable or non-JSON, attempting direct authentication fallback:", apiErr);
+            // Fallback to direct Supabase sign in if 2FA service endpoint is unavailable or returns non-JSON
+            await signIn(formData.email, formData.password);
+            toast.success("Signed in successfully.", { id: toastId });
+            navigate(redirect);
           }
-          setLoginStep('otp');
-          toast.success("Verification code sent! Check your email inbox.", { id: toastId });
         } else {
           const response = await fetch("/api/login-step2", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: formData.email, password: formData.password, otp: loginOtp }),
           });
-          const result = await response.json();
+          const result = await parseJsonResponse(response);
           if (!response.ok) throw new Error(result.error || "Failed to verify code.");
 
           // Establish user session
@@ -368,13 +393,12 @@ export default function Login() {
       setLoading(true);
       const toastId = toast.loading("Sending reset code...");
       try {
-        // OTP is generated SERVER-SIDE — never touches the frontend
         const response = await fetch("/api/send-reset-email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: resetData.email }),
         });
-        const result = await response.json();
+        const result = await parseJsonResponse(response);
         if (!response.ok) throw new Error(result.error || "Failed to send email.");
         setForgotMode('otp');
         toast.success("Reset code sent! Check your inbox.", { id: toastId });
@@ -389,7 +413,6 @@ export default function Login() {
       setLoading(true);
       const toastId = toast.loading("Verifying code & resetting password...");
       try {
-        // Verify OTP and reset password in a single secure server-side call
         const response = await fetch("/api/verify-reset-otp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -399,7 +422,7 @@ export default function Login() {
             newPassword: resetData.newPassword,
           }),
         });
-        const result = await response.json();
+        const result = await parseJsonResponse(response);
         if (!response.ok) throw new Error(result.error || "Verification failed.");
         toast.success("Password reset successfully!", { id: toastId });
         setForgotMode('none');

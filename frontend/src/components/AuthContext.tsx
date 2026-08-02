@@ -81,7 +81,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               localStorage.removeItem("auth_login_time");
               setUser(null);
             } else {
-              setUser(JSON.parse(storedUser));
+              try {
+                setUser(JSON.parse(storedUser));
+              } catch {
+                localStorage.removeItem("auth_user");
+                setUser(null);
+              }
             }
           }
         }
